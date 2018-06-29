@@ -42,7 +42,7 @@ export default class AsignarTareaComponent extends Component {
         }
         tareaService.actualizarTarea(this.state.tarea)
             .then(() => this.volver())
-            .catch((e) => console.log("Fallo", e))
+            .catch((e) => this.generarError("Error en la actualización de la tarea: " + e))
     }
 
     cambiarEstado(closureChange) {
