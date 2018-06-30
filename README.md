@@ -1,5 +1,7 @@
 # Tareas de un equipo de desarrollo
 
+[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-react.svg?branch=master)](https://travis-ci.org/uqbar-project/eg-tareas-react)
+
 ![video](video/demo2.gif)
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
