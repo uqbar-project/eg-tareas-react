@@ -1,6 +1,6 @@
 # Tareas de un equipo de desarrollo
 
-![video](video/demo.gif)
+![video](video/demo2.gif)
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 
@@ -39,14 +39,18 @@ Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente 
 >>>TareasComponent
 constructor(props) {
     super(props)
-    tareaService.allInstances()
-        .then((res) => res.json())
-        .then((tareasJson) => {
-            this.setState({
-                tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
-            })
+    this.tareaService = new TareaService()
+}
+
+componentWillMount() {
+    this.tareaService.allInstances()
+    .then((res) => res.json())
+    .then((tareasJson) => {
+        this.setState({
+            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
         })
-        .catch(this.errorHandler)
+    })
+    .catch(this.errorHandler)
 }
 ```
 
@@ -69,7 +73,7 @@ En ese evento se delega a cumplir de Tarea y se pide al service que actualice el
 >>>TareaRow
 cumplirTarea(tarea) {
     tarea.cumplir()
-    tareaService.actualizarTarea(tarea).then(
+    this.props.tareaService.actualizarTarea(tarea).then(
         () => this.setState({
             tarea: tarea
         })
@@ -154,7 +158,7 @@ Para entender cómo funciona la asignación, el combo dispara el evento de cambi
 El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el identificador, pero lamentablemente el servicio REST solo nos da el nombre), entonces delegamos a un método más general que actualiza el estado de la tarea:
 
 ```javascript
->>>TareasComponent
+>>>AsignarTareaComponent
 asignar(asignatario) {
     this.cambiarEstado((tarea) => tarea.asignarA(asignatario))
 }
@@ -175,7 +179,7 @@ Al actualizar el estado se dispara el render que refleja el nuevo valor para el 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
 ```javascript
->>>TareasComponent
+>>>AsignarTareaComponent
 asignarTarea() {
     if (this.state.tarea.nombreAsignatario().trim() === "") {
         this.generarError("Debe asignar la tarea a una persona")
@@ -191,4 +195,107 @@ Cosas para mejorar a futuro: podríamos delegar la validación en la tarea direc
 
 # Testing
 
-TODO
+Los últimos tests son básicos, validan que para el componente TareaRow al que le pasamos una tarea
+
+- si está asignada nos aparece el botón que permite marcarla como cumplida
+- si no está asignada no aparece dicho botón
+
+```javascript
+it('una tarea asignada puede cumplirse', () => {
+  const tareaConstruirTest = shallow(<TareaRow tarea={construirTest} />)
+  expect(tareaConstruirTest.find("#cumplir_159")).toBeTruthy()
+})
+it('una tarea sin asignar no puede cumplirse', () => {
+  const construirTest_sinAsignar = construirTest
+  construirTest_sinAsignar.desasignar()
+  const tareaConstruirTest = shallow(<TareaRow tarea={construirTest_sinAsignar} />)
+  expect(tareaConstruirTest.find("#cumplir_159").exists()).toBeFalsy()
+})
+```
+
+Podrían aparecer más tests a futuro (como presionar el botón cumplir y ver que la tarea queda al 100%), lo dejamos a criterio del lector.
+
+## Mockear el servicio
+
+La parte más interesante de los tests es cómo hacemos para interceptar las llamadas **fetch** que disparan las llamadas hacia el server. Para lograr esto, primero construimos una lista de tareas con ids específicos en el test (_App.test.js_):
+
+```javascript
+function crearTarea(id, descripcion, porcentaje, asignado) {
+  const result = new Tarea()
+  result.id = id
+  result.descripcion = descripcion
+  result.porcentaje = porcentaje
+  result.asignatario = new Usuario(asignado)
+  return result
+}
+
+const construirTest = crearTarea(159, "Construir test TODO List", 0, "Marcos Rojo")
+
+const mockTareas = 
+  [
+    crearTarea(68, "Desarrollar TODO List en React", 75, "Paula Paretto"),
+    construirTest
+  ]
+```
+
+Luego definimos una función que devuelve un _response mockeado_, que simula la respuesta del server, con el status http y una lista de tareas que le pasamos como parámetro: 
+
+```javascript
+const mockResponse = (status, statusText, response) => {
+  return new window.Response(JSON.stringify(response), {
+    status: status,
+    statusText: statusText,
+    headers: {
+      'Accept': 'application/json',
+      'Content-type': 'application/json'
+    }
+  })
+}
+```
+
+Para evitar un inconveniente debemos escribir un hack (cosas que pasan con frameworks que todavía no alcanzaron su punto de madurez):
+
+```javascript
+// Hack para que no falle el mount del TareasComponent
+// https://github.com/airbnb/enzyme/issues/1626
+if (global.document) {
+  document.createRange = () => ({
+      setStart: () => {},
+      setEnd: () => {},
+      commonAncestorContainer: {
+          nodeName: 'BODY',
+          ownerDocument: document,
+      },
+  })
+}
+// fin hack
+```
+
+Y ahora sí podemos construir una _promise mockeada_, que decora las llamadas asincrónicas al server, pasándole el status http 200 (OK) y la lista de tareas:
+
+```javascript
+// Mock del fetch para devolver las tareas creadas en este test
+const mockPromise = Promise.resolve(mockResponse(200, null, mockTareas))
+window.fetch = jest.fn().mockImplementation(() => mockPromise)
+```
+
+Esto permite que el test que hace un mount del componente Tareas funcione correctamente:
+
+```javascript
+it('lista de tareas', () => {
+  mount(<TareasComponent />)
+})
+```
+
+Lamentablemente no pudimos lograr acceder a los valores que debe renderizar la tabla, en próximas versiones esperemos poder lograrlo, pero si el lector coloca `console.log` en TareasComponent previos al render, verá que recibe correctamente las dos tareas que creamos en el test:
+
+```javascript
+>>>TareasComponent
+    componentWillMount() {
+        this.tareaService.allInstances()
+        .then((res) => res.json())
+        .then((tareasJson) => {
+            console.log("tareas", tareas) // se visualizan las dos tareas del test
+            this.setState({
+```
+

@@ -14,22 +14,23 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import { Tooltip } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
 
-const tareaService = new TareaService()
-
 export class TareasComponent extends Component {
 
     constructor(props) {
         super(props)
-        tareaService.allInstances()
-            .then((res) => res.json())
-            .then((tareasJson) => {
-                this.setState({
-                    tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
-                })
-            })
-            .catch(this.errorHandler)
+        this.tareaService = new TareaService()
     }
 
+    componentWillMount() {
+        this.tareaService.allInstances()
+        .then((res) => res.json())
+        .then((tareasJson) => {
+            this.setState({
+                tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+            })
+        })
+        .catch(this.errorHandler)
+    }
 
     errorHandler(errorMessage) {
         throw errorMessage
@@ -52,8 +53,8 @@ export class TareasComponent extends Component {
                             <TableCell>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
-                        {tareas.map((tarea) => <TareaRow tarea={tarea} key={tarea.id} history={this.props.history} />)}
+                    <TableBody id="resultados">
+                        {tareas.map((tarea) => <TareaRow tarea={tarea} id={"Row" + tarea.id} key={tarea.id} history={this.props.history} tareaService={this.tareaService}/>)}
                     </TableBody>
                 </Table>
             </Paper>
@@ -63,16 +64,15 @@ export class TareasComponent extends Component {
 
 export class TareaRow extends Component {
 
-    constructor(props) {
-        super(props)
-        this.state = {
+    componentWillMount() {
+        this.setState({
             tarea: this.props.tarea
-        }
+        })
     }
 
     cumplirTarea(tarea) {
         tarea.cumplir()
-        tareaService.actualizarTarea(tarea).then(
+        this.props.tareaService.actualizarTarea(tarea).then(
             () => this.setState({
                 tarea: tarea
             })
@@ -85,7 +85,7 @@ export class TareaRow extends Component {
         if (tarea.sePuedeCumplir()) {
             cumplirButton = 
             <Tooltip id="tooltip-fab" title="Cumplir tarea">
-                <IconButton aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
+                <IconButton id={"cumplir_" + tarea.id} aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
                     <CheckCircleIcon />
                 </IconButton>
             </Tooltip>
@@ -101,7 +101,7 @@ export class TareaRow extends Component {
         }
 
         return (
-            <TableRow key={tarea.id}>
+            <TableRow key={tarea.id} id={"TableRow" + tarea.id}>
                 <TableCell component="th" scope="row">
                     {tarea.descripcion}
                 </TableCell>
