@@ -11,10 +11,10 @@ export class TareaService {
     return fetch(REST_SERVER_URL + "/tareas")
   }
 
-  getTareaById(id) {
-    return fetch(REST_SERVER_URL + "/tareas/" + id)
-      .then((res) => res.json())
-      .then(tareaJson => this.tareaAsJson(tareaJson))
+  async getTareaById(id) {
+    const res = await fetch(REST_SERVER_URL + "/tareas/" + id)
+    const tareaJson = await res.json()
+    return this.tareaAsJson(tareaJson)
   }
 
   actualizarTarea(tarea) {

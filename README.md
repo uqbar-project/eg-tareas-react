@@ -58,6 +58,22 @@ componentWillMount() {
 
 Se encadenan las promises mediante la función then, y se atrapa cualquier excepción dentro del catch.
 
+O utilizando la sintaxis async / await esto se transforma en:
+
+```js
+async componentWillMount() {
+    try {
+        const res = await this.tareaService.allInstances()
+        const tareasJson = await res.json()
+        this.setState({
+            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+        })
+    } catch(e) {
+        this.errorHandler(e)
+    }
+}
+```
+
 ## Cumplir una tarea
 
 El componente captura el evento del botón:
@@ -73,13 +89,12 @@ En ese evento se delega a cumplir de Tarea y se pide al service que actualice el
 
 ```javascript
 >>>TareaRow
-cumplirTarea(tarea) {
+async cumplirTarea(tarea) {
     tarea.cumplir()
-    this.props.tareaService.actualizarTarea(tarea).then(
-        () => this.setState({
-            tarea: tarea
-        })
-    )
+    await this.props.tareaService.actualizarTarea(tarea)
+    this.setState({
+        tarea: tarea
+    })
 }
 ```
 
@@ -103,11 +118,13 @@ El botón de asignación dispara la navegación de la ruta '/asignar':
 </IconButton>
 ```
 
-para lo cual recordemos que hay que decorar el componente TareasComponent con el router de React:
+para lo cual hay que decorar el componente TareasComponent con el router de React:
 
 ```javascript
 export default withRouter(TareasComponent)
 ```
+
+Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `this.props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
 
 ## Asignación de tareas
 
@@ -176,24 +193,53 @@ cambiarEstado(closureChange) {
 }
 ```
 
+### Un pequeño párrafo para el spread operator
+
+El lector habrá notado esta línea:
+
+```js
+this.setState({
+    ...this.state,
+```
+
+lo que se conoce como _spread operator_, un _syntactic sugar_ que permite expandir un objeto con sus propiedades sin tener que definir explícitamente sus atributos. En el caso de que el estado tuviera además de la tarea otras 4 referencias (ref1, ref2, ref3, ref4), nos evita hacer
+
+```js
+this.setState({
+    ref1: this.state.ref1,
+    ref2: this.state.ref2,
+    ref3: this.state.ref3,
+    ref4: this.state.ref4,
+    tarea: tarea,
+    ...
+})
+```
+
+Ya que recordemos que el estado es inmutable, solo podemos generar un **nuevo** estado en base al actual.
+
+Para más información pueden consultar [esta página](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Operadores/Spread_operator).
+
+### Continuamos actualizando el estado del componente que asigna una tarea
+
 Al actualizar el estado se dispara el render que refleja el nuevo valor para el combo, y tenemos entonces siempre la tarea actualizada.
 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
 ```javascript
 >>>AsignarTareaComponent
-asignarTarea() {
-    if (this.state.tarea.nombreAsignatario().trim() === "") {
-        this.generarError("Debe asignar la tarea a una persona")
-        return
+async asignarTarea() {
+    try {
+        this.state.tarea.validarAsignacion()
+        await tareaService.actualizarTarea(this.state.tarea)
+        this.volver()
+    } catch (e) {
+        this.generarError(e)
     }
-    tareaService.actualizarTarea(this.state.tarea)
-        .then(() => this.volver())
-        .catch((e) => this.generarError("Error en la actualización de la tarea: " + e))
 }
 ```
 
-Cosas para mejorar a futuro: podríamos delegar la validación en la tarea directamente.
+Se delega la validación en la tarea directamente. Pueden ver la implementación en el código.
+
 
 # Testing
 

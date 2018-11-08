@@ -74,4 +74,15 @@ export class Tarea {
         return result
     }
 
+    validarAsignacion() {
+        if (this.nombreAsignatario().trim() === "") {
+            throw new UserException("Debe asignar la tarea a una persona")
+        }
+    }
+}
+
+class UserException extends Error {
+    toString() {
+        return this.message
+    }
 }

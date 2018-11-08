@@ -21,15 +21,16 @@ export class TareasComponent extends Component {
         this.tareaService = new TareaService()
     }
 
-    componentWillMount() {
-        this.tareaService.allInstances()
-        .then((res) => res.json())
-        .then((tareasJson) => {
+    async componentWillMount() {
+        try {
+            const res = await this.tareaService.allInstances()
+            const tareasJson = await res.json()
             this.setState({
                 tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
             })
-        })
-        .catch(this.errorHandler)
+        } catch(e) {
+            this.errorHandler(e)
+        }
     }
 
     errorHandler(errorMessage) {
@@ -70,13 +71,12 @@ export class TareaRow extends Component {
         })
     }
 
-    cumplirTarea(tarea) {
+    async cumplirTarea(tarea) {
         tarea.cumplir()
-        this.props.tareaService.actualizarTarea(tarea).then(
-            () => this.setState({
-                tarea: tarea
-            })
-        )
+        await this.props.tareaService.actualizarTarea(tarea)
+        this.setState({
+            tarea: tarea
+        })
     }
 
     render() {

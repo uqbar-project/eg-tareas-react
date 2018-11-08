@@ -15,34 +15,36 @@ export default class AsignarTareaComponent extends Component {
             usuarios: [],
             tarea: new Tarea()
         }
-        usuarioService.allInstances().then((response) => response.json()).then((usuarios) => {
+        this.initialize()
+    }
+
+    async initialize() {
+        try {
+            const response = await usuarioService.allInstances()
+            const usuarios = await response.json()
+            const tarea = await tareaService.getTareaById(this.props.match.params.id)
             this.setState({
                 ...this.state,
-                usuarios: usuarios
+                usuarios: usuarios,
+                tarea: tarea
             })
-        })
-        tareaService.getTareaById(this.props.match.params.id)
-            .then((tarea) => {
-                this.setState({
-                    ...this.state,
-                    tarea: tarea
-                })
-            }
-            )
+        } catch (e) {
+            this.generarError(e)
+        }
     }
 
     snackbarOpen() {
-        return (this.state.errorMessage || "").trim() !== ""
+        return this.state.errorMessage !== undefined && this.state.errorMessage !== ''
     }
 
-    asignarTarea() {
-        if (this.state.tarea.nombreAsignatario().trim() === "") {
-            this.generarError("Debe asignar la tarea a una persona")
-            return
+    async asignarTarea() {
+        try {
+            this.state.tarea.validarAsignacion()
+            await tareaService.actualizarTarea(this.state.tarea)
+            this.volver()
+        } catch (e) {
+            this.generarError(e)
         }
-        tareaService.actualizarTarea(this.state.tarea)
-            .then(() => this.volver())
-            .catch((e) => this.generarError("Error en la actualización de la tarea: " + e))
     }
 
     cambiarEstado(closureChange) {
@@ -56,9 +58,11 @@ export default class AsignarTareaComponent extends Component {
     }
 
     generarError(errorMessage) {
+        console.log(errorMessage)
+        console.log("state", this.state)
         this.setState({
             ...this.state,
-            errorMessage: errorMessage
+            errorMessage: errorMessage.toString()
         })
     }
 
