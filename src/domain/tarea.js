@@ -6,7 +6,7 @@ export class Tarea {
         this.descripcion = ""
         this.iteracion = ""
         this.asignatario = USUARIO_NULO
-        this.fecha = new Date()
+        this.fecha = '10/10/2015'
         this.porcentajeCumplimiento = 0
     }
 

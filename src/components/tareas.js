@@ -19,6 +19,7 @@ export class TareasComponent extends Component {
     constructor(props) {
         super(props)
         this.tareaService = new TareaService()
+        this.state = { tareas: [] }
     }
 
     async componentWillMount() {
@@ -38,7 +39,6 @@ export class TareasComponent extends Component {
     }
 
     render() {
-        const tareas = this.state ? this.state.tareas : []
         return (
             <Paper>
                 <br />
@@ -55,7 +55,7 @@ export class TareasComponent extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody id="resultados">
-                        {tareas.map((tarea) => <TareaRow tarea={tarea} id={"Row" + tarea.id} key={tarea.id} history={this.props.history} tareaService={this.tareaService}/>)}
+                        {this.state.tareas.map((tarea) => <TareaRow tarea={tarea} id={"Row" + tarea.id} key={tarea.id} history={this.props.history} tareaService={this.tareaService}/>)}
                     </TableBody>
                 </Table>
             </Paper>
@@ -81,24 +81,20 @@ export class TareaRow extends Component {
 
     render() {
         const tarea = this.state.tarea
-        let cumplirButton = ""
-        if (tarea.sePuedeCumplir()) {
-            cumplirButton = 
+        const cumplirButton =
+            (tarea.sePuedeCumplir()) &&
             <Tooltip id="tooltip-fab" title="Cumplir tarea">
                 <IconButton id={"cumplir_" + tarea.id} aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
                     <CheckCircleIcon />
                 </IconButton>
             </Tooltip>
-        }
-        let asignarButton = ""
-        if (tarea.sePuedeAsignar()) {
-            asignarButton =
+
+        const asignarButton = (tarea.sePuedeAsignar()) &&
             <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
                 <IconButton aria-label="Asignar" onClick={() => this.props.history.push('/asignarTarea/' + tarea.id)}>
                     <AccountBoxIcon />
                 </IconButton>
             </Tooltip>
-        }
 
         return (
             <TableRow key={tarea.id} id={"TableRow" + tarea.id}>

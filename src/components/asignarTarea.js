@@ -24,7 +24,6 @@ export default class AsignarTareaComponent extends Component {
             const usuarios = await response.json()
             const tarea = await tareaService.getTareaById(this.props.match.params.id)
             this.setState({
-                ...this.state,
                 usuarios: usuarios,
                 tarea: tarea
             })
@@ -34,7 +33,7 @@ export default class AsignarTareaComponent extends Component {
     }
 
     snackbarOpen() {
-        return this.state.errorMessage !== undefined && this.state.errorMessage !== ''
+        return this.state.errorMessage
     }
 
     async asignarTarea() {
@@ -51,8 +50,7 @@ export default class AsignarTareaComponent extends Component {
         const tarea = this.state.tarea
         closureChange(tarea)
         this.setState({
-            ...this.state,
-            tarea: tarea,
+            tarea: tarea, // otra opción es tarea a secas
             errorMessage: ""
         })
     }
@@ -61,7 +59,6 @@ export default class AsignarTareaComponent extends Component {
         console.log(errorMessage)
         console.log("state", this.state)
         this.setState({
-            ...this.state,
             errorMessage: errorMessage.toString()
         })
     }
@@ -75,9 +72,7 @@ export default class AsignarTareaComponent extends Component {
     }
 
     volver() {
-        tareaService.allInstances().then((res) => res.json()).then(
-            (tareas) => this.props.history.push('/', { tareas: tareas })
-        )
+        this.props.history.push('/')
     }
 
     render() {
@@ -125,7 +120,7 @@ export default class AsignarTareaComponent extends Component {
                 <Snackbar
                     open={this.snackbarOpen()}
                     message={this.state.errorMessage}
-                    autoHideDuration={5000}
+                    autoHideDuration="4"
                 />
             </Paper>
         )
