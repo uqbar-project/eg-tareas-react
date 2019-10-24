@@ -3,6 +3,7 @@ import { Paper, TextField, Select, MenuItem, FormLabel, Button, Snackbar } from 
 import { TareaService } from '../services/tareaService'
 import { UsuarioService } from '../services/usuarioService'
 import { Tarea } from '../domain/tarea'
+import { PropTypes } from 'prop-types'
 
 const tareaService = new TareaService()
 const usuarioService = new UsuarioService()
@@ -33,7 +34,7 @@ export default class AsignarTareaComponent extends Component {
     }
 
     snackbarOpen() {
-        return this.state.errorMessage
+        return !!this.state.errorMessage
     }
 
     async asignarTarea() {
@@ -50,14 +51,12 @@ export default class AsignarTareaComponent extends Component {
         const tarea = this.state.tarea
         closureChange(tarea)
         this.setState({
-            tarea: tarea, // otra opción es tarea a secas
-            errorMessage: ""
+            tarea,
+            errorMessage: ''
         })
     }
 
     generarError(errorMessage) {
-        console.log(errorMessage)
-        console.log("state", this.state)
         this.setState({
             errorMessage: errorMessage.toString()
         })
@@ -84,7 +83,7 @@ export default class AsignarTareaComponent extends Component {
                 <br />
                 <FormLabel>Descripción</FormLabel>
                 <br /><br />
-                <TextField id="descripcion" value={this.state.tarea.descripcion} onChange={(event) => this.cambiarDescripcion(event.target.value)} />
+                <TextField id="descripcion" value={this.state.tarea.descripcion} onChange={(event) => this.cambiarDescripcion(event.target.value)} fullWidth />
                 <br />
                 <br /><br />
                 <br /><br />
@@ -99,7 +98,7 @@ export default class AsignarTareaComponent extends Component {
                         id: 'asignatario'
                     }}
                 >
-                    >
+                    &gt;
                         <MenuItem value=" ">
                         <em>Sin Asignar</em>
                     </MenuItem>
@@ -120,10 +119,16 @@ export default class AsignarTareaComponent extends Component {
                 <Snackbar
                     open={this.snackbarOpen()}
                     message={this.state.errorMessage}
-                    autoHideDuration="4"
+                    autoHideDuration={4}
                 />
             </Paper>
         )
     }
 
+    static get propTypes() {
+      return {
+        history: PropTypes.object,
+        match: PropTypes.object,
+      }
+    }    
 }

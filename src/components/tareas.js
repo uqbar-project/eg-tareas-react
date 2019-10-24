@@ -13,122 +13,139 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import { Tooltip } from '@material-ui/core'
 import { withRouter } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
 export class TareasComponent extends Component {
 
-    constructor(props) {
-        super(props)
-        this.tareaService = new TareaService()
-        this.state = { tareas: [] }
-    }
+  constructor(props) {
+    super(props)
+    this.tareaService = new TareaService()
+    this.state = { tareas: [] }
+  }
 
-    async componentWillMount() {
-        try {
-            const res = await this.tareaService.allInstances()
-            const tareasJson = await res.json()
-            this.setState({
-                tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
-            })
-        } catch(e) {
-            this.errorHandler(e)
-        }
+  async componentDidMount() {
+    try {
+      const res = await this.tareaService.allInstances()
+      const tareasJson = await res.json()
+      this.setState({
+        tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+      })
+    } catch (e) {
+      this.errorHandler(e)
     }
+  }
 
-    errorHandler(errorMessage) {
-        throw errorMessage
-    }
+  errorHandler(errorMessage) {
+    throw errorMessage
+  }
 
-    render() {
-        return (
-            <Paper>
-                <br />
-                <h1>Tareas a realizar
-                </h1>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Tarea</TableCell>
-                            <TableCell>Fecha</TableCell>
-                            <TableCell>Asignatario</TableCell>
-                            <TableCell>% Cumplimiento</TableCell>
-                            <TableCell>Acciones</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody id="resultados">
-                        {this.state.tareas.map((tarea) => <TareaRow tarea={tarea} id={"Row" + tarea.id} key={tarea.id} history={this.props.history} tareaService={this.tareaService}/>)}
-                    </TableBody>
-                </Table>
-            </Paper>
-        )
+  render() {
+    return (
+      <Paper>
+        <br />
+        <h1>Tareas a realizar</h1>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Tarea</TableCell>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Asignatario</TableCell>
+              <TableCell>% Cumplimiento</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody id="resultados">
+            {this.state.tareas.map((tarea) => <TareaRow tarea={tarea} id={'Row' + tarea.id} key={tarea.id} history={this.props.history} tareaService={this.tareaService} />)}
+          </TableBody>
+        </Table>
+      </Paper>
+    )
+  }
+
+  static get propTypes() {
+    return {
+      history: PropTypes.object
     }
+  }
 }
 
 export class TareaRow extends Component {
+  state = {
+    tarea: this.props.tarea
+  }
 
-    componentWillMount() {
-        this.setState({
-            tarea: this.props.tarea
-        })
+  async cumplirTarea(tarea) {
+    tarea.cumplir()
+    await this.props.tareaService.actualizarTarea(tarea)
+    this.setState({
+      tarea: tarea
+    })
+  }
+
+  render() {
+    const tarea = this.state.tarea
+    const cumplirButton =
+      (tarea.sePuedeCumplir()) &&
+      <Tooltip id="tooltip-fab" title="Cumplir tarea">
+        <IconButton id={'cumplir_' + tarea.id} aria-label="Cumplir" onClick={() => this.cumplirTarea(tarea)}>
+          <CheckCircleIcon />
+        </IconButton>
+      </Tooltip>
+
+    const asignarButton = (tarea.sePuedeAsignar()) &&
+      <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
+        <IconButton aria-label="Asignar" onClick={() => this.props.history.push('/asignarTarea/' + tarea.id)}>
+          <AccountBoxIcon />
+        </IconButton>
+      </Tooltip>
+
+    return (
+      <TableRow key={tarea.id} id={'TableRow' + tarea.id}>
+        <TableCell component="th" scope="row">
+          {tarea.descripcion}
+        </TableCell>
+        <TableCell>{tarea.fecha}</TableCell>
+        <TableCell>{tarea.asignatario ? tarea.asignatario.nombre : ''}</TableCell>
+        <TableCell>
+          <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento || 0} />
+        </TableCell>
+        <TableCell>
+          {cumplirButton}
+          {asignarButton}
+        </TableCell>
+      </TableRow>
+    )
+  }
+
+  static get propTypes() {
+    return {
+      history: PropTypes.object,
+      tarea: PropTypes.object,
+      tareaService: PropTypes.object,
     }
-
-    async cumplirTarea(tarea) {
-        tarea.cumplir()
-        await this.props.tareaService.actualizarTarea(tarea)
-        this.setState({
-            tarea: tarea
-        })
-    }
-
-    render() {
-        const tarea = this.state.tarea
-        const cumplirButton =
-            (tarea.sePuedeCumplir()) &&
-            <Tooltip id="tooltip-fab" title="Cumplir tarea">
-                <IconButton id={"cumplir_" + tarea.id} aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
-                    <CheckCircleIcon />
-                </IconButton>
-            </Tooltip>
-
-        const asignarButton = (tarea.sePuedeAsignar()) &&
-            <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
-                <IconButton aria-label="Asignar" onClick={() => this.props.history.push('/asignarTarea/' + tarea.id)}>
-                    <AccountBoxIcon />
-                </IconButton>
-            </Tooltip>
-
-        return (
-            <TableRow key={tarea.id} id={"TableRow" + tarea.id}>
-                <TableCell component="th" scope="row">
-                    {tarea.descripcion}
-                </TableCell>
-                <TableCell>{tarea.fecha}</TableCell>
-                <TableCell>{tarea.asignatario ? tarea.asignatario.nombre : ''}</TableCell>
-                <TableCell>
-                    <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento || 0} />
-                </TableCell>
-                <TableCell>
-                    {cumplirButton}
-                    {asignarButton}
-                </TableCell>
-            </TableRow>
-        )
-    }
+  }
 }
 
 class PorcentajeCumplimiento extends Component {
 
-    get backgroundColor() {
-        if (this.props.porcentaje > 80) return 'green'
-        if (this.props.porcentaje < 50) return 'darkred'
-        return 'gold'
-    }
+  get backgroundColor() {
+    if (this.props.porcentaje > 80) return 'green'
+    if (this.props.porcentaje < 50) return 'darkred'
+    return 'gold'
+  }
 
-    render() {
-        if (!this.props.porcentaje) return null
-        return (
-            <Avatar style={{ backgroundColor: this.backgroundColor, fontSize: '0.7rem' }}>{this.props.porcentaje || 0}%</Avatar>
-        )
+  render() {
+    if (!this.props.porcentaje) return null
+    return (
+      <Avatar style={{ backgroundColor: this.backgroundColor, fontSize: '0.7rem' }}>{this.props.porcentaje || 0}%</Avatar>
+    )
+  }
+
+  static get propTypes() {
+    return {
+      porcentaje: PropTypes.number
     }
+  }
 }
 
 export default withRouter(TareasComponent)

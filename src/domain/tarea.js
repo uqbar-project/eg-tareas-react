@@ -1,88 +1,87 @@
-import { Usuario, USUARIO_NULO } from "./usuario"
+import { Usuario, USUARIO_NULO } from './usuario'
 
+const PORCENTAJE_CUMPLIDA = 100
 export class Tarea {
-    constructor() {
-        this.id = 0
-        this.descripcion = ""
-        this.iteracion = ""
-        this.asignatario = USUARIO_NULO
-        this.fecha = '10/10/2015'
-        this.porcentajeCumplimiento = 0
-    }
+  constructor() {
+    this.id = 0
+    this.descripcion = ''
+    this.iteracion = ''
+    this.asignatario = USUARIO_NULO
+    this.fecha = '10/10/2015'
+    this.porcentajeCumplimiento = 0
+  }
 
-    contiene(palabra) {
-        return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
-    }
+  contiene(palabra) {
+    return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
+  }
 
-    cumplio(porcentaje) {
-        return this.porcentajeCumplimiento === porcentaje
-    }
+  cumplio(porcentaje) {
+    return this.porcentajeCumplimiento === porcentaje
+  }
 
-    cumplioMenosDe(porcentaje) {
-        return this.porcentajeCumplimiento < porcentaje
-    }
+  cumplioMenosDe(porcentaje) {
+    return this.porcentajeCumplimiento < porcentaje
+  }
 
-    sePuedeCumplir() {
-        return this.porcentajeCumplimiento < 100 && this.estaAsignada()
-    }
+  sePuedeCumplir() {
+    return this.porcentajeCumplimiento < PORCENTAJE_CUMPLIDA && this.estaAsignada()
+  }
 
-    cumplir() {
-        this.porcentajeCumplimiento = 100
-    }
+  cumplir() {
+    this.porcentajeCumplimiento = PORCENTAJE_CUMPLIDA
+  }
 
-    desasignar() {
-        this.asignatario = USUARIO_NULO
-    }
+  desasignar() {
+    this.asignatario = USUARIO_NULO
+  }
 
-    sePuedeDesasignar() {
-        return this.sePuedeCumplir()
-    }
+  sePuedeDesasignar() {
+    return this.sePuedeCumplir()
+  }
 
-    asignarA(asignatario) {
-        this.asignatario = new Usuario(asignatario)
-    }
+  asignarA(asignatario) {
+    this.asignatario = new Usuario(asignatario)
+  }
 
-    sePuedeAsignar() {
-        return !this.estaCumplida()
-    }
+  sePuedeAsignar() {
+    return !this.estaCumplida()
+  }
 
-    estaCumplida() {
-        return this.porcentajeCumplimiento === 100
-    }
+  estaCumplida() {
+    return this.porcentajeCumplimiento === PORCENTAJE_CUMPLIDA
+  }
 
-    estaAsignada() {
-        return !this.asignatario.equals(USUARIO_NULO)
-    }
+  estaAsignada() {
+    return !this.asignatario.equals(USUARIO_NULO)
+  }
 
-    static fromJson(tareaJSON) {
-        const result = new Tarea()
-        for (let key in tareaJSON) {
-            result[key] = tareaJSON[key]
-        }
-        result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
-        return result
-    }
+  static fromJson(tareaJSON) {
+    return Object.assign(new Tarea(),
+      tareaJSON,
+      { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
+  }
 
-    nombreAsignatario() {
-        return this.asignatario.nombre
-    }
+  nombreAsignatario() {
+    return this.asignatario.nombre
+  }
 
-    toJSON() {
-        const result = Object.assign({}, this)
-        result.asignatario = null 
-        result.asignadoA = this.asignatario.nombre
-        return result
+  toJSON() {
+    return {
+      ...this,
+      asignatario: null,
+      asignadoA: this.asignatario.nombre,
     }
+  }
 
-    validarAsignacion() {
-        if (this.nombreAsignatario().trim() === "") {
-            throw new UserException("Debe asignar la tarea a una persona")
-        }
+  validarAsignacion() {
+    if (!this.nombreAsignatario().trim()) {
+      throw new UserException('Debe asignar la tarea a una persona')
     }
+  }
 }
 
 class UserException extends Error {
-    toString() {
-        return this.message
-    }
+  toString() {
+    return this.message
+  }
 }

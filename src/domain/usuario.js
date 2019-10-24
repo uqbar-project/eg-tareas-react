@@ -1,5 +1,4 @@
 export class Usuario {
-
   nombre
 
   constructor(_nombre) {
@@ -12,9 +11,9 @@ export class Usuario {
   }
 
   static fromJSON(nombre) {
-    return new Usuario(nombre || " ")
+    return new Usuario(nombre || ' ')
   }
 
 }
 
-export const USUARIO_NULO = new Usuario(" ")
+export const USUARIO_NULO = new Usuario(' ')
