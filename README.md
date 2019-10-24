@@ -240,7 +240,6 @@ async asignarTarea() {
 
 Se delega la validación en la tarea directamente. Pueden ver la implementación en el código.
 
-
 # Testing
 
 Los últimos tests son básicos, validan que para el componente TareaRow al que le pasamos una tarea
@@ -279,14 +278,14 @@ function crearTarea(id, descripcion, porcentaje, asignado) {
 
 const construirTest = crearTarea(159, "Construir test TODO List", 0, "Marcos Rojo")
 
-const mockTareas = 
+const mockTareas =
   [
     crearTarea(68, "Desarrollar TODO List en React", 75, "Paula Paretto"),
     construirTest
   ]
 ```
 
-Luego definimos una función que devuelve un _response mockeado_, que simula la respuesta del server, con el status http y una lista de tareas que le pasamos como parámetro: 
+Luego definimos una función que devuelve un _response mockeado_, que simula la respuesta del server, con el status http y una lista de tareas que le pasamos como parámetro:
 
 ```javascript
 const mockResponse = (status, statusText, response) => {
@@ -339,11 +338,10 @@ Lamentablemente no pudimos lograr acceder a los valores que debe renderizar la t
 
 ```javascript
 >>>TareasComponent
-    componentWillMount() {
+    componentDidMount() {
         this.tareaService.allInstances()
         .then((res) => res.json())
         .then((tareasJson) => {
             console.log("tareas", tareas) // se visualizan las dos tareas del test
             this.setState({
 ```
-
