@@ -29,7 +29,7 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 El componente llama al service quien dispara la búsqueda de tareas y devuelve la promise:
 
 ```javascript
->>TareaService
+>>>TareaService
 allInstances() {
   return fetch(REST_SERVER_URL + "/tareas")
 }
@@ -44,7 +44,7 @@ constructor(props) {
     this.tareaService = new TareaService()
 }
 
-componentWillMount() {
+componentDidMount() {
     this.tareaService.allInstances()
     .then((res) => res.json())
     .then((tareasJson) => {
@@ -61,7 +61,7 @@ Se encadenan las promises mediante la función then, y se atrapa cualquier excep
 O utilizando la sintaxis async / await esto se transforma en:
 
 ```js
-async componentWillMount() {
+async componentDidMount() {
     try {
         const res = await this.tareaService.allInstances()
         const tareasJson = await res.json()
@@ -93,7 +93,7 @@ async cumplirTarea(tarea) {
     tarea.cumplir()
     await this.props.tareaService.actualizarTarea(tarea)
     this.setState({
-        tarea: tarea
+        tarea
     })
 }
 ```

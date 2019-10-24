@@ -1,5 +1,5 @@
-import { Tarea } from "../domain/tarea"
-import { REST_SERVER_URL } from "./constants"
+import { Tarea } from '../domain/tarea'
+import { REST_SERVER_URL } from './constants'
 
 export class TareaService {
 
@@ -8,17 +8,17 @@ export class TareaService {
   }
 
   allInstances() {
-    return fetch(REST_SERVER_URL + "/tareas")
+    return fetch(REST_SERVER_URL + '/tareas')
   }
 
   async getTareaById(id) {
-    const res = await fetch(REST_SERVER_URL + "/tareas/" + id)
+    const res = await fetch(REST_SERVER_URL + '/tareas/' + id)
     const tareaJson = await res.json()
     return this.tareaAsJson(tareaJson)
   }
 
   actualizarTarea(tarea) {
-    return fetch(REST_SERVER_URL + "/tareas/" + tarea.id, {
+    return fetch(REST_SERVER_URL + '/tareas/' + tarea.id, {
       method: 'put',
       body: JSON.stringify(tarea.toJSON())
     })

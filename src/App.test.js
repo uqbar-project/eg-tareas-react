@@ -1,13 +1,12 @@
-import React from 'react'
-import 'jest-enzyme'
-import { configure } from 'enzyme'
+import { configure, mount, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { mount, shallow } from 'enzyme'
-
+import 'jest-enzyme'
+import React from 'react'
 import App from './App'
-import tareas, { TareasComponent, TareaRow } from './components/tareas'
+import { TareaRow, TareasComponent } from './components/tareas'
 import { Tarea } from './domain/tarea'
 import { Usuario } from './domain/usuario'
+
 
 configure({ adapter: new Adapter() })
 
@@ -23,19 +22,19 @@ const mockResponse = (status, statusText, response) => {
 }
 
 function crearTarea(id, descripcion, porcentaje, asignado) {
-  const result = new Tarea()
-  result.id = id
-  result.descripcion = descripcion
-  result.porcentaje = porcentaje
-  result.asignatario = new Usuario(asignado)
-  return result
+  return Object.assign(new Tarea(), {
+    id,
+    descripcion,
+    porcentaje,
+    asignatario: new Usuario(asignado)
+  })
 }
 
-const construirTest = crearTarea(159, "Construir test TODO List", 0, "Marcos Rojo")
+const construirTest = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
 
-const mockTareas = 
+const mockTareas =
   [
-    crearTarea(68, "Desarrollar TODO List en React", 75, "Paula Paretto"),
+    crearTarea(68, 'Desarrollar TODO List en React', 75, 'Paula Paretto'),
     construirTest
   ]
 
@@ -43,12 +42,12 @@ const mockTareas =
 // https://github.com/airbnb/enzyme/issues/1626
 if (global.document) {
   document.createRange = () => ({
-      setStart: () => {},
-      setEnd: () => {},
-      commonAncestorContainer: {
-          nodeName: 'BODY',
-          ownerDocument: document,
-      },
+    setStart: () => { },
+    setEnd: () => { },
+    commonAncestorContainer: {
+      nodeName: 'BODY',
+      ownerDocument: document,
+    },
   })
 }
 // fin hack
@@ -65,11 +64,11 @@ it('lista de tareas', () => {
 })
 it('una tarea asignada puede cumplirse', () => {
   const tareaConstruirTest = shallow(<TareaRow tarea={construirTest} />)
-  expect(tareaConstruirTest.find("#cumplir_159")).toBeTruthy()
+  expect(tareaConstruirTest.find('#cumplir_159')).toBeTruthy()
 })
 it('una tarea sin asignar no puede cumplirse', () => {
   const construirTest_sinAsignar = construirTest
   construirTest_sinAsignar.desasignar()
   const tareaConstruirTest = shallow(<TareaRow tarea={construirTest_sinAsignar} />)
-  expect(tareaConstruirTest.find("#cumplir_159").exists()).toBeFalsy()
+  expect(tareaConstruirTest.find('#cumplir_159').exists()).toBeFalsy()
 })
