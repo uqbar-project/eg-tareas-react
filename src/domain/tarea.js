@@ -61,7 +61,7 @@ export class Tarea {
       { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
   }
 
-  nombreAsignatario() {
+  get nombreAsignatario() {
     return this.asignatario.nombre
   }
 
@@ -74,7 +74,7 @@ export class Tarea {
   }
 
   validarAsignacion() {
-    if (!this.nombreAsignatario().trim()) {
+    if (!this.nombreAsignatario.trim()) {
       throw new UserException('Debe asignar la tarea a una persona')
     }
   }

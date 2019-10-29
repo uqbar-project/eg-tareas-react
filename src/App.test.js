@@ -1,14 +1,12 @@
-import { configure, mount, shallow } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-import 'jest-enzyme'
+import { mount, shallow } from 'enzyme'
 import React from 'react'
 import App from './App'
-import { TareaRow, TareasComponent } from './components/tareas'
+import { TareasComponent } from './components/tareas/tareas'
+import TareaRow from './components/tareas/tareaRow'
 import { Tarea } from './domain/tarea'
 import { Usuario } from './domain/usuario'
 
 
-configure({ adapter: new Adapter() })
 
 const mockResponse = (status, statusText, response) => {
   return new window.Response(JSON.stringify(response), {

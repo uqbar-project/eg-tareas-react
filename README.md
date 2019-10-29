@@ -31,7 +31,7 @@ El componente llama al service quien dispara la búsqueda de tareas y devuelve l
 ```javascript
 >>>TareaService
 allInstances() {
-  return fetch(REST_SERVER_URL + "/tareas")
+  return fetch(`${REST_SERVER_URL}/tareas`)
 }
 ```
 
@@ -46,10 +46,9 @@ constructor(props) {
 
 componentDidMount() {
     this.tareaService.allInstances()
-    .then((res) => res.json())
-    .then((tareasJson) => {
+    .then((tareas) => {
         this.setState({
-            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+            tareas: tareas
         })
     })
     .catch(this.errorHandler)
@@ -63,10 +62,9 @@ O utilizando la sintaxis async / await esto se transforma en:
 ```js
 async componentDidMount() {
     try {
-        const res = await this.tareaService.allInstances()
-        const tareasJson = await res.json()
+        const tareas = await this.tareaService.allInstances()
         this.setState({
-            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+            tareas: tareas
         })
     } catch(e) {
         this.errorHandler(e)
@@ -80,21 +78,25 @@ El componente captura el evento del botón:
 
 ```javascript
 >>>TareaRow
-<IconButton aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
+
+
+<IconButton aria-label="Cumplir" onClick={cumplirTarea}>
     <CheckCircleIcon />
 </IconButton>
 ```
 
-En ese evento se delega a cumplir de Tarea y se pide al service que actualice el backend. Cuando la promise se cumple, disparamos la actualización del estado para renderizar los cambios en la vista:
+En ese evento se delega a cumplir de Tarea y se pide al service que actualice el backend. Cuando la promise se cumple, disparamos la funcion que nos pasaron por props y a buscar nuevamente las tareas al backend:
 
 ```javascript
 >>>TareaRow
-async cumplirTarea(tarea) {
+const cumplirTarea = async () => {
     tarea.cumplir()
-    await this.props.tareaService.actualizarTarea(tarea)
-    this.setState({
-        tarea
-    })
+    try {
+      await props.tareaService.actualizarTarea(tarea)
+      props.actualizar()
+    } catch (error) {
+      console.log(error)
+    }
 }
 ```
 
@@ -102,7 +104,7 @@ El método actualizarTarea del service dispara el método PUT:
 
 ```javascript
 actualizarTarea(tarea) {
-  return fetch(REST_SERVER_URL + "/tareas/" + tarea.id, {
+  return fetch(`${REST_SERVER_URL}/tareas/${tarea.id}`, {
     method: 'put',
     body: JSON.stringify(tarea.toJSON())
   })
@@ -112,19 +114,22 @@ actualizarTarea(tarea) {
 El botón de asignación dispara la navegación de la ruta '/asignar':
 
 ```javascript
->>>TareasComponent
-<IconButton aria-label="Asignar" onClick={() => this.props.history.push('/asignarTarea/' + tarea.id)}>
+>>>TareaRow
+const goToAsignarTarea = () => {
+  props.history.push(`/asignarTarea/${tarea.id}`)
+}
+<IconButton aria-label="Asignar" onClick={goToAsignarTarea}>
     <AccountBoxIcon />
 </IconButton>
 ```
 
-para lo cual hay que decorar el componente TareasComponent con el router de React:
+para lo cual hay que decorar el componente TareaRow con el router de React:
 
 ```javascript
-export default withRouter(TareasComponent)
+export default withRouter(TareaRow)
 ```
 
-Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `this.props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
+Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
 
 ## Asignación de tareas
 
@@ -135,7 +140,9 @@ En la asignación de tareas el combo de usuarios se llena con una llamada al ser
 ```javascript
 >>>UsuarioService
 allInstances() {
-  return fetch(REST_SERVER_URL + "/usuarios")
+  const response = await fetch(`${REST_SERVER_URL}/usuarios`)
+  const usuariosJson = await response.json()
+  return usuariosJson
 }
 ```
 
@@ -143,7 +150,7 @@ Agregamos en el combo la opción "Sin Asignar":
 
 ```javascript
 <Select
-    value={this.state.tarea.nombreAsignatario()}
+    value={this.state.tarea.nombreAsignatario}
     onChange={(event) => this.asignar(event.target.value)}
     className="formControl"
     inputProps={{
@@ -155,7 +162,7 @@ Agregamos en el combo la opción "Sin Asignar":
         <MenuItem value=" ">
         <em>Sin Asignar</em>
     </MenuItem>
-    {this.state.usuarios.map(usr => <MenuItem value={usr.nombre} key={usr.id}>{usr.nombre}</MenuItem>)}
+    {this.state.usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
 </Select>
 ```
 
