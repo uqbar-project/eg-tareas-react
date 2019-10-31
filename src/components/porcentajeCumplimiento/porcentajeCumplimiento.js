@@ -8,7 +8,7 @@ export function PorcentajeCumplimiento(props) {
         if (props.porcentaje < 50) return 'darkred'
         return 'gold'
     }
-    if (!props.porcentaje) return null
+    if (!props.porcentaje) return null //
     return (
         <Avatar style={{ backgroundColor: backgroundColor(), fontSize: '0.7rem' }}>{props.porcentaje || 0}%</Avatar>
     )

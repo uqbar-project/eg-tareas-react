@@ -6,17 +6,20 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import { Tooltip } from '@material-ui/core'
 import PropTypes from 'prop-types'
-import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
+import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 import { withRouter } from 'react-router-dom'
-import { Tarea } from '../../domain/tarea'
+import { Tarea } from '../../../domain/tarea'
+import { TareaService } from '../../../services/tareaService'
 
-function TareaRow(props) {
+
+export function TareaRow(props) {
     const { tarea } = props
 
     const cumplirTarea = async () => {
         tarea.cumplir()
+        // debugger
         try {
-            await props.tareaService.actualizarTarea(tarea)
+            await TareaService.actualizarTarea(tarea)
             props.actualizar()
         } catch (error) {
             console.log(error)
@@ -29,14 +32,14 @@ function TareaRow(props) {
 
     const cumplirButton = tarea.sePuedeCumplir() &&
         <Tooltip id="tooltip-fab" title="Cumplir tarea">
-            <IconButton id={'cumplir_' + tarea.id} aria-label="Cumplir" onClick={cumplirTarea}>
+            <IconButton id={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
                 <CheckCircleIcon />
             </IconButton>
         </Tooltip>
 
     const asignarButton = tarea.sePuedeAsignar() &&
         <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
-            <IconButton aria-label="Asignar" onClick={goToAsignarTarea}>
+            <IconButton aria-label="Asignar" onClick={goToAsignarTarea} id={`asignar_${tarea.id}`}>
                 <AccountBoxIcon />
             </IconButton>
         </Tooltip>
@@ -49,7 +52,7 @@ function TareaRow(props) {
             <TableCell>{tarea.fecha}</TableCell>
             <TableCell>{tarea.nombreAsignatario}</TableCell>
             <TableCell>
-                <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento || 0} />
+                <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
             </TableCell>
             <TableCell>
                 {cumplirButton}

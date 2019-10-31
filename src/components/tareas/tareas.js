@@ -6,36 +6,38 @@ import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
-import TareaRow from './tareaRow'
+import TareaRow from './tareaRow/tareaRow'
 import PropTypes from 'prop-types'
 
 export class TareasComponent extends Component {
 
   constructor(props) {
     super(props)
-    this.tareaService = new TareaService()
     this.state = { tareas: [] }
   }
 
-  actualizar = async () => {
+  async componentDidMount() {
+    // debugger to show lifecycle
+    await this.actualizarTareas()
+  }
+
+  actualizarTareas = async () => {
     try {
-      const tareas = await this.tareaService.allInstances()
+      const tareas = await TareaService.allInstances()
       this.setState({
         tareas: tareas
       })
-    } catch (e) {
-      this.errorHandler(e)
+    } catch (error) {
+      this.errorHandler(error)
     }
   }
-  async componentDidMount() {
-    this.actualizar()
-  }
+
 
   errorHandler(errorMessage) {
     throw errorMessage
   }
-
   render() {
+
     return (
       <Paper>
         <br />
@@ -51,7 +53,12 @@ export class TareasComponent extends Component {
             </TableRow>
           </TableHead>
           <TableBody id="resultados">
-            {this.state.tareas.map((tarea) => <TareaRow tarea={tarea} key={tarea.id} tareaService={this.tareaService} actualizar={this.actualizar} />)}
+            {
+              this.state.tareas.map((tarea) => <TareaRow tarea={tarea}
+                key={tarea.id}
+                id={`tarea_${tarea.id}`}
+                actualizar={this.actualizarTareas} />)
+            }
           </TableBody>
         </Table>
       </Paper>

@@ -5,8 +5,6 @@ import { UsuarioService } from '../services/usuarioService'
 import { Tarea } from '../domain/tarea'
 import { PropTypes } from 'prop-types'
 
-const tareaService = new TareaService()
-const usuarioService = new UsuarioService()
 
 export default class AsignarTareaComponent extends Component {
 
@@ -17,8 +15,8 @@ export default class AsignarTareaComponent extends Component {
 
   async componentDidMount() {
     try {
-      const usuarios = await usuarioService.allInstances()
-      const tarea = await tareaService.getTareaById(this.props.match.params.id)
+      const usuarios = await UsuarioService.allInstances()
+      const tarea = await TareaService.getTareaById(this.props.match.params.id)
       this.setState({
         usuarios: usuarios,
         tarea: tarea
@@ -31,7 +29,7 @@ export default class AsignarTareaComponent extends Component {
   asignarTarea = async () => {
     try {
       this.state.tarea.validarAsignacion()
-      await tareaService.actualizarTarea(this.state.tarea)
+      await TareaService.actualizarTarea(this.state.tarea)
       this.volver()
     } catch (e) {
       this.generarError(e)

@@ -3,23 +3,23 @@ import { REST_SERVER_URL } from './constants'
 
 export class TareaService {
 
-  tareaAsJson(tareaJSON) {
+  static tareaAsJson(tareaJSON) {
     return Tarea.fromJson(tareaJSON)
   }
 
-  async allInstances() {
-    const response = await fetch(`${REST_SERVER_URL}/tareas`)
-    const tareasJson = await response.json()
-    return tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
+  static async allInstances() {
+    const respuesta = await fetch(`${REST_SERVER_URL}/tareas`)
+    const tareasJson = await respuesta.json()
+    return tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson)) //this.tareaAsJson
   }
 
-  async getTareaById(id) {
-    const res = await fetch(`${REST_SERVER_URL}/tareas/${id}`)
-    const tareaJson = await res.json()
-    return this.tareaAsJson(tareaJson)
+  static async getTareaById(id) {
+    const respuesta = await fetch(`${REST_SERVER_URL}/tareas/${id}`)
+    const tareaJson = await respuesta.json()
+    return TareaService.tareaAsJson(tareaJson)
   }
 
-  actualizarTarea(tarea) {
+  static actualizarTarea(tarea) {
     return fetch(`${REST_SERVER_URL}/tareas/${tarea.id}`, {
       method: 'put',
       body: JSON.stringify(tarea.toJSON())
