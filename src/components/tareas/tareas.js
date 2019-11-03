@@ -17,7 +17,7 @@ export class TareasComponent extends Component {
   }
 
   async componentDidMount() {
-    // debugger to show lifecycle
+    //debugger //  to show lifecycle
     await this.actualizarTareas()
   }
 
@@ -54,10 +54,12 @@ export class TareasComponent extends Component {
           </TableHead>
           <TableBody id="resultados">
             {
-              this.state.tareas.map((tarea) => <TareaRow tarea={tarea}
-                key={tarea.id}
-                id={`tarea_${tarea.id}`}
-                actualizar={this.actualizarTareas} />)
+              this.state.tareas.map((tarea) =>
+                <TareaRow
+                  tarea={tarea}
+                  key={tarea.id}
+                  id={`tarea_${tarea.id}`}
+                  actualizar={this.actualizarTareas} />)
             }
           </TableBody>
         </Table>

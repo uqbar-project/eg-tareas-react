@@ -14,15 +14,13 @@ const mockTareas =
 
 describe('TareasComponent', () => {
   describe('cuando el servicio respode correctamente', () => {
-    it('se muestran las tareas en la tabla', async (done) => {
+    it('se muestran las tareas en la tabla', () => {
       TareaService.allInstances = () => Promise.resolve(mockTareas)
       const componente = shallow(<TareasComponent />)
-      setTimeout(() => {
-        expect(componente.find('#tarea_159')).toBeTruthy()
-        expect(componente.find('#tarea_68')).toBeTruthy()
-        done()
-      }, 1000)
-
+      setImmediate(() => {
+        expect(componente.find('#tarea_159').exists()).toBeTruthy()
+        expect(componente.find('#tarea_68').exists()).toBeTruthy()
+      })
     })
   })
 })

@@ -17,7 +17,7 @@ export function TareaRow(props) {
 
     const cumplirTarea = async () => {
         tarea.cumplir()
-        // debugger
+        // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
         try {
             await TareaService.actualizarTarea(tarea)
             props.actualizar()
@@ -65,7 +65,6 @@ export function TareaRow(props) {
 TareaRow.propTypes = {
     tarea: PropTypes.instanceOf(Tarea),
     history: PropTypes.object,
-    tareaService: PropTypes.object,
     actualizar: PropTypes.func
 }
 

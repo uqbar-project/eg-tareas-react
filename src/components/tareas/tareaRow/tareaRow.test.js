@@ -36,9 +36,7 @@ describe('TareaRow', () => {
                 const componente = shallow(
                     <TareaRow
                         tarea={tareaAsignada}
-                        history={{
-                            push: pushEspia
-                        }}
+                        history={{ push: pushEspia }}
                     />)
                 botonAsignacion(componente, tareaAsignada.id).simulate('click')
                 expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
