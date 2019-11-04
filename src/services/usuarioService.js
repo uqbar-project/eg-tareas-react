@@ -1,9 +1,12 @@
 import { REST_SERVER_URL } from './constants'
 
-export class UsuarioService {
+class UsuarioService {
 
-  allInstances() {
-    return fetch(REST_SERVER_URL + '/usuarios')
+  async allInstances() {
+    const response = await fetch(`${REST_SERVER_URL}/usuarios`)
+    const usuariosJson = await response.json()
+    return usuariosJson
   }
 
 }
+export const usuarioService = new UsuarioService()

@@ -8,7 +8,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <div className="App">
-          <TareasRoutes/>
+          <TareasRoutes />
         </div>
       </BrowserRouter>
     )

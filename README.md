@@ -26,12 +26,12 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 ![image](images/ArquitecturaTareas.png)
 
-El componente llama al service quien dispara la búsqueda de tareas y devuelve la promise:
+El componente llama al service (singleton) quien dispara la búsqueda de tareas y devuelve la promise:
 
 ```javascript
 >>>TareaService
-allInstances() {
-  return fetch(REST_SERVER_URL + "/tareas")
+ allInstances() {
+  return fetch(`${REST_SERVER_URL}/tareas`)
 }
 ```
 
@@ -39,20 +39,20 @@ Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente 
 
 ```javascript
 >>>TareasComponent
-constructor(props) {
-    super(props)
-    this.tareaService = new TareaService()
+componentDidMount() {
+  this.actualizarTareas()
 }
 
-componentDidMount() {
-    this.tareaService.allInstances()
-    .then((res) => res.json())
-    .then((tareasJson) => {
-        this.setState({
-            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
-        })
+actualizarTareas = () => {
+  tareaService.allInstances()
+    .then((tareas)=>{
+      this.setState({
+        tareas: tareas
+      })
     })
-    .catch(this.errorHandler)
+    .catch((error) => {
+      this.errorHandler(error)
+    })
 }
 ```
 
@@ -61,18 +61,31 @@ Se encadenan las promises mediante la función then, y se atrapa cualquier excep
 O utilizando la sintaxis async / await esto se transforma en:
 
 ```js
-async componentDidMount() {
-    try {
-        const res = await this.tareaService.allInstances()
-        const tareasJson = await res.json()
-        this.setState({
-            tareas: tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson))
-        })
-    } catch(e) {
-        this.errorHandler(e)
-    }
+actualizarTareas = async () => {
+  try {
+    const tareas = await tareaService.allInstances()
+    this.setState({
+      tareas: tareas
+    })
+  } catch (error) {
+    this.errorHandler(error)
+  }
 }
 ```
+
+Y por que no un método comun de clase y si una lambda ? :thinking:
+
+Si quisiéramos usar un método, lo que deberíamos  hacer dentro del constructor el `this` del componente, ya que el `this` que está tomando es del método, por lo tanto no tendríamos acceso a `this.setState` o `this.state` que son propios de la clase de react de la cual extendemos.
+
+```javascript
+constructor(props) {
+  super(props)
+  this.state = { tareas: [] }
+  this.actualizarTareas =  this.actualizarTareas.bind(this)
+}
+```
+
+Por lo tanto hacemos uso de una lambda, ya que no crea su propio `this` y utiliza el del contexto donde está declarado, en este caso para nosotros es el componente de react
 
 ## Cumplir una tarea
 
@@ -80,21 +93,23 @@ El componente captura el evento del botón:
 
 ```javascript
 >>>TareaRow
-<IconButton aria-label="Cumplir" onClick={(event) => this.cumplirTarea(tarea)}>
+<IconButton aria-label="Cumplir" onClick={cumplirTarea}>
     <CheckCircleIcon />
 </IconButton>
 ```
 
-En ese evento se delega a cumplir de Tarea y se pide al service que actualice el backend. Cuando la promise se cumple, disparamos la actualización del estado para renderizar los cambios en la vista:
+En ese evento se delega a cumplir de Tarea y se pide al service que actualice el backend. Cuando la promise se cumple, disparamos la función que nos pasaron por props y a buscar nuevamente las tareas al backend, para traernos la ultima información:
 
 ```javascript
 >>>TareaRow
-async cumplirTarea(tarea) {
+const cumplirTarea = async () => {
     tarea.cumplir()
-    await this.props.tareaService.actualizarTarea(tarea)
-    this.setState({
-        tarea
-    })
+    try {
+      await tareaService.actualizarTarea(tarea)
+      props.actualizar()
+    } catch (error) {
+      console.log(error)
+    }
 }
 ```
 
@@ -102,7 +117,7 @@ El método actualizarTarea del service dispara el método PUT:
 
 ```javascript
 actualizarTarea(tarea) {
-  return fetch(REST_SERVER_URL + "/tareas/" + tarea.id, {
+  return fetch(`${REST_SERVER_URL}/tareas/${tarea.id}`, {
     method: 'put',
     body: JSON.stringify(tarea.toJSON())
   })
@@ -112,19 +127,22 @@ actualizarTarea(tarea) {
 El botón de asignación dispara la navegación de la ruta '/asignar':
 
 ```javascript
->>>TareasComponent
-<IconButton aria-label="Asignar" onClick={() => this.props.history.push('/asignarTarea/' + tarea.id)}>
+>>>TareaRow
+const goToAsignarTarea = () => {
+  props.history.push(`/asignarTarea/${tarea.id}`)
+}
+<IconButton aria-label="Asignar" onClick={goToAsignarTarea}>
     <AccountBoxIcon />
 </IconButton>
 ```
 
-para lo cual hay que decorar el componente TareasComponent con el router de React:
+para lo cual hay que decorar el componente TareaRow con el router de React:
 
 ```javascript
-export default withRouter(TareasComponent)
+export default withRouter(TareaRow)
 ```
 
-Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `this.props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
+Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
 
 ## Asignación de tareas
 
@@ -134,8 +152,10 @@ En la asignación de tareas el combo de usuarios se llena con una llamada al ser
 
 ```javascript
 >>>UsuarioService
-allInstances() {
-  return fetch(REST_SERVER_URL + "/usuarios")
+ async allInstances() {
+  const response = await fetch(`${REST_SERVER_URL}/usuarios`)
+  const usuariosJson = await response.json()
+  return usuariosJson
 }
 ```
 
@@ -143,7 +163,7 @@ Agregamos en el combo la opción "Sin Asignar":
 
 ```javascript
 <Select
-    value={this.state.tarea.nombreAsignatario()}
+    value={this.state.tarea.nombreAsignatario}
     onChange={(event) => this.asignar(event.target.value)}
     className="formControl"
     inputProps={{
@@ -155,7 +175,7 @@ Agregamos en el combo la opción "Sin Asignar":
         <MenuItem value=" ">
         <em>Sin Asignar</em>
     </MenuItem>
-    {this.state.usuarios.map(usr => <MenuItem value={usr.nombre} key={usr.id}>{usr.nombre}</MenuItem>)}
+    {this.state.usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
 </Select>
 ```
 
@@ -186,9 +206,8 @@ cambiarEstado(closureChange) {
     const tarea = this.state.tarea
     closureChange(tarea)
     this.setState({
-        ...this.state,
         tarea: tarea,
-        errorMessage: ""
+        errorMessage: ''
     })
 }
 ```
@@ -242,29 +261,81 @@ Se delega la validación en la tarea directamente. Pueden ver la implementación
 
 # Testing
 
-Los últimos tests son básicos, validan que para el componente TareaRow al que le pasamos una tarea
+Ahora que separamos todo en componentes más chicos y con menos responsabilidades, son mucho más fáciles de testear :tada:
 
+### TareaRow
+
+A este componente le pasamos una tarea por `props` y basándonos en los diferentes estados de la misma hacemos lo siguiente:
 - si está asignada nos aparece el botón que permite marcarla como cumplida
+- si está asignada pero su porcentaje de cumplimiento está completo no aparece el está de cumplir
+- cuando tocamos el está de asignar nos redirige hacia otra página
 - si no está asignada no aparece dicho botón
 
 ```javascript
-it('una tarea asignada puede cumplirse', () => {
-  const tareaConstruirTest = shallow(<TareaRow tarea={construirTest} />)
-  expect(tareaConstruirTest.find("#cumplir_159")).toBeTruthy()
-})
-it('una tarea sin asignar no puede cumplirse', () => {
-  const construirTest_sinAsignar = construirTest
-  construirTest_sinAsignar.desasignar()
-  const tareaConstruirTest = shallow(<TareaRow tarea={construirTest_sinAsignar} />)
-  expect(tareaConstruirTest.find("#cumplir_159").exists()).toBeFalsy()
+describe('TareaRow', () => {
+    describe('cuando una tarea está asignada', () => {
+        let tareaAsignada
+        beforeEach(() => {
+            tareaAsignada = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
+        })
+        it('puede cumplirse', () => {
+            const componente = shallow(<TareaRow tarea={tareaAsignada} />)
+            expect(existeCumplir(componente, tareaAsignada.id)).toBeTruthy()
+        })
+        describe('si su porcentaje de cumplimiento está completo', () => {
+            it('NO se puede asignar', () => {
+                tareaAsignada.porcentajeCumplimiento = 100
+                const componente = shallow(<TareaRow tarea={tareaAsignada} />)
+                expect(existeAsignacion(componente, tareaAsignada.id)).toBeFalsy()
+            })
+        })
+        describe('si su porcentaje de cumplimiento NO está completo', () => {
+            it('se puede asignar', () => {
+                tareaAsignada.porcentajeCumplimiento = 50
+                const componente = shallow(<TareaRow tarea={tareaAsignada} />)
+                expect(existeAsignacion(componente, tareaAsignada.id)).toBeTruthy()
+            })
+            it('y se clickea el botón de asignación, nos redirige a la ruta de asignación con el id', () => {
+                tareaAsignada.porcentajeCumplimiento = 50
+                const pushEspia = jest.fn()
+                const componente = shallow(
+                    <TareaRow
+                        tarea={tareaAsignada}
+                        history={{ push: pushEspia }}
+                    />)
+                botonAsignacion(componente, tareaAsignada.id).simulate('click')
+                expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
+
+            })
+        })
+    })
+
+    describe('cuando una tarea NO está asignada', () => {
+        it('una tarea sin asignar no puede cumplirse', () => {
+            const tareaNoAsignada = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
+            tareaNoAsignada.desasignar()
+            const componente = shallow(<TareaRow tarea={tareaNoAsignada} />)
+            expect(existeCumplir(componente, tareaNoAsignada.id)).toBeFalsy()
+        })
+    })
 })
 ```
 
-Podrían aparecer más tests a futuro (como presionar el botón cumplir y ver que la tarea queda al 100%), lo dejamos a criterio del lector.
+Acá podemos ver el uso de la función `beforeEach`, que lo que hace es ejecutarse cada vez que va a correr un test, nosotros la aprovechamos para tener una tarea nueva cada vez que corramos cada test, asi nos aseguramos que no hay estado compartido entre los diferentes tests :hearth:
+
+Y hacemos uso de un par de funciones auxiliares para no repetir código entre nuestros tests: 
+```javascript
+const botonAsignacion = (componente, id) => componente.find(`#asignar_${id}`)
+const existeAsignacion = (componente, id) => botonAsignacion(componente, id).exists()
+const existeCumplir = (componente, id) => componente.find(`#cumplir_${id}`).exists()
+```
+
+
+### Tareas
 
 ## Mockear el servicio
 
-La parte más interesante de los tests es cómo hacemos para interceptar las llamadas **fetch** que disparan las llamadas hacia el server. Para lograr esto, primero construimos una lista de tareas con ids específicos en el test (_App.test.js_):
+La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a nuestros **services**, lo primero es crear nuestros datos de mock
 
 ```javascript
 function crearTarea(id, descripcion, porcentaje, asignado) {
@@ -285,63 +356,30 @@ const mockTareas =
   ]
 ```
 
-Luego definimos una función que devuelve un _response mockeado_, que simula la respuesta del server, con el status http y una lista de tareas que le pasamos como parámetro:
+Y ahora sí podemos construir una _promise mockeada_, dentro de nuestros tests :
+
+Ya que nuestro servicio de tareas es un singleton, podríamos pisar el método en el contexto de los tests haciendo que devuelva una promesa con lo que nosotros queramos directamente, de la siguiente manera :
 
 ```javascript
-const mockResponse = (status, statusText, response) => {
-  return new window.Response(JSON.stringify(response), {
-    status: status,
-    statusText: statusText,
-    headers: {
-      'Accept': 'application/json',
-      'Content-type': 'application/json'
-    }
+tareaService.allInstances = () => Promise.resolve(mockTareas)
+```
+
+Y nuestro test quedaría de la siguiente forma :
+
+```javascript
+describe('TareasComponent', () => {
+  describe('cuando el servicio respode correctamente', () => {
+    it('se muestran las tareas en la tabla', () => {
+      tareaService.allInstances = () => Promise.resolve(mockTareas)
+      const componente = shallow(<TareasComponent />)
+      setImmediate(() => {
+        expect(componente.find('#tarea_159').exists()).toBeTruthy()
+        expect(componente.find('#tarea_68').exists()).toBeTruthy()
+      })
+    })
   })
-}
-```
-
-Para evitar un inconveniente debemos escribir un hack (cosas que pasan con frameworks que todavía no alcanzaron su punto de madurez):
-
-```javascript
-// Hack para que no falle el mount del TareasComponent
-// https://github.com/airbnb/enzyme/issues/1626
-if (global.document) {
-  document.createRange = () => ({
-      setStart: () => {},
-      setEnd: () => {},
-      commonAncestorContainer: {
-          nodeName: 'BODY',
-          ownerDocument: document,
-      },
-  })
-}
-// fin hack
-```
-
-Y ahora sí podemos construir una _promise mockeada_, que decora las llamadas asincrónicas al server, pasándole el status http 200 (OK) y la lista de tareas:
-
-```javascript
-// Mock del fetch para devolver las tareas creadas en este test
-const mockPromise = Promise.resolve(mockResponse(200, null, mockTareas))
-window.fetch = jest.fn().mockImplementation(() => mockPromise)
-```
-
-Esto permite que el test que hace un mount del componente Tareas funcione correctamente:
-
-```javascript
-it('lista de tareas', () => {
-  mount(<TareasComponent />)
 })
 ```
 
-Lamentablemente no pudimos lograr acceder a los valores que debe renderizar la tabla, en próximas versiones esperemos poder lograrlo, pero si el lector coloca `console.log` en TareasComponent previos al render, verá que recibe correctamente las dos tareas que creamos en el test:
+Tenemos que usar un `setImmediate` para esperar a que nuestro componente termine de renderizar el jsx y ahí nosotros poder buscar las tareas
 
-```javascript
->>>TareasComponent
-    componentDidMount() {
-        this.tareaService.allInstances()
-        .then((res) => res.json())
-        .then((tareasJson) => {
-            console.log("tareas", tareas) // se visualizan las dos tareas del test
-            this.setState({
-```

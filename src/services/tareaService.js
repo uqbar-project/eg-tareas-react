@@ -1,27 +1,31 @@
 import { Tarea } from '../domain/tarea'
 import { REST_SERVER_URL } from './constants'
 
-export class TareaService {
+class TareaService {
 
   tareaAsJson(tareaJSON) {
     return Tarea.fromJson(tareaJSON)
   }
 
-  allInstances() {
-    return fetch(REST_SERVER_URL + '/tareas')
+  async allInstances() {
+    const respuesta = await fetch(`${REST_SERVER_URL}/tareas`)
+    const tareasJson = await respuesta.json()
+    return tareasJson.map((tareaJson) => Tarea.fromJson(tareaJson)) //this.tareaAsJson
   }
 
   async getTareaById(id) {
-    const res = await fetch(REST_SERVER_URL + '/tareas/' + id)
-    const tareaJson = await res.json()
+    const respuesta = await fetch(`${REST_SERVER_URL}/tareas/${id}`)
+    const tareaJson = await respuesta.json()
     return this.tareaAsJson(tareaJson)
   }
 
   actualizarTarea(tarea) {
-    return fetch(REST_SERVER_URL + '/tareas/' + tarea.id, {
+    return fetch(`${REST_SERVER_URL}/tareas/${tarea.id}`, {
       method: 'put',
       body: JSON.stringify(tarea.toJSON())
     })
   }
 
 }
+
+export const tareaService = new TareaService()
