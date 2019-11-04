@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Paper, TextField, Select, MenuItem, FormLabel, Button, Snackbar } from '@material-ui/core'
-import { TareaService } from '../services/tareaService'
-import { UsuarioService } from '../services/usuarioService'
+import { tareaService } from '../services/tareaService'
+import { usuarioService } from '../services/usuarioService'
 import { Tarea } from '../domain/tarea'
 import { PropTypes } from 'prop-types'
 
@@ -15,8 +15,8 @@ export default class AsignarTareaComponent extends Component {
 
   async componentDidMount() {
     try {
-      const usuarios = await UsuarioService.allInstances()
-      const tarea = await TareaService.getTareaById(this.props.match.params.id)
+      const usuarios = await usuarioService.allInstances()
+      const tarea = await tareaService.getTareaById(this.props.match.params.id)
       this.setState({
         usuarios: usuarios,
         tarea: tarea
@@ -29,7 +29,7 @@ export default class AsignarTareaComponent extends Component {
   asignarTarea = async () => {
     try {
       this.state.tarea.validarAsignacion()
-      await TareaService.actualizarTarea(this.state.tarea)
+      await tareaService.actualizarTarea(this.state.tarea)
       this.volver()
     } catch (e) {
       this.generarError(e)

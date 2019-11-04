@@ -30,7 +30,7 @@ describe('TareaRow', () => {
                 const componente = shallow(<TareaRow tarea={tareaAsignada} />)
                 expect(existeAsignacion(componente, tareaAsignada.id)).toBeTruthy()
             })
-            it('y se clickea el boton de asignacion, nos redirije a la ruta de asignacion con el id', () => {
+            it('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', () => {
                 tareaAsignada.porcentajeCumplimiento = 50
                 const pushEspia = jest.fn()
                 const componente = shallow(

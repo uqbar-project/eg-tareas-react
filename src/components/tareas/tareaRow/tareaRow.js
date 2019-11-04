@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 import { withRouter } from 'react-router-dom'
 import { Tarea } from '../../../domain/tarea'
-import { TareaService } from '../../../services/tareaService'
+import { tareaService } from '../../../services/tareaService'
 
 
 export function TareaRow(props) {
@@ -19,7 +19,7 @@ export function TareaRow(props) {
         tarea.cumplir()
         // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
         try {
-            await TareaService.actualizarTarea(tarea)
+            await tareaService.actualizarTarea(tarea)
             props.actualizar()
         } catch (error) {
             console.log(error)

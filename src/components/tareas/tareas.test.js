@@ -1,7 +1,7 @@
 import { shallow } from 'enzyme'
 import React from 'react'
 import { TareasComponent } from './tareas'
-import { TareaService } from '../../services/tareaService'
+import { tareaService } from '../../services/tareaService'
 import { crearTarea } from '../../testsUtils/crearTarea'
 
 
@@ -15,11 +15,11 @@ const mockTareas =
 describe('TareasComponent', () => {
   describe('cuando el servicio respode correctamente', () => {
     it('se muestran las tareas en la tabla', () => {
-      TareaService.allInstances = () => Promise.resolve(mockTareas)
+      tareaService.allInstances = () => Promise.resolve(mockTareas)
       const componente = shallow(<TareasComponent />)
       setImmediate(() => {
-        expect(componente.find('#tarea_159').exists()).toBeTruthy()
-        expect(componente.find('#tarea_68').exists()).toBeTruthy()
+        expect(componente.find('[data-testid="tarea_159"]').exists()).toBeTruthy()
+        expect(componente.find('[data-testid="tarea_68"]').exists()).toBeTruthy()
       })
     })
   })

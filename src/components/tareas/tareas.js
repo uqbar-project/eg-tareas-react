@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { TareaService } from '../../services/tareaService'
+import { tareaService } from '../../services/tareaService'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -23,7 +23,7 @@ export class TareasComponent extends Component {
 
   actualizarTareas = async () => {
     try {
-      const tareas = await TareaService.allInstances()
+      const tareas = await tareaService.allInstances()
       this.setState({
         tareas: tareas
       })
@@ -58,7 +58,7 @@ export class TareasComponent extends Component {
                 <TareaRow
                   tarea={tarea}
                   key={tarea.id}
-                  id={`tarea_${tarea.id}`}
+                  data-testid={`tarea_${tarea.id}`}
                   actualizar={this.actualizarTareas} />)
             }
           </TableBody>
