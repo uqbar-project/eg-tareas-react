@@ -89,6 +89,7 @@ export default class AsignarTareaComponent extends Component {
             name: 'asignatario',
             id: 'asignatario'
           }}
+          data-testid="select-asignar"
         >
           &gt;
               <MenuItem value=" ">
@@ -99,11 +100,11 @@ export default class AsignarTareaComponent extends Component {
         <br />
         <br />
         <br />
-        <Button variant="contained" color="primary" onClick={this.asignarTarea}>
+        <Button variant="contained" color="primary" onClick={this.asignarTarea} data-testid="aceptar-asignacion">
           Aceptar
         </Button>
         &nbsp;&nbsp;&nbsp;
-        <Button variant="contained" onClick={this.volver}>
+        <Button variant="contained" onClick={this.volver} data-testid="cancelar-asignacion">
           Cancelar
         </Button>
         <br />

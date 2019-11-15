@@ -5,22 +5,29 @@
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",
+    "axios": "^0.19.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.2.0"
   },
   "devDependencies": {
+    "cypress": "3.3.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "jest-enzyme": "^7.1.1",
-    "nock": "^11.6.0"
+    "nock": "^11.6.0",
+    "wait-on": "^3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --verbose",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:ci": "npm start & wait-on http://localhost:3000",
+    "cy:run": "cypress run",
+    "cy:open": "cypress open",
+    "cy:verify": "cypress verify"
   },
   "browserslist": [
     ">0.2%",

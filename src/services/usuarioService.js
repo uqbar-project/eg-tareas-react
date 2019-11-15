@@ -1,11 +1,11 @@
 import { REST_SERVER_URL } from './constants'
+import axios from 'axios'
 
 class UsuarioService {
 
   async allInstances() {
-    const response = await fetch(`${REST_SERVER_URL}/usuarios`)
-    const usuariosJson = await response.json()
-    return usuariosJson
+    const response = await axios.get(`${REST_SERVER_URL}/usuarios`)
+    return response.data
   }
 
 }

@@ -1,0 +1,21 @@
+[ {
+    "id" : 1,
+    "nombre" : "Fernando Dodino",
+    "new" : false
+  }, {
+    "id" : 2,
+    "nombre" : "Rodrigo Grisolia",
+    "new" : false
+  }, {
+    "id" : 3,
+    "nombre" : "Dario Grinberg",
+    "new" : false
+  }, {
+    "id" : 4,
+    "nombre" : "Juan Contardo",
+    "new" : false
+  }, {
+    "id" : 5,
+    "nombre" : "Nahuel Palumbo",
+    "new" : false
+  } ]

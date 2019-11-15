@@ -2,10 +2,11 @@ import { shallow } from 'enzyme'
 import React from 'react'
 import { TareaRow } from './tareaRow'
 import { crearTarea } from '../../../testsUtils/crearTarea'
+const getDataTestId = (value) => `[data-testid="${value}"]`
 
-const botonAsignacion = (componente, id) => componente.find(`#asignar_${id}`)
+const botonAsignacion = (componente, id) => componente.find(getDataTestId(`asignar_${id}`))
 const existeAsignacion = (componente, id) => botonAsignacion(componente, id).exists()
-const existeCumplir = (componente, id) => componente.find(`#cumplir_${id}`).exists()
+const existeCumplir = (componente, id) => componente.find(getDataTestId(`cumplir_${id}`)).exists()
 
 describe('TareaRow', () => {
     describe('cuando una tarea está asignada', () => {

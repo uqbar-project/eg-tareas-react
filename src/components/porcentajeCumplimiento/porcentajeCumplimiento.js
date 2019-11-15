@@ -11,6 +11,7 @@ export function PorcentajeCumplimiento(props) {
     if (!props.porcentaje) return null // se puede comentar para ver como se muestra el avatar en 0%
     return (
         <Avatar
+            data-testid={`${props.tareaId}_porcentaje_${props.porcentaje}`}
             style={{ backgroundColor: backgroundColor(), fontSize: '0.7rem' }}>
             {props.porcentaje || 0}%
         </Avatar>
@@ -18,5 +19,6 @@ export function PorcentajeCumplimiento(props) {
 }
 
 PorcentajeCumplimiento.propTypes = {
-    porcentaje: PropTypes.number
+    porcentaje: PropTypes.number,
+    tareaId: PropTypes.number
 }

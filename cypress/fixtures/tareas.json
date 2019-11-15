@@ -1,0 +1,33 @@
+[ {
+    "id" : 1,
+    "descripcion" : "Desarrollar componente de envio de mails",
+    "iteracion" : "Iteración 1",
+    "porcentajeCumplimiento" : 0,
+    "new" : false,
+    "asignadoA" : "Juan Contardo",
+    "fecha" : "14/11/2019"
+  }, {
+    "id" : 2,
+    "descripcion" : "Implementar single sign on desde la extranet",
+    "iteracion" : "Iteración 1",
+    "porcentajeCumplimiento" : 76,
+    "new" : false,
+    "asignadoA" : "",
+    "fecha" : "09/09/2018"
+  }, {
+    "id" : 3,
+    "descripcion" : "Cancelar pedidos que esten pendientes desde hace 2 meses",
+    "iteracion" : "Iteración 1",
+    "porcentajeCumplimiento" : 22,
+    "new" : false,
+    "asignadoA" : "Rodrigo Grisolia",
+    "fecha" : "30/06/2018"
+  }, {
+    "id" : 4,
+    "descripcion" : "Mostrar info del pedido cuando esta finalizado",
+    "iteracion" : "Iteración 2",
+    "porcentajeCumplimiento" : 90,
+    "new" : false,
+    "asignadoA" : "",
+    "fecha" : "10/08/2018"
+  } ]

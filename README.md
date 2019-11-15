@@ -1,6 +1,6 @@
 # Tareas de un equipo de desarrollo
 
-[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-react.svg?branch=master)](https://travis-ci.org/uqbar-project/eg-tareas-react)
+[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-react.svg?branch=cypress)](https://travis-ci.org/uqbar-project/eg-tareas-react)
 
 ![video](video/demo2.gif)
 
@@ -383,3 +383,146 @@ describe('TareasComponent', () => {
 
 Tenemos que usar un `setImmediate` para esperar a que nuestro componente termine de renderizar el jsx y ahí nosotros poder buscar las tareas
 
+
+## Cypress
+
+Nos interesa testear 2 flujos de nuestra aplicación:
+- Cumplir una tarea
+- Asignar una tarea a una persona
+
+En esta app, tenemos una comunicación con el [backend](https://github.com/uqbar-project/eg-tareas-xtrest), entonces deberíamos levantarlo para poder comunicarnos correctamente.
+
+Vamos con nuestro primer test:
+
+```javascript
+describe('Cumplir una tarea', () => {
+    before(()=>{
+        cy.visit('/')
+    })
+
+    it('cuando clickeamos en el boton cumplir', () => {
+        cy.get(getDataTestId('cumplir_3')).click()
+    })
+
+    it('se pasa al porcentaje del cumplimiento 100%',()=>{
+        cy.get(getDataTestId('3_porcentaje_100')).click()
+    })
+})
+```
+
+Buenisimo, lo corremos y da verde, pero si lo volvemos a correr.... falla !
+
+![video](video/test_e2e_fallo.gif)
+
+¿Y por que pasa esto ? 
+Por que nuestro backend, maneja datos y una vez que los cambiamos quedan así para siempre, deberíamos tirar y volver a levantar para ver los datos limpios.
+
+Entonces.... ¿que hacemos ? 
+
+Bueno para evitar estos problemas en los tests E2E tenemos varias estrategias.
+
+- Si nuestro backend estuviese conectado a una base de datos, podríamos recrear datos de prueba antes de correr los tests (crear estos datos de prueba puede llegar a generar ciertas complicaciones).
+
+- Poner una capa antes del backend la cual podemos mockear dinámicamente (solo para los tests), esto por lo general se denomina [mock-server](http://www.mock-server.com/)
+
+- Cypress nos provee una manera de interceptar los requests salientes del navegador para nosotros poder mockearlas.
+
+Vamos a optar por la manera de cypress: 
+```javascript
+const tarea = {
+    'id' : 3,
+    'descripcion' : 'Desarrollar componente de envio de mails',
+    'iteracion' : 'Iteración 1',
+    'porcentajeCumplimiento' : 0,
+    'new' : false,
+    'fecha' : '14/11/2019',
+    'asignadoA':'Rodrigo Grisolia'
+}
+describe('Cumplir una tarea', () => {
+    before(()=>{
+        // iniciamos el server de mock
+        cy.server()
+        // mockeamos el GET de tareas
+        cy.route('/tareas', [ tarea ])
+        cy.visit('/')
+    })
+
+    it('cuando clickeamos en el boton cumplir', () => {
+        cy.server()
+        // volvemos a mockear el GET /tareas, pero esta vez con la tarea completa al 100%
+        cy.route('/tareas', [ {...tarea, porcentajeCumplimiento:100} ])
+        // Tambien tenenemos que mockear el PUT de modificar la tarea
+        cy.route({url:`/tareas/${tarea.id}`, status:200, response:{}, method:'PUT'})
+        cy.get(getDataTestId('cumplir_3')).click()
+    })
+
+    it('se pasa al porcentaje del cumplimiento 100%',()=>{
+        cy.get(getDataTestId('3_porcentaje_100')).click()
+    })
+})
+```
+
+Aparecen nuevos conceptos :
+
+[cy.server()](https://docs.cypress.io/api/commands/server.html) => Nos habilita el uso de `cy.route`
+
+[cy.route()](https://docs.cypress.io/api/commands/route.html) => Podemos mockear cualquier request 
+
+Y nuestro flujo de asignación :
+```javascript
+/// <reference types="Cypress" />
+const getDataTestId = (value) => `[data-testid=${value}]`
+const asignarButton = (id) => getDataTestId(`asignar_${id}`)
+const tarea = {
+    'id' : 1,
+    'descripcion' : 'Desarrollar componente de envio de mails',
+    'iteracion' : 'Iteración 1',
+    'porcentajeCumplimiento' : 0,
+    'new' : false,
+    'fecha' : '14/11/2019'
+  }
+describe('Asignar tarea a usuario', () => {
+    before(() => {
+        cy.server()
+        //obtenemos los datos del fixture/usuarios.json
+        return cy.fixture('usuarios')
+        .then(usuarios => {
+            //mockeamos a los usuarios
+            cy.route('/usuarios', usuarios)
+            // mockeamos las tareas
+            cy.route('/tareas',[ tarea ])
+            // mockeamos el detalle de una tarea
+            cy.route('/tareas/1',tarea)
+
+        })
+    })
+
+    it('cuando clickeamos en el boton cumplir', () => {
+        cy.visit('/')
+        cy.get(asignarButton(1)).click()
+    })
+
+    it('nos redirije a la pagina de asignacion',()=>{
+        cy.url().should('include', '/asignarTarea/1')
+    })
+
+    it('seleccionamos un usuario',()=>{
+        cy.get(getDataTestId('select-asignar')).click()
+        cy.get('[data-value="Rodrigo Grisolia"]').click()
+    })
+    
+    it('tocamos aceptar y nos devuelve a la home',()=>{
+        cy.server()
+        // mockeamos las tareas con la tarea asignada
+        cy.route('/tareas', [ {...tarea , asignadoA:'Rodrigo Grisolia'} ])
+        cy.get(getDataTestId('aceptar-asignacion')).click()
+        cy.url().should('eq', 'http://localhost:3000/')
+    })
+
+    it('y el usuario queda asignado',()=>{
+        cy.get(getDataTestId('nombre-asignatario_1')).contains('Rodrigo Grisolia')
+    })
+})
+```
+
+[cy.fixture()](https://docs.cypress.io/api/commands/fixture.html) => Nos permite tener el contenido de los archivos de mocks que creamos dentro de **cypress/fixtures** y lo hace forma asíncrona, así que tenemos que tratarlo como una promesa

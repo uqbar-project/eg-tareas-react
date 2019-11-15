@@ -32,27 +32,27 @@ export function TareaRow(props) {
 
     const cumplirButton = tarea.sePuedeCumplir() &&
         <Tooltip id="tooltip-fab" title="Cumplir tarea">
-            <IconButton id={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
+            <IconButton data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
                 <CheckCircleIcon />
             </IconButton>
         </Tooltip>
 
     const asignarButton = tarea.sePuedeAsignar() &&
         <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
-            <IconButton aria-label="Asignar" onClick={goToAsignarTarea} id={`asignar_${tarea.id}`}>
+            <IconButton aria-label="Asignar" onClick={goToAsignarTarea} data-testid={`asignar_${tarea.id}`}>
                 <AccountBoxIcon />
             </IconButton>
         </Tooltip>
 
     return (
-        <TableRow key={tarea.id} id={'TableRow' + tarea.id}>
+        <TableRow key={tarea.id} data-testid={'TableRow' + tarea.id}>
             <TableCell component="th" scope="row">
                 {tarea.descripcion}
             </TableCell>
             <TableCell>{tarea.fecha}</TableCell>
-            <TableCell>{tarea.nombreAsignatario}</TableCell>
+            <TableCell data-testid={`nombre-asignatario_${tarea.id}`}>{tarea.nombreAsignatario}</TableCell>
             <TableCell>
-                <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
+                <PorcentajeCumplimiento tareaId={tarea.id} porcentaje={tarea.porcentajeCumplimiento} />
             </TableCell>
             <TableCell>
                 {cumplirButton}
