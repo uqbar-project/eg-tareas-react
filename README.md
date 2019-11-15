@@ -405,7 +405,7 @@ describe('Cumplir una tarea', () => {
     })
 
     it('se pasa al porcentaje del cumplimiento 100%',()=>{
-        cy.get(getDataTestId('3_porcentaje_100')).click()
+        cy.get(getDataTestId('3_porcentaje_100'))
     })
 })
 ```
