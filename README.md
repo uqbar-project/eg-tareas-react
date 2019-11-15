@@ -425,7 +425,7 @@ Bueno para evitar estos problemas en los tests E2E tenemos varias estrategias.
 
 - Poner una capa antes del backend la cual podemos mockear dinámicamente (solo para los tests), esto por lo general se denomina [mock-server](http://www.mock-server.com/)
 
-- Cypress nos provee una manera de interceptar los requests salientes del navegador para nosotros poder mockearlas.
+- Cypress nos provee una manera de interceptar los requests salientes del navegador para nosotros poder mockearlas. Para este último punto tuvimos que cambiar `fetch` por una librería que nos permite hacer requests, ya que hace un [bug](https://github.com/cypress-io/cypress/issues/95) conocido cypress + fetch para mockear las api calls
 
 Vamos a optar por la manera de cypress: 
 ```javascript
@@ -481,46 +481,35 @@ const tarea = {
     'new' : false,
     'fecha' : '14/11/2019'
   }
-describe('Asignar tarea a usuario', () => {
+const tarea = {
+    'id': 3,
+    'descripcion': 'Desarrollar componente de envio de mails',
+    'iteracion': 'Iteración 1',
+    'porcentajeCumplimiento': 0,
+    'new': false,
+    'fecha': '14/11/2019',
+    'asignadoA': 'Rodrigo Grisolia'
+}
+describe('Cumplir una tarea', () => {
     before(() => {
+        // iniciamos el server de mock
         cy.server()
-        //obtenemos los datos del fixture/usuarios.json
-        return cy.fixture('usuarios')
-        .then(usuarios => {
-            //mockeamos a los usuarios
-            cy.route('/usuarios', usuarios)
-            // mockeamos las tareas
-            cy.route('/tareas',[ tarea ])
-            // mockeamos el detalle de una tarea
-            cy.route('/tareas/1',tarea)
-
-        })
+        // mockeamos el GET de tareas
+        cy.route('/tareas', [tarea])
+        cy.visit('/')
     })
 
     it('cuando clickeamos en el boton cumplir', () => {
-        cy.visit('/')
-        cy.get(asignarButton(1)).click()
-    })
-
-    it('nos redirije a la pagina de asignacion',()=>{
-        cy.url().should('include', '/asignarTarea/1')
-    })
-
-    it('seleccionamos un usuario',()=>{
-        cy.get(getDataTestId('select-asignar')).click()
-        cy.get('[data-value="Rodrigo Grisolia"]').click()
-    })
-    
-    it('tocamos aceptar y nos devuelve a la home',()=>{
         cy.server()
-        // mockeamos las tareas con la tarea asignada
-        cy.route('/tareas', [ {...tarea , asignadoA:'Rodrigo Grisolia'} ])
-        cy.get(getDataTestId('aceptar-asignacion')).click()
-        cy.url().should('eq', 'http://localhost:3000/')
+        // volvemos a mockear el GET /tareas, pero esta vez con la tarea completa al 100%
+        cy.route('/tareas', [{ ...tarea, porcentajeCumplimiento: 100 }])
+        // Tambien tenenemos que mockear el PUT de modificar la tarea
+        cy.route({ url: `/tareas/${tarea.id}`, status: 200, response: {}, method: 'PUT' })
+        cy.get(getDataTestId('cumplir_3')).click()
     })
 
-    it('y el usuario queda asignado',()=>{
-        cy.get(getDataTestId('nombre-asignatario_1')).contains('Rodrigo Grisolia')
+    it('se pasa al porcentaje del cumplimiento 100%', () => {
+        cy.get(getDataTestId('3_porcentaje_100')).click()
     })
 })
 ```
