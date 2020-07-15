@@ -2,18 +2,18 @@ import React from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import PropTypes from 'prop-types'
 
-export function PorcentajeCumplimiento(props) {
+export function PorcentajeCumplimiento({tareaId, porcentaje}) {
     const backgroundColor = () => {
-        if (props.porcentaje > 80) return 'green'
-        if (props.porcentaje < 50) return 'darkred'
+        if (porcentaje > 80) return 'green'
+        if (porcentaje < 50) return 'darkred'
         return 'gold'
     }
-    if (!props.porcentaje) return null // se puede comentar para ver como se muestra el avatar en 0%
+    if (!porcentaje) return null // se puede comentar para ver como se muestra el avatar en 0%
     return (
         <Avatar
-            data-testid={`${props.tareaId}_porcentaje_${props.porcentaje}`}
+            data-testid={`${tareaId}_porcentaje_${porcentaje}`}
             style={{ backgroundColor: backgroundColor(), fontSize: '0.7rem' }}>
-            {props.porcentaje || 0}%
+            {porcentaje || 0}%
         </Avatar>
     )
 }

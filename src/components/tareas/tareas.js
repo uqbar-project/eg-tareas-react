@@ -49,7 +49,7 @@ export function TareasComponent() {
               tarea={tarea}
               key={tarea.id}
               data-testid={`tarea_${tarea.id}`}
-              actualizar={actualizarTareas}
+              actualizarTareas={actualizarTareas}
             />
           ))}
         </TableBody>

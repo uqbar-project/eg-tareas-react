@@ -7,27 +7,27 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import { Tooltip } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
-import { withRouter } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
 
+export default function TareaRow({tarea, actualizarTareas}) {
 
-export function TareaRow(props) {
-    const { tarea } = props
+    const history = useHistory()
 
     const cumplirTarea = async () => {
         tarea.cumplir()
         // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
         try {
             await tareaService.actualizarTarea(tarea)
-            props.actualizar()
+            actualizarTareas()
         } catch (error) {
             console.log(error)
         }
     }
 
     const goToAsignarTarea = () => {
-        props.history.push(`/asignarTarea/${tarea.id}`)
+        history.push(`/asignarTarea/${tarea.id}`)
     }
 
     const cumplirButton = tarea.sePuedeCumplir() &&
@@ -65,8 +65,5 @@ export function TareaRow(props) {
 TareaRow.propTypes = {
     tarea: PropTypes.instanceOf(Tarea),
     history: PropTypes.object,
-    actualizar: PropTypes.func
+    actualizarTareas: PropTypes.func
 }
-
-
-export default withRouter(TareaRow)
