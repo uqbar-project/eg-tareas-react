@@ -25,7 +25,7 @@ describe('TareasComponent', () => {
       let componente
       tareaService.allInstances = () => Promise.resolve(mockTareas)
       await act(async () => {
-        componente = await mount(<TareasComponent />)
+        componente = mount(<TareasComponent />)
       })
       componente.update()
       setImmediate(() => {
