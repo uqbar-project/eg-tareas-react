@@ -1,12 +1,20 @@
 import { shallow } from 'enzyme'
 import React from 'react'
-import { TareaRow } from './tareaRow'
+import TareaRow from './tareaRow'
 import { crearTarea } from '../../../testsUtils/crearTarea'
 const getDataTestId = (value) => `[data-testid="${value}"]`
 
 const botonAsignacion = (componente, id) => componente.find(getDataTestId(`asignar_${id}`))
 const existeAsignacion = (componente, id) => botonAsignacion(componente, id).exists()
 const existeCumplir = (componente, id) => componente.find(getDataTestId(`cumplir_${id}`)).exists()
+const mockHistoryPush = jest.fn()
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useHistory: () => ({
+    push: mockHistoryPush
+  })
+}))
 
 describe('TareaRow', () => {
     describe('cuando una tarea está asignada', () => {
@@ -33,14 +41,12 @@ describe('TareaRow', () => {
             })
             it('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', () => {
                 tareaAsignada.porcentajeCumplimiento = 50
-                const pushEspia = jest.fn()
                 const componente = shallow(
                     <TareaRow
                         tarea={tareaAsignada}
-                        history={{ push: pushEspia }}
                     />)
                 botonAsignacion(componente, tareaAsignada.id).simulate('click')
-                expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
+                expect(mockHistoryPush).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
 
             })
         })
