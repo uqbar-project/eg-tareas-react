@@ -25,7 +25,7 @@ describe('Asignar tarea a usuario', () => {
             })
     })
 
-    it('cuando clickeamos en el boton cumplir', () => {
+    it('cuando clickeamos en el boton asignar', () => {
         cy.visit('/')
         cy.get(asignarButton(tarea.id)).click()
     })

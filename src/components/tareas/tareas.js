@@ -15,7 +15,11 @@ export function TareasComponent() {
   const actualizarTareas = useCallback(async () => {
     try {
       const tareas = await tareaService.allInstances()
-      setTareas(tareas)
+      setTareas(
+        tareas.sort(function (tarea, otraTarea) {
+          return tarea.id - otraTarea.id
+        })
+      )
     } catch (error) {
       errorHandler(error)
     }
