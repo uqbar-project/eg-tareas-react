@@ -1,127 +1,121 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Paper, TextField, Select, MenuItem, FormLabel, Button, Snackbar } from '@material-ui/core'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
 import { Tarea } from '../domain/tarea'
 import { PropTypes } from 'prop-types'
+import { useHistory } from 'react-router-dom'
+import { useParams } from 'react-router'
 
+export default function AsignarTareaComponent() {
+  const { id } = useParams()
+  const [usuarios, setUsuarios] = useState([])
+  const [tarea, setTarea] = useState(new Tarea())
+  const [errorMessage, setErrorMessage] = useState('')
+  const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
+  const history = useHistory()
 
-export default class AsignarTareaComponent extends Component {
+  useEffect(() => {
+    async function getData() {
+      try {
+        setUsuarios(await usuarioService.allInstances())
+        setTarea(await tareaService.getTareaById(id))
+      } catch (e) {
+        generarError(e)
+      }
+    }
+    getData()
+  }, [id])
 
-  state = {
-    usuarios: [],
-    tarea: new Tarea()
-  }
-
-  async componentDidMount() {
+  const asignarTarea = async () => {
     try {
-      const usuarios = await usuarioService.allInstances()
-      const tarea = await tareaService.getTareaById(this.props.match.params.id)
-      this.setState({
-        usuarios: usuarios,
-        tarea: tarea
-      })
+      tarea.validarActualizacion()
+      await tareaService.actualizarTarea(tarea)
+      volver()
     } catch (e) {
-      this.generarError(e)
+      generarError(e)
     }
   }
 
-  asignarTarea = async () => {
-    try {
-      this.state.tarea.validarAsignacion()
-      await tareaService.actualizarTarea(this.state.tarea)
-      this.volver()
-    } catch (e) {
-      this.generarError(e)
-    }
-  }
-
-  cambiarEstado = (closureChange) => {
-    const tarea = this.state.tarea
+  const cambiarEstado = (closureChange) => {
     closureChange(tarea)
-    this.setState({
-      tarea,
-      errorMessage: ''
-    })
+    setTarea(Object.assign(new Tarea(), tarea))
+    setErrorMessage('')
   }
 
-  generarError = (errorMessage) => {
-    this.setState({
-      errorMessage: errorMessage.toString()
-    })
+  const generarError = (error) => {
+    setErrorMessage(error.response ? error.response.data : error.toString())
   }
 
-  asignar = (asignatario) => {
-    this.cambiarEstado((tarea) => tarea.asignarA(asignatario))
+  const asignar = (asignatario) => {
+    cambiarEstado((tarea) => tarea.asignarA(asignatario))
   }
 
-  cambiarDescripcion = (event) => {
+  const cambiarDescripcion = (event) => {
     const valor = event.target.value
-    this.cambiarEstado((tarea) => tarea.descripcion = valor)
+    cambiarEstado((tarea) => (tarea.descripcion = valor))
   }
 
-  volver = () => {
-    this.props.history.push('/')
+  const volver = () => {
+    history.push('/')
   }
 
-  render() {
-    const { tarea, usuarios, errorMessage } = this.state
-    const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
-    return (
-      <Paper>
-        <br />
-        <h2>Asignar tarea</h2>
-        <br />
-        <FormLabel>Descripción</FormLabel>
-        <br /><br />
-        <TextField id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} fullWidth />
-        <br />
-        <br /><br />
-        <br /><br />
-        <FormLabel>Asignatario</FormLabel>
-        <br /><br />
-        <Select
-          /*Aca podemos ver como esta declarado nombreAsignatario */
-          value={tarea.nombreAsignatario}
-          onChange={(event) => this.asignar(event.target.value)}
-          className="formControl"
-          inputProps={{
-            name: 'asignatario',
-            id: 'asignatario'
-          }}
-          data-testid="select-asignar"
-        >
-          &gt;
-              <MenuItem value=" ">
-            <em>Sin Asignar</em>
+  return (
+    <Paper>
+      <br />
+      <h2>Asignar tarea</h2>
+      <br />
+      <FormLabel>Descripción</FormLabel>
+      <br />
+      <br />
+      <TextField id="descripcion" value={tarea.descripcion} onChange={cambiarDescripcion} fullWidth />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <FormLabel>Asignatario</FormLabel>
+      <br />
+      <br />
+      <Select
+        /*Aca podemos ver como esta declarado nombreAsignatario */
+        value={tarea.nombreAsignatario}
+        onChange={(event) => asignar(event.target.value)}
+        className="formControl"
+        inputProps={{
+          name: 'asignatario',
+          id: 'asignatario'
+        }}
+        data-testid="select-asignar"
+      >
+        &gt;
+        <MenuItem value=" ">
+          <em>Sin Asignar</em>
+        </MenuItem>
+        {usuarios.map((usuario) => (
+          <MenuItem value={usuario.nombre} key={usuario.id}>
+            {usuario.nombre}
           </MenuItem>
-          {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
-        </Select>
-        <br />
-        <br />
-        <br />
-        <Button variant="contained" color="primary" onClick={this.asignarTarea} data-testid="aceptar-asignacion">
-          Aceptar
-        </Button>
-        &nbsp;&nbsp;&nbsp;
-        <Button variant="contained" onClick={this.volver} data-testid="cancelar-asignacion">
-          Cancelar
-        </Button>
-        <br />
-        <br />
-        <Snackbar
-          open={snackbarOpen}
-          message={errorMessage}
-          autoHideDuration={4}
-        />
-      </Paper>
-    )
-  }
+        ))}
+      </Select>
+      <br />
+      <br />
+      <br />
+      <Button variant="contained" color="primary" onClick={asignarTarea} data-testid="aceptar-asignacion">
+        Aceptar
+      </Button>
+      &nbsp;&nbsp;&nbsp;
+      <Button variant="contained" onClick={volver} data-testid="cancelar-asignacion">
+        Cancelar
+      </Button>
+      <br />
+      <br />
+      <Snackbar open={snackbarOpen} message={errorMessage} autoHideDuration={4} />
+    </Paper>
+  )
+}
 
-  static get propTypes() {
-    return {
-      history: PropTypes.object,
-      match: PropTypes.object,
-    }
-  }
+AsignarTareaComponent.propTypes = {
+  history: PropTypes.object,
+  match: PropTypes.object
 }
