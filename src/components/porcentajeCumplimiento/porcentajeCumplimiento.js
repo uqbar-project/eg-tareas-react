@@ -2,7 +2,7 @@ import React from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import PropTypes from 'prop-types'
 
-export function PorcentajeCumplimiento({tareaId, porcentaje}) {
+export function PorcentajeCumplimiento({tareaId, porcentaje}) { // hablar de destructuring
     const backgroundColor = () => {
         if (porcentaje > 80) return 'green'
         if (porcentaje < 50) return 'darkred'

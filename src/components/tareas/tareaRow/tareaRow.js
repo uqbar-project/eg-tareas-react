@@ -11,7 +11,7 @@ import { useHistory } from 'react-router-dom'
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
 
-export default function TareaRow({tarea, actualizarTareas}) {
+export default function TareaRow({tarea, actualizarTareas}) { // hablar de destructuring
 
     const history = useHistory()
 
