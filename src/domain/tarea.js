@@ -73,9 +73,12 @@ export class Tarea {
     }
   }
 
-  validarAsignacion() {
+  validarActualizacion() {
     if (!this.nombreAsignatario.trim()) {
       throw new UserException('Debe asignar la tarea a una persona')
+    }
+    if (!this.descripcion) {
+      throw new UserException('Debe ingresar descripción')
     }
   }
 }
