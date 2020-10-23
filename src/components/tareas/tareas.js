@@ -1,13 +1,14 @@
-import React, { Component } from 'react'
-import { tareaService } from '../../services/tareaService'
+import Paper from '@material-ui/core/Paper'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
-import TareaRow from './tareaRow/tareaRow'
 import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+
+import { tareaService } from '../../services/tareaService'
+import TareaRow from './tareaRow/tareaRow'
 
 export class TareasComponent extends Component {
 
@@ -25,7 +26,7 @@ export class TareasComponent extends Component {
     try {
       const tareas = await tareaService.allInstances()
       this.setState({
-        tareas: tareas
+        tareas,
       })
     } catch (error) {
       this.errorHandler(error)
@@ -34,10 +35,11 @@ export class TareasComponent extends Component {
 
 
   errorHandler(errorMessage) {
+    console.log('Error en la página principal')
     throw errorMessage
   }
-  render() {
 
+  render() {
     return (
       <Paper>
         <br />
