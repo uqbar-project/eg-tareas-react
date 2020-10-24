@@ -1,37 +1,35 @@
-import { shallow } from 'enzyme'
+import { render } from '@testing-library/react'
 import React from 'react'
+
 import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
 
-const getAvatarBy = (componente, selector) => componente.find(selector)
+/**
+ * DISCLAIMER: estos tests de UI no son buenos
+ * 
+ * - si cambia la clase del css, o bien si cambiamos material por cualquier otro framework
+ *   el test se rompe
+ * - no estamos testeando comportamiento
+ * - por un buen motivo, React Testing Library no provee helpers para buscar por clase de css
+ * - solo los dejamos para mostrar que se puede y como anti-pattern, 
+ *   no creemos que sea una buena práctica este tipo de test
+ */
+describe('porcentaje de cumplimiento', () => {
+  test('porcentaje en el límite superior', () => {
+    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={99} />)
+    expect(getByTestId('green')).toBeInTheDocument()
+  })
+  test('porcentaje intermedio', () => {
+    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={75} />)
+    expect(getByTestId('gold')).toBeInTheDocument()
+  })
 
-const getAvatarByColor = (componente, color) => componente.find({ style: { backgroundColor: color } })
+  test('porcentaje más bajo', () => {
+    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={25} />)
+    expect(getByTestId('darkred')).toBeInTheDocument()
+  })
 
-describe('PorcentajeCumplimiento', () => {
-    describe('cuando se le pasa un porcentaje', () => {
-        describe('y el porcentaje es mayor a 80', () => {
-            const componente = shallow(<PorcentajeCumplimiento porcentaje={99} />)
-            it('renderiza un avatar verde', () => {
-                expect(getAvatarByColor(componente, 'green').exists()).toBeTruthy()
-            })
-        })
-        describe('y el porcentaje es menor a 80 pero mayor a 50', () => {
-            const componente = shallow(<PorcentajeCumplimiento porcentaje={75} />)
-            it('renderiza un avatar amarillo', () => {
-                expect(getAvatarByColor(componente, 'gold').exists()).toBeTruthy()
-            })
-        })
-        describe('y el porcentaje es menor a 50', () => {
-            const componente = shallow(<PorcentajeCumplimiento porcentaje={25} />)
-            it('renderiza un avatar rojo', () => {
-                expect(getAvatarByColor(componente, 'darkred').exists()).toBeTruthy()
-            })
-        })
-    })
-
-    describe('cuando no se le pasa un porcentaje', () => {
-        const componente = shallow(<PorcentajeCumplimiento />)
-        it('no renderiza un avatar', () => {
-            expect(getAvatarBy(componente, 'Avatar').exists()).toBeFalsy()
-        })
-    })
+  test('cuando no se le pasa porcentaje no renderiza un avatar', () => {
+    const { container } = render(<PorcentajeCumplimiento />)
+    expect(container.innerHTML).toBe('')
+  })
 })

@@ -53,13 +53,12 @@ export class TareasComponent extends Component {
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody id="resultados">
+          <TableBody data-testid="resultados">
             {
               this.state.tareas.map((tarea) =>
                 <TareaRow
                   tarea={tarea}
                   key={tarea.id}
-                  data-testid={`tarea_${tarea.id}`}
                   actualizar={this.actualizarTareas} />)
             }
           </TableBody>

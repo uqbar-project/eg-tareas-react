@@ -1,15 +1,16 @@
-import React from 'react'
+import { Tooltip } from '@material-ui/core'
+import IconButton from '@material-ui/core/IconButton'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
-import IconButton from '@material-ui/core/IconButton'
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
-import { Tooltip } from '@material-ui/core'
+import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import PropTypes from 'prop-types'
-import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
+
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
+import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 
 
 export function TareaRow(props) {
@@ -31,21 +32,21 @@ export function TareaRow(props) {
     }
 
     const cumplirButton = tarea.sePuedeCumplir() &&
-        <Tooltip id="tooltip-fab" title="Cumplir tarea">
-            <IconButton id={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
+        <Tooltip data-testid="tooltip-fab" title="Cumplir tarea">
+            <IconButton data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
                 <CheckCircleIcon />
             </IconButton>
         </Tooltip>
 
     const asignarButton = tarea.sePuedeAsignar() &&
-        <Tooltip id="tooltip-asignar" title="Asignar persona a tarea">
-            <IconButton aria-label="Asignar" onClick={goToAsignarTarea} id={`asignar_${tarea.id}`}>
+        <Tooltip data-testid="tooltip-asignar" title="Asignar persona a tarea">
+            <IconButton aria-label="Asignar" onClick={goToAsignarTarea} data-testid={`asignar_${tarea.id}`}>
                 <AccountBoxIcon />
             </IconButton>
         </Tooltip>
 
     return (
-        <TableRow key={tarea.id} id={'TableRow' + tarea.id}>
+        <TableRow key={tarea.id} data-testid={'tarea_' + tarea.id}>
             <TableCell component="th" scope="row">
                 {tarea.descripcion}
             </TableCell>

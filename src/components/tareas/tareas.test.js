@@ -1,10 +1,10 @@
-import { shallow } from 'enzyme'
+import { render, wait } from '@testing-library/react'
 import React from 'react'
-import { TareasComponent } from './tareas'
+import { BrowserRouter } from 'react-router-dom'
+
 import { tareaService } from '../../services/tareaService'
 import { crearTarea } from '../../testsUtils/crearTarea'
-
-
+import { TareasComponent } from './tareas'
 
 const mockTareas =
   [
@@ -13,14 +13,17 @@ const mockTareas =
   ]
 
 describe('TareasComponent', () => {
-  describe('cuando el servicio respode correctamente', () => {
-    it('se muestran las tareas en la tabla', () => {
+  describe('cuando el servicio responde correctamente', () => {
+    test('se muestran las tareas en la tabla', async () => {
       tareaService.allInstances = () => Promise.resolve(mockTareas)
-      const componente = shallow(<TareasComponent />)
-      setImmediate(() => {
-        expect(componente.find('[data-testid="tarea_159"]').exists()).toBeTruthy()
-        expect(componente.find('[data-testid="tarea_68"]').exists()).toBeTruthy()
-      })
+      const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+      //
+      // está deprecado para la versión 10 de React Testing Library
+      // hay que usar [waitFor](https://testing-library.com/docs/dom-testing-library/api-async)
+      await wait()
+      //
+      expect(getByTestId('tarea_159')).toBeInTheDocument()
+      expect(getByTestId('tarea_68')).toBeInTheDocument()
     })
   })
 })
