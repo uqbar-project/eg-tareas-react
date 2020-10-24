@@ -33,7 +33,6 @@ export class TareasComponent extends Component {
     }
   }
 
-
   errorHandler(errorMessage) {
     console.log('Error en la página principal')
     throw errorMessage

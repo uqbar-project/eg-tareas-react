@@ -1,0 +1,10 @@
+.botonera {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 2em;
+}
+
+.linea {
+  margin-top: 2.5em;
+}

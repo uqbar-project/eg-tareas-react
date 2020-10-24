@@ -1,9 +1,16 @@
+import './asignarTarea.css'
+
+import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@material-ui/core'
+import Card from '@material-ui/core/Card'
+import CardActions from '@material-ui/core/CardActions'
+import CardContent from '@material-ui/core/CardContent'
+import Typography from '@material-ui/core/Typography'
+import { PropTypes } from 'prop-types'
 import React, { Component } from 'react'
-import { Paper, TextField, Select, MenuItem, FormLabel, Button, Snackbar } from '@material-ui/core'
+
+import { Tarea } from '../domain/tarea'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
-import { Tarea } from '../domain/tarea'
-import { PropTypes } from 'prop-types'
 
 
 export default class AsignarTareaComponent extends Component {
@@ -68,52 +75,56 @@ export default class AsignarTareaComponent extends Component {
     const { tarea, usuarios, errorMessage } = this.state
     const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
     return (
-      <Paper>
-        <br />
-        <h2>Asignar tarea</h2>
-        <br />
-        <FormLabel>Descripción</FormLabel>
-        <br /><br />
-        <TextField id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} fullWidth />
-        <br />
-        <br /><br />
-        <br /><br />
-        <FormLabel>Asignatario</FormLabel>
-        <br /><br />
-        <Select
-          /*Aca podemos ver como esta declarado nombreAsignatario */
-          value={tarea.nombreAsignatario}
-          onChange={(event) => this.asignar(event.target.value)}
-          className="formControl"
-          inputProps={{
-            name: 'asignatario',
-            id: 'asignatario'
-          }}
-        >
-          &gt;
-              <MenuItem value=" ">
-            <em>Sin Asignar</em>
-          </MenuItem>
-          {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
-        </Select>
-        <br />
-        <br />
-        <br />
-        <Button variant="contained" color="primary" onClick={this.asignarTarea}>
-          Aceptar
+      <Card>
+        <CardContent>
+          <Typography variant="h5" component="h2">
+            Asignar tarea
+        </Typography>
+        </CardContent>
+        <CardContent className="linea">
+          <FormLabel>Descripción:</FormLabel>
+        </CardContent>
+        <CardContent>
+          <TextField id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} className="formControl" />
+        </CardContent>
+        <CardContent className="linea">
+          <FormLabel>Asignatario:</FormLabel>
+        </CardContent>
+        <CardContent>
+          <Select
+            /*Aca podemos ver como esta declarado nombreAsignatario */
+            value={tarea.nombreAsignatario}
+            onChange={(event) => this.asignar(event.target.value)}
+            className="formControl"
+            inputProps={{
+              name: 'asignatario',
+              id: 'asignatario'
+            }}
+          >
+            <MenuItem value=" ">
+              <em>Sin Asignar</em>
+            </MenuItem>
+            {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
+          </Select>
+        </CardContent>
+        <CardActions className="botonera">
+          <CardContent>
+            <Button variant="contained" color="primary" onClick={this.asignarTarea}>
+              Aceptar
         </Button>
-        &nbsp;&nbsp;&nbsp;
-        <Button variant="contained" onClick={this.volver}>
-          Cancelar
+          </CardContent>
+          <CardContent>
+            <Button variant="contained" onClick={this.volver}>
+              Cancelar
         </Button>
-        <br />
-        <br />
+          </CardContent>
+        </CardActions>
         <Snackbar
           open={snackbarOpen}
           message={errorMessage}
           autoHideDuration={4}
         />
-      </Paper>
+      </Card>
     )
   }
 
