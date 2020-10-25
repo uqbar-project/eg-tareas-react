@@ -12,8 +12,7 @@ import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 
-
-export function TareaRow(props) {
+export const TareaRow = (props) => {
     const { tarea } = props
 
     const cumplirTarea = async () => {
