@@ -196,6 +196,45 @@ asignarTarea = async () => {
 
 Se delega la validación en la tarea directamente. Pueden ver la implementación en el código.
 
+## Keys de componentes custom en un loop
+
+Veamos el código que muestra la lista de tareas:
+
+```js
+  <TableBody data-testid="resultados">
+    {
+      this.state.tareas.map((tarea) =>
+        <TareaRow
+          tarea={tarea}
+          key={tarea.id}
+          actualizar={this.actualizarTareas} />)
+    }
+  </TableBody>
+```
+
+Como lo cuenta [la documentación de React](https://es.reactjs.org/docs/lists-and-keys.html), es importante dar a cada uno de nuestros componentes custom (`TareaRow` en este caso) una **key** para identificar rápidamente qué componentes están asociados a un cambio de estado (el Virtual DOM interno que maneja React). La restricción que deben cumplir los componentes hermanos es que a) sus **key** sean únicas, b) que existan.
+
+Si eliminamos la línea que genera la key, el Linter de React nos muestra un mensaje de error: `Missing "key" prop for element in iterator`. Pero qué ocurre si definimos una clave constante, como por ejemplo `1`:
+
+```js
+<TableBody data-testid="resultados">
+  {
+    this.state.tareas.map((tarea) =>
+      <TareaRow
+        tarea={tarea}
+        key={1}
+        actualizar={this.actualizarTareas} />)
+  }
+</TableBody>
+```
+
+![Misma clave](./video/sameKey.gif)
+
+- por un lado en la consola nos aparece un error en runtime, donde nos alerta que definir la misma clave puede producir inconsistencias en las actualizaciones de la página
+- por otro lado, cuando cumplimos una tarea, se actualizan innecesariamente todas las filas de la tabla. Podría pasar incluso que se actualice la información de las filas incorrectas
+
+La necesidad de trabajar con **key** únicas entre hermanos solo es necesaria cuando tenemos un loop, una iteración (no ocurre cuando estamos definiendo un componente solo).
+
 # Testing
 
 Ahora que separamos todo en componentes más chicos y con menos responsabilidades, son mucho más fáciles de testear :tada:

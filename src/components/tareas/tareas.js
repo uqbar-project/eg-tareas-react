@@ -59,7 +59,7 @@ export class TareasComponent extends Component {
               this.state.tareas.map((tarea) =>
                 <TareaRow
                   tarea={tarea}
-                  key={tarea.id}
+                  key={1}
                   actualizar={this.actualizarTareas} />)
             }
           </TableBody>
