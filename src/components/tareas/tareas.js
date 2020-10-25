@@ -1,4 +1,5 @@
 import Paper from '@material-ui/core/Paper'
+import Snackbar from '@material-ui/core/Snackbar'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -14,7 +15,10 @@ export class TareasComponent extends Component {
 
   constructor(props) {
     super(props)
-    this.state = { tareas: [] }
+    this.state = {
+      tareas: [],
+      errorMessage: ''
+    }
   }
 
   async componentDidMount() {
@@ -29,16 +33,13 @@ export class TareasComponent extends Component {
         tareas,
       })
     } catch (error) {
-      this.errorHandler(error)
+      this.setState({ errorMessage: error.response ? error.response.data : error.message })
     }
   }
 
-  errorHandler(errorMessage) {
-    console.log('Error en la página principal')
-    throw errorMessage
-  }
-
   render() {
+    const snackbarOpen = !!this.state.errorMessage
+
     return (
       <Paper>
         <br />
@@ -63,6 +64,11 @@ export class TareasComponent extends Component {
             }
           </TableBody>
         </Table>
+        <Snackbar
+          open={snackbarOpen}
+          message={this.state.errorMessage}
+          autoHideDuration={4}
+        />
       </Paper>
     )
   }

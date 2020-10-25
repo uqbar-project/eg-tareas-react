@@ -1,7 +1,9 @@
-import React, { Component } from 'react'
 import './App.css'
-import { TareasRoutes } from './routes'
+
+import React, { Component } from 'react'
 import { BrowserRouter } from 'react-router-dom'
+
+import { TareasRoutes } from './routes'
 
 class App extends Component {
   render() {
