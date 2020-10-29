@@ -25,15 +25,15 @@ export default class AsignarTareaComponent extends Component {
       const usuarios = await usuarioService.allInstances()
       const tarea = await tareaService.getTareaById(this.props.match.params.id)
       this.setState({
-        usuarios: usuarios,
-        tarea: tarea
+        usuarios,
+        tarea,
       })
     } catch (e) {
       this.generarError(e)
     }
   }
 
-  asignarTarea = async () => {
+  aceptarCambios = async () => {
     try {
       this.state.tarea.validarAsignacion()
       await tareaService.actualizarTarea(this.state.tarea)
@@ -43,12 +43,11 @@ export default class AsignarTareaComponent extends Component {
     }
   }
 
-  cambiarEstado = (closureChange) => {
-    const tarea = this.state.tarea
-    closureChange(tarea)
+  cambiarEstado = (tarea) => {
+    const newTarea = Object.assign(tarea)
     this.setState({
-      tarea,
-      errorMessage: ''
+      tarea: newTarea,
+      errorMessage: '',
     })
   }
 
@@ -59,12 +58,15 @@ export default class AsignarTareaComponent extends Component {
   }
 
   asignar = (asignatario) => {
-    this.cambiarEstado((tarea) => tarea.asignarA(asignatario))
+    const tarea = this.state.tarea
+    tarea.asignarA(asignatario)
+    this.cambiarEstado(tarea)
   }
 
   cambiarDescripcion = (event) => {
-    const valor = event.target.value
-    this.cambiarEstado((tarea) => tarea.descripcion = valor)
+    const tarea = this.state.tarea
+    tarea.descripcion = event.target.value
+    this.cambiarEstado(tarea)
   }
 
   volver = () => {
@@ -109,7 +111,7 @@ export default class AsignarTareaComponent extends Component {
         </CardContent>
         <CardActions className="botonera">
           <CardContent>
-            <Button variant="contained" color="primary" onClick={this.asignarTarea}>
+            <Button variant="contained" color="primary" onClick={this.aceptarCambios}>
               Aceptar
         </Button>
           </CardContent>

@@ -22,7 +22,7 @@ export const TareaRow = (props) => {
             await tareaService.actualizarTarea(tarea)
             props.actualizar()
         } catch (error) {
-            console.log(error)
+            this.generarError(error)
         }
     }
 

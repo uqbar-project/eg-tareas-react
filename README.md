@@ -80,7 +80,7 @@ const cumplirTarea = async () => {
       await tareaService.actualizarTarea(tarea)
       props.actualizar()
     } catch (error) {
-      console.log(error)
+      this.generarError(error)
     }
 }
 ```
@@ -101,9 +101,20 @@ const goToAsignarTarea = () => {
 }
 ```
 
+según lo definido en las rutas del archivo `routes.js`:
+
+```js
+export const TareasRoutes = () => (
+    <Router>
+        <Route exact={true} path="/" component={TareasComponent} />
+        <Route path="/asignarTarea/:id" component={AsignarTareaComponent} />
+    </Router>
+)
+```
+
 para lo cual hay que decorar el componente TareaRow con el router de React:
 
-```javascript
+```js
 export default withRouter(TareaRow)
 ```
 
@@ -163,15 +174,17 @@ El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el
 
 ```javascript
 asignar = (asignatario) => {
-  this.cambiarEstado((tarea) => tarea.asignarA(asignatario))
+  const tarea = this.state.tarea
+  tarea.asignarA(asignatario)
+  this.cambiarEstado(tarea)
 }
 
-cambiarEstado = (closureChange) => {
-  const tarea = this.state.tarea
-  closureChange(tarea)
+cambiarEstado = (tarea) => {
+  // generamos una copia de la tarea, sabiendo que no necesita una copia profunda
+  const newTarea = Object.assign(tarea)
   this.setState({
-    tarea,
-    errorMessage: ''
+    tarea: newTarea,
+    errorMessage: '',
   })
 }
 ```
@@ -183,7 +196,7 @@ Al actualizar el estado se dispara el render que refleja el nuevo valor para el 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
 ```javascript
-asignarTarea = async () => {
+aceptarCambios = async () => {
   try {
     this.state.tarea.validarAsignacion()
     await tareaService.actualizarTarea(this.state.tarea)
