@@ -4,7 +4,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import PropTypes from 'prop-types'
+import { PropTypes } from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 
@@ -65,8 +65,7 @@ export const TareaRow = (props) => {
 TareaRow.propTypes = {
     tarea: PropTypes.instanceOf(Tarea),
     history: PropTypes.object,
-    actualizar: PropTypes.func
+    actualizar: PropTypes.func,
 }
-
 
 export default withRouter(TareaRow)

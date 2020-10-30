@@ -58,7 +58,8 @@ export class Tarea {
   static fromJson(tareaJSON) {
     return Object.assign(new Tarea(),
       tareaJSON,
-      { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
+      { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) }
+    )
   }
 
   get nombreAsignatario() {

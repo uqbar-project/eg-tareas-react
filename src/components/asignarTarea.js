@@ -33,16 +33,6 @@ export default class AsignarTareaComponent extends Component {
     }
   }
 
-  aceptarCambios = async () => {
-    try {
-      this.state.tarea.validarAsignacion()
-      await tareaService.actualizarTarea(this.state.tarea)
-      this.volver()
-    } catch (e) {
-      this.generarError(e)
-    }
-  }
-
   cambiarEstado = (tarea) => {
     const newTarea = Object.assign(tarea)
     this.setState({
@@ -67,6 +57,16 @@ export default class AsignarTareaComponent extends Component {
     const tarea = this.state.tarea
     tarea.descripcion = event.target.value
     this.cambiarEstado(tarea)
+  }
+
+  aceptarCambios = async () => {
+    try {
+      this.state.tarea.validarAsignacion()
+      await tareaService.actualizarTarea(this.state.tarea)
+      this.volver()
+    } catch (e) {
+      this.generarError(e)
+    }
   }
 
   volver = () => {

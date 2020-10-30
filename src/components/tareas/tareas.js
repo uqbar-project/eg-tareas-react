@@ -5,7 +5,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
-import PropTypes from 'prop-types'
+import { PropTypes } from 'prop-types'
 import React, { Component } from 'react'
 
 import { tareaService } from '../../services/tareaService'
@@ -59,7 +59,7 @@ export class TareasComponent extends Component {
               this.state.tareas.map((tarea) =>
                 <TareaRow
                   tarea={tarea}
-                  key={1}
+                  key={tarea.id}
                   actualizar={this.actualizarTareas} />)
             }
           </TableBody>
