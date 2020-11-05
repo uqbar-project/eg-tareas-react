@@ -256,8 +256,8 @@ Ahora que separamos todo en componentes más chicos y con menos responsabilidade
 
 A este componente le pasamos una tarea por `props` y basándonos en los diferentes estados de la misma hacemos lo siguiente:
 - si está asignada nos aparece el botón que permite marcarla como cumplida
-- si está asignada pero su porcentaje de cumplimiento está completo no aparece el está de cumplir
-- cuando tocamos el está de asignar nos redirige hacia otra página
+- si está asignada pero su porcentaje de cumplimiento está completo no aparece el botón cumplir
+- cuando tocamos el botón asignar nos redirige hacia otra página
 - si no está asignada no aparece dicho botón
 
 El lector puede ver la implementación en el archivo [tareaRow.test.js](./src/components/tareas/tareaRow/tareaRow.test.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId`:
