@@ -1,29 +1,36 @@
-import { Tooltip } from '@material-ui/core'
+import { Snackbar, Tooltip } from '@material-ui/core'
 import IconButton from '@material-ui/core/IconButton'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import { PropTypes } from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
+import { obtenerMensaje } from '../../../utils/obtenerMensaje'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 
 export const TareaRow = (props) => {
     const { tarea } = props
+    const [errorMessage, setErrorMessage] = useState('')
 
     const cumplirTarea = async () => {
-        tarea.cumplir()
-        // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
         try {
             await tareaService.actualizarTarea(tarea)
+            tarea.cumplir()
+            // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
             props.actualizar()
         } catch (error) {
-            this.generarError(error)
+            generarError(error)
         }
+    }
+
+    const generarError = (error) => {
+        const mensaje = obtenerMensaje(error)
+        setErrorMessage(mensaje)
     }
 
     const goToAsignarTarea = () => {
@@ -58,6 +65,11 @@ export const TareaRow = (props) => {
                 {cumplirButton}
                 {asignarButton}
             </TableCell>
+            <Snackbar
+                open={!!errorMessage}
+                message={errorMessage}
+                autoHideDuration={4}
+            />
         </TableRow>
     )
 }

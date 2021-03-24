@@ -11,7 +11,7 @@ import React, { Component } from 'react'
 import { Tarea } from '../domain/tarea'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
-
+import { obtenerMensaje } from '../utils/obtenerMensaje'
 
 export default class AsignarTareaComponent extends Component {
 
@@ -41,10 +41,8 @@ export default class AsignarTareaComponent extends Component {
     })
   }
 
-  generarError = (errorMessage) => {
-    this.setState({
-      errorMessage: errorMessage.toString()
-    })
+  generarError = (error) => {
+    this.setState({ errorMessage: obtenerMensaje(error) })
   }
 
   asignar = (asignatario) => {

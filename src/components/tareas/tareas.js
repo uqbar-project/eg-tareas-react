@@ -9,6 +9,7 @@ import { PropTypes } from 'prop-types'
 import React, { Component } from 'react'
 
 import { tareaService } from '../../services/tareaService'
+import { obtenerMensaje } from '../../utils/obtenerMensaje'
 import TareaRow from './tareaRow/tareaRow'
 
 export class TareasComponent extends Component {
@@ -33,7 +34,7 @@ export class TareasComponent extends Component {
         tareas,
       })
     } catch (error) {
-      this.setState({ errorMessage: error.response ? error.response.data : error.message })
+      this.setState({ errorMessage: obtenerMensaje(error) })
     }
   }
 
@@ -79,6 +80,5 @@ export class TareasComponent extends Component {
     }
   }
 }
-
 
 export default TareasComponent
