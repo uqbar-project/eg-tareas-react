@@ -51,7 +51,7 @@ class TareasComponent {
         tareas, // recordemos que equivale a tareas: tareas,
       })
     } catch (error) {
-      this.setState({ errorMessage: error.response ? error.response.data : error.message })
+      this.setState({ errorMessage: obtenerMensaje(error) })
     }
   }
 ```
