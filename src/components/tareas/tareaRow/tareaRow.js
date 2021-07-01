@@ -18,10 +18,10 @@ export const TareaRow = (props) => {
     const [errorMessage, setErrorMessage] = useState('')
 
     const cumplirTarea = async () => {
+        tarea.cumplir()
+        // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
         try {
             await tareaService.actualizarTarea(tarea)
-            tarea.cumplir()
-            // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
             props.actualizar()
         } catch (error) {
             generarError(error)
