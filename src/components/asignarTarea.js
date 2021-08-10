@@ -47,7 +47,8 @@ export default class AsignarTareaComponent extends Component {
 
   asignar = (asignatario) => {
     const tarea = this.state.tarea
-    tarea.asignarA(asignatario)
+    const asignatarioNuevo = asignatario.trim() ? asignatario : null
+    tarea.asignarA(asignatarioNuevo)
     this.cambiarEstado(tarea)
   }
 
@@ -93,7 +94,7 @@ export default class AsignarTareaComponent extends Component {
         <CardContent>
           <Select
             /*Aca podemos ver como esta declarado nombreAsignatario */
-            value={tarea.nombreAsignatario}
+            value={tarea.nombreAsignatario || ' '}
             onChange={(event) => this.asignar(event.target.value)}
             className="formControl"
             inputProps={{

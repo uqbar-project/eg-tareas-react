@@ -1,4 +1,4 @@
-import { Usuario, USUARIO_NULO } from './usuario'
+import { Usuario } from './usuario'
 
 const PORCENTAJE_CUMPLIDA = 100
 export class Tarea {
@@ -6,7 +6,7 @@ export class Tarea {
     this.id = 0
     this.descripcion = ''
     this.iteracion = ''
-    this.asignatario = USUARIO_NULO
+    this.asignatario = null
     this.fecha = '10/10/2015'
     this.porcentajeCumplimiento = 0
   }
@@ -24,7 +24,7 @@ export class Tarea {
   }
 
   sePuedeCumplir() {
-    return this.porcentajeCumplimiento < PORCENTAJE_CUMPLIDA && this.estaAsignada()
+    return this.cumplioMenosDe(PORCENTAJE_CUMPLIDA) && this.estaAsignada()
   }
 
   cumplir() {
@@ -32,7 +32,7 @@ export class Tarea {
   }
 
   desasignar() {
-    this.asignatario = USUARIO_NULO
+    this.asignatario = null
   }
 
   sePuedeDesasignar() {
@@ -52,30 +52,33 @@ export class Tarea {
   }
 
   estaAsignada() {
-    return !this.asignatario.equals(USUARIO_NULO)
+    return !!this.asignatario
   }
 
   static fromJson(tareaJSON) {
-    return Object.assign(new Tarea(),
+    const result = Object.assign(new Tarea(),
       tareaJSON,
-      { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) }
+      { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : null }
     )
+    // eliminamos el dato de JSON
+    delete result.asignadoA
+    return result
   }
 
   get nombreAsignatario() {
-    return this.asignatario.nombre
+    return this.asignatario?.nombre
   }
 
   toJSON() {
     return {
       ...this,
-      asignatario: null,
-      asignadoA: this.asignatario.nombre,
+      asignatario: null, // o podríamos pisarlo
+      asignadoA: this.nombreAsignatario,
     }
   }
 
   validarAsignacion() {
-    if (!this.nombreAsignatario.trim()) {
+    if (!this.nombreAsignatario) {
       throw new UserException('Debe asignar la tarea a una persona')
     }
   }
