@@ -1,6 +1,7 @@
+
 # Tareas de un equipo de desarrollo
 
-[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-react.svg?branch=master)](https://travis-ci.org/uqbar-project/eg-tareas-react)
+[![Build React App](https://github.com/uqbar-project/eg-hola-mundo-react/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/uqbar-project/eg-hola-mundo-react/actions/workflows/build.yml) ![coverage](./badges/coverage/coverage.svg)
 
 ![video](video/demo2.gif)
 

@@ -41,7 +41,7 @@ describe('TareaRow', () => {
     })
 
     describe('cuando una tarea NO está asignada', () => {
-        test('una tarea sin asignar no puede cumplirse', () => {
+        test('no puede cumplirse', () => {
             const tareaNoAsignada = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
             tareaNoAsignada.desasignar()
             const { queryByTestId } = render(<TareaRow tarea={tareaNoAsignada} />)

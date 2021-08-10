@@ -1,4 +1,4 @@
-import { render, wait } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -17,13 +17,10 @@ describe('TareasComponent', () => {
     test('se muestran las tareas en la tabla', async () => {
       tareaService.allInstances = () => Promise.resolve(mockTareas)
       const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      //
-      // está deprecado para la versión 10 de React Testing Library
-      // hay que usar [waitFor](https://testing-library.com/docs/dom-testing-library/api-async)
-      await wait()
-      //
-      expect(getByTestId('tarea_159')).toBeInTheDocument()
-      expect(getByTestId('tarea_68')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByTestId('tarea_159')).toBeInTheDocument()
+        expect(getByTestId('tarea_68')).toBeInTheDocument()
+      })
     })
   })
 })
