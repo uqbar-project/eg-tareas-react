@@ -9,7 +9,7 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 # Coverage
 
-Extrañamente, tuvimos que renombrar los archivos test por spec para poder tener un correcto porcentaje de cobertura.
+Extrañamente, tuvimos que renombrar los archivos de test por spec para poder tener un correcto porcentaje de cobertura. Ejemplo: `porcentajeCobertura.test.js` pasó a llamarse `porcentajeCobertura.spec.js`.
 
 # Conceptos
 
