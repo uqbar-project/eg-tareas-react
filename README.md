@@ -7,6 +7,10 @@
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 
+# Coverage
+
+Extrañamente, tuvimos que renombrar los archivos test por spec para poder tener un correcto porcentaje de cobertura.
+
 # Conceptos
 
 - Componentes de React
