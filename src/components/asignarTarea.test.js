@@ -52,4 +52,10 @@ describe('tests de asignar tarea', () => {
       expect(reasignacion.getByText("Delia Negro")).toBeInTheDocument()
     })
   })
+
+  // Estaría bárbaro agregar más cobertura pero:
+  // 1- Al intentar simular el click en asignar entramos en loop infinito de renders
+  //    (hay que averiguar por qué)
+  // 2- El costo de agregar cobertura supera al beneficio del código testeado y a lo
+  //    poco resiliente que es (es muy fácil romper los tests)
 })
