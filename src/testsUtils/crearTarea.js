@@ -1,11 +1,11 @@
 import { Tarea } from '../domain/tarea'
 import { Usuario } from '../domain/usuario'
 
-export function crearTarea(id, descripcion, porcentaje, asignado) {
+export function crearTarea(id, descripcion, porcentajeCumplimiento, asignado) {
     return Object.assign(new Tarea(), {
         id,
         descripcion,
-        porcentaje,
+        porcentajeCumplimiento,
         asignatario: new Usuario(asignado)
     })
 }

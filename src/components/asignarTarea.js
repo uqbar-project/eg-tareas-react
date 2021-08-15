@@ -86,14 +86,14 @@ export default class AsignarTareaComponent extends Component {
           <FormLabel>Descripción:</FormLabel>
         </CardContent>
         <CardContent>
-          <TextField id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} className="formControl" />
+          <TextField inputProps={{"data-testid":"descripcion"}} id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} className="formControl" />
         </CardContent>
         <CardContent className="linea">
           <FormLabel>Asignatario:</FormLabel>
         </CardContent>
         <CardContent>
           <Select
-            /*Aca podemos ver como esta declarado nombreAsignatario */
+            /*Aca podemos ver cómo esta declarado nombreAsignatario */
             value={tarea.nombreAsignatario || ' '}
             onChange={(event) => this.asignar(event.target.value)}
             className="formControl"
@@ -105,14 +105,14 @@ export default class AsignarTareaComponent extends Component {
             <MenuItem value=" ">
               <em>Sin Asignar</em>
             </MenuItem>
-            {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
+            {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
           </Select>
         </CardContent>
         <CardActions className="botonera">
           <CardContent>
             <Button variant="contained" color="primary" onClick={this.aceptarCambios}>
               Aceptar
-        </Button>
+            </Button>
           </CardContent>
           <CardContent>
             <Button variant="contained" onClick={this.volver}>

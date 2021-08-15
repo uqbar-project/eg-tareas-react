@@ -40,6 +40,20 @@ describe('tests de tarea', () => {
     expect(tarea.sePuedeCumplir()).toBeTruthy()
   })
 
+  test('una tarea que está a menos del 100% y asignada se puede desasignar', () => {
+    const tarea = new Tarea()
+    tarea.porcentajeCumplimiento = 99
+    tarea.asignarA(nombrePersona)
+    expect(tarea.sePuedeDesasignar()).toBeTruthy()
+  })
+
+  test('una tarea que está al 100% no se puede desasignar', () => {
+    const tarea = new Tarea()
+    tarea.porcentajeCumplimiento = 100
+    tarea.asignarA(nombrePersona)
+    expect(tarea.sePuedeDesasignar()).toBeFalsy()
+  })
+
   test('una tarea que está al 100% no se puede cumplir', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 100
@@ -59,6 +73,7 @@ describe('tests de tarea', () => {
     tarea.cumplir()
     expect(tarea.porcentajeCumplimiento).toBe(100)
     expect(tarea.estaCumplida()).toBeTruthy()
+    expect(tarea.cumplio(100)).toBeTruthy()
   })
 
   test('una tarea que está cumplida no puede asignarse', () => {
@@ -107,5 +122,14 @@ describe('tests de tarea', () => {
   })
   test('una tarea sin asignatario no es válida', () => {
     expect(() => { tarea.validarAsignacion() }).toThrowError()
+  })
+
+  test('una tarea con asignatario es válida', () => {
+    const tarea = Tarea.fromJson({
+      porcentajeCumplimiento: 20,
+      asignadoA: nombrePersona,
+      iteracion: 'Sprint 3'
+    })
+    expect(() => { tarea.validarAsignacion() }).not.toThrowError()
   })
 })
