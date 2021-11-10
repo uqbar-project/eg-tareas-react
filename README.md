@@ -80,8 +80,8 @@ En ese evento se delega a cumplir de Tarea y se pide al service que actualice el
 ```js
 // en el componente funcional TareaRow
 const cumplirTarea = async () => {
-    tarea.cumplir()
-    try {
+  try {
+      tarea.cumplir()
       await tareaService.actualizarTarea(tarea)
       props.actualizar()
     } catch (error) {
@@ -97,6 +97,8 @@ actualizarTarea(tarea) {
   return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
 }
 ```
+
+## Asignación de tareas
 
 El botón de asignación dispara la navegación de la ruta '/asignar' (en TareaRow):
 
@@ -124,8 +126,6 @@ export default withRouter(TareaRow)
 ```
 
 Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
-
-## Asignación de tareas
 
 ![image](images/ArquitecturaTareasAsignacion.png)
 
@@ -193,6 +193,8 @@ cambiarEstado = (tarea) => {
   })
 }
 ```
+
+Un detalle importante es que no podemos hacer la copia de la tarea utilizando el _spread operator_ (`{...tarea}`) porque solo copia los atributos del objeto y no sus métodos. Pueden investigar más en [este link](https://www.javascripttutorial.net/object/3-ways-to-copy-objects-in-javascript/).
 
 ### Continuamos actualizando el estado del componente que asigna una tarea
 
@@ -309,23 +311,6 @@ Y nuestro test queda de la siguiente forma :
     test('se muestran las tareas en la tabla', async () => {
       tareaService.allInstances = () => Promise.resolve(mockTareas)
       const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      //
-      // está deprecado para la versión 10 de React Testing Library
-      await wait()
-      //
-      expect(getByTestId('tarea_159')).toBeInTheDocument()
-      expect(getByTestId('tarea_68')).toBeInTheDocument()
-    })
-  })
-```
-
-Tenemos que usar un `wait` para esperar a que nuestro componente termine de renderizar el jsx y así poder encontrar las tareas. A partir de las versión 10 de React Testing Library deberemos usar [waitFor](https://testing-library.com/docs/dom-testing-library/api-async):
-
-```js
-  describe('cuando el servicio responde correctamente', () => {
-    test('se muestran las tareas en la tabla', async () => {
-      tareaService.allInstances = () => Promise.resolve(mockTareas)
-      const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
       // nueva variante -> waitFor
       await waitFor(() => {
         expect(getByTestId('tarea_159')).toBeInTheDocument()
@@ -336,4 +321,7 @@ Tenemos que usar un `wait` para esperar a que nuestro componente termine de rend
   })
 ```
 
-pero debemos esperar a que React y su biblioteca de testing se alineen correspondientemente.
+Cosas interesantes para comentar:
+
+- [waitFor](https://testing-library.com/docs/dom-testing-library/api-async) nos permite esperar a que la promise que devuelve las tareas mockeadas se resuelva y hacer las aserciones correspondientes
+- es necesario envolver TareasComponent en el **BrowserRouter** para recibir la props.history y funcionar correctamente.
