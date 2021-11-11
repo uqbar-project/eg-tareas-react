@@ -24,10 +24,10 @@ export class TareasComponent extends Component {
 
   async componentDidMount() {
     //debugger //  to show lifecycle
-    await this.actualizarTareas()
+    await this.traerTareas()
   }
 
-  actualizarTareas = async () => {
+  traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
       this.setState({
@@ -61,7 +61,7 @@ export class TareasComponent extends Component {
                 <TareaRow
                   tarea={tarea}
                   key={tarea.id}
-                  actualizar={this.actualizarTareas} />)
+                  actualizar={this.traerTareas} />)
             }
           </TableBody>
         </Table>

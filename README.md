@@ -7,10 +7,6 @@
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 
-# Coverage
-
-Extrañamente, tuvimos que renombrar los archivos de test por spec para poder tener un correcto porcentaje de cobertura. Ejemplo: `porcentajeCobertura.test.js` pasó a llamarse `porcentajeCobertura.spec.js`.
-
 # Conceptos
 
 - Componentes de React
@@ -31,9 +27,23 @@ Extrañamente, tuvimos que renombrar los archivos de test por spec para poder te
 
 ![image](images/ArquitecturaTareas.png)
 
-El componente llama al service (singleton) quien dispara la búsqueda de tareas y devuelve la promise:
+En el componente que muestra las tareas disparamos la búsqueda de tareas (evento `componentDidMount` porque `tareas` está definido como clase):
 
-```javascript
+```js
+  async componentDidMount() {
+    //debugger //  to show lifecycle
+    await this.traerTareas()
+  }
+
+  traerTareas = async () => {
+    try {
+      const tareas = await tareaService.allInstances()
+      ...
+```
+
+El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios):
+
+```js
 class TareaService {
   async allInstances() {
     const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
@@ -45,11 +55,8 @@ Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente 
 
 ```js
 class TareasComponent {
-  componentDidMount() {
-    this.actualizarTareas()
-  }
 
-  actualizarTareas = async () => {
+  traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
       this.setState({
@@ -63,9 +70,23 @@ class TareasComponent {
 
 También podríamos utilizar la sintaxis de promises común `then().catch()`.
 
+```js
+traerTareas() {
+  tareaService.allInstances()
+    .then((tareas) => {
+      this.setState({
+        tareas,
+      })
+    })
+    .catch ((error) => {
+      this.setState({ errorMessage: obtenerMensaje(error) })
+    })
+}
+```
+
 ## Cumplir una tarea
 
-El componente captura el evento del botón:
+El componente `TareaRow` captura el evento del botón:
 
 ```js
 export const TareaRow = (props) => {
@@ -75,7 +96,7 @@ export const TareaRow = (props) => {
   </IconButton>
 ```
 
-En ese evento se delega a cumplir de Tarea y se pide al service que actualice el backend. Cuando la promise se cumple, disparamos la función que nos pasaron por props para buscar nuevamente las tareas al backend, así traemos la última información:
+En el método del componente delegamos el cumplimiento al objeto de dominio Tarea y pedimos al service que actualice el backend. Cuando la promise se cumple, disparamos la función que nos pasaron por props para buscar nuevamente las tareas al backend, así traemos la última información:
 
 ```js
 // en el componente funcional TareaRow
@@ -90,7 +111,27 @@ const cumplirTarea = async () => {
 }
 ```
 
-El método actualizarTarea del service dispara el pedido PUT al backend:
+`props.actualizar()` lo recibimos como una función:
+
+```js
+// en Tarea se envía para cada uno de los elementos de la lista
+<TareaRow
+  tarea={tarea}
+  key={tarea.id}
+  actualizar={this.traerTareas} />)
+```
+
+```js
+TareaRow.propTypes = {
+    tarea: PropTypes.instanceOf(Tarea),
+    history: PropTypes.object,
+    actualizar: PropTypes.func,  // <== aquí lo recibimos
+}
+```
+
+El método traerTareas ya lo hemos visto, es el que se dispara inicialmente en el evento componentDidMount de `Tarea`.
+
+Por su parte, el método actualizarTarea del service dispara el pedido PUT al backend, pasando como body la conversión de nuestro objeto de dominio Tarea a JSON:
 
 ```js
 actualizarTarea(tarea) {
@@ -100,7 +141,9 @@ actualizarTarea(tarea) {
 
 ## Asignación de tareas
 
-El botón de asignación dispara la navegación de la ruta '/asignar' (en TareaRow):
+### Navegación
+
+El botón de asignación dispara la navegación de la ruta '/asignarTarea' (en TareaRow):
 
 ```js
 const goToAsignarTarea = () => {
@@ -129,6 +172,8 @@ Esto permite que se le inyecte dentro del mapa `props` la referencia `history` q
 
 ![image](images/ArquitecturaTareasAsignacion.png)
 
+### Llamadas asincrónicas
+
 En la asignación de tareas el combo de usuarios se llena con una llamada al servicio REST que trae los usuarios:
 
 ```js
@@ -136,13 +181,16 @@ class UsuarioService {
 
   async allInstances() {
     const { data } = await axios.get(`${REST_SERVER_URL}/usuarios`)
+    // { data } aplica destructuring sobre el objeto recibido por la promise, es equivalente a hacer
+    // const response = await ...
+    // return response.data
     return data
   }
 ```
 
-Agregamos en el combo la opción "Sin Asignar":
+Además de los usuarios, agregamos en el combo la opción "Sin Asignar", para poder desasignar una tarea (lo tenemos que asociar a un valor en blanco):
 
-```javascript
+```js
 <Select
     value={this.state.tarea.nombreAsignatario}
     onChange={(event) => this.asignar(event.target.value)}
@@ -171,13 +219,13 @@ La clase formControl especifica un width más grande (el default es muy chico), 
 
 Para entender cómo funciona la asignación, el combo dispara el evento de cambio al componente AsignarTareas:
 
-```javascript
+```js
 ... onChange={(event) => this.asignar(event.target.value)}
 ```
 
 El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el identificador, pero lamentablemente el servicio REST solo nos da el nombre), entonces delegamos a un método más general que actualiza el estado de la tarea. En el componente AsignarTareaComponent:
 
-```javascript
+```js
 asignar = (asignatario) => {
   const tarea = this.state.tarea
   tarea.asignarA(asignatario)
@@ -196,13 +244,13 @@ cambiarEstado = (tarea) => {
 
 Un detalle importante es que no podemos hacer la copia de la tarea utilizando el _spread operator_ (`{...tarea}`) porque solo copia los atributos del objeto y no sus métodos. Pueden investigar más en [este link](https://www.javascripttutorial.net/object/3-ways-to-copy-objects-in-javascript/).
 
-### Continuamos actualizando el estado del componente que asigna una tarea
-
 Al actualizar el estado se dispara el render que refleja el nuevo valor para el combo, y tenemos entonces siempre la tarea actualizada.
+
+### Aceptar los cambios de la asignación
 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
-```javascript
+```js
 aceptarCambios = async () => {
   try {
     this.state.tarea.validarAsignacion()
@@ -227,7 +275,7 @@ Veamos el código que muestra la lista de tareas:
         <TareaRow
           tarea={tarea}
           key={tarea.id}
-          actualizar={this.actualizarTareas} />)
+          actualizar={this.traerTareas} />)
     }
   </TableBody>
 ```
@@ -243,7 +291,7 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
       <TareaRow
         tarea={tarea}
         key={1}
-        actualizar={this.actualizarTareas} />)
+        actualizar={this.traerTareas} />)
   }
 </TableBody>
 ```
@@ -259,7 +307,7 @@ La necesidad de trabajar con **key** únicas entre hermanos solo es necesaria cu
 
 Ahora que separamos todo en componentes más chicos y con menos responsabilidades, son mucho más fáciles de testear :tada:
 
-### TareaRow
+## TareaRow
 
 A este componente le pasamos una tarea por `props` y basándonos en los diferentes estados de la misma hacemos lo siguiente:
 - si está asignada nos aparece el botón que permite marcarla como cumplida
@@ -267,7 +315,7 @@ A este componente le pasamos una tarea por `props` y basándonos en los diferent
 - cuando tocamos el botón asignar nos redirige hacia otra página
 - si no está asignada no aparece dicho botón
 
-El lector puede ver la implementación en el archivo [tareaRow.test.js](./src/components/tareas/tareaRow/tareaRow.test.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId`:
+El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/components/tareas/tareaRow/tareaRow.spec.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId`:
 
 ```js
   test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
@@ -294,13 +342,13 @@ Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cu
   })
 ```
 
-### Tareas
+## Tareas
 
-## Mockear el servicio
+### Mockear el servicio
 
 La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a nuestros **services**, lo primero es crear nuestros datos de mock (pueden ver la implementación en el archivo [crearTarea.js](./src/testsUtils/crearTarea.js)). Y ahora sí podemos construir una _promise mockeada_, dentro de nuestros tests. Como nuestro servicio de tareas es un singleton, podemos pisar el método en el contexto de los tests haciendo que devuelva una promesa con lo que nosotros queramos directamente, de la siguiente manera:
 
-```javascript
+```js
 tareaService.allInstances = () => Promise.resolve(mockTareas)
 ```
 
