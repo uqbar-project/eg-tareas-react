@@ -13,8 +13,7 @@ import { tareaService } from '../../../services/tareaService'
 import { obtenerMensaje } from '../../../utils/obtenerMensaje'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
 
-export const TareaRow = (props) => {
-    const { tarea } = props
+export const TareaRow = ({ tarea, actualizar, history }) => {
     const [errorMessage, setErrorMessage] = useState('')
 
     const cumplirTarea = async () => {
@@ -22,9 +21,11 @@ export const TareaRow = (props) => {
         try {
             tarea.cumplir()
             await tareaService.actualizarTarea(tarea)
-            props.actualizar()
         } catch (error) {
             generarError(error)
+        } finally {
+            // viene como props
+            await actualizar()
         }
     }
 
@@ -34,7 +35,7 @@ export const TareaRow = (props) => {
     }
 
     const goToAsignarTarea = () => {
-        props.history.push(`/asignarTarea/${tarea.id}`)
+        history.push(`/asignarTarea/${tarea.id}`)
     }
 
     const cumplirButton = tarea.sePuedeCumplir() &&
