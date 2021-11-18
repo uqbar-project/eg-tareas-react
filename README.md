@@ -319,7 +319,7 @@ El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/co
 
 ```js
   test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
-      tareaAsignada.porcentajeCumplimiento = 100
+      tareaAsignada.cumplir()
       const { queryByTestId } = render(<TareaRow tarea={tareaAsignada} />)
       expect(queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
   })

@@ -15,7 +15,7 @@ describe('TareaRow', () => {
             expect(getByTestId('cumplir_' + tareaAsignada.id)).toBeInTheDocument()
         })
         test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
-            tareaAsignada.porcentajeCumplimiento = 100
+            tareaAsignada.cumplir()
             const { queryByTestId } = render(<TareaRow tarea={tareaAsignada} />)
             expect(queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
         })
