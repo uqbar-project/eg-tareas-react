@@ -1,19 +1,20 @@
-import { Snackbar, Tooltip } from '@material-ui/core'
-import IconButton from '@material-ui/core/IconButton'
-import TableCell from '@material-ui/core/TableCell'
-import TableRow from '@material-ui/core/TableRow'
-import AccountBoxIcon from '@material-ui/icons/AccountBox'
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
+import Snackbar from '@mui/material/Snackbar'
+import Tooltip from '@mui/material/Tooltip'
+import IconButton from '@mui/material/IconButton'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { PropTypes } from 'prop-types'
 import React, { useState } from 'react'
-import { withRouter } from 'react-router-dom'
 
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
 import { obtenerMensaje } from '../../../utils/obtenerMensaje'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
+import { withRouter } from '../../../utils/withRouter'
 
-export const TareaRow = ({ tarea, actualizar, history }) => {
+export const TareaRow = ({ tarea, actualizar, navigate }) => {
     const [errorMessage, setErrorMessage] = useState('')
 
     const cumplirTarea = async () => {
@@ -35,7 +36,7 @@ export const TareaRow = ({ tarea, actualizar, history }) => {
     }
 
     const goToAsignarTarea = () => {
-        history.push(`/asignarTarea/${tarea.id}`)
+        navigate(`/asignarTarea/${tarea.id}`)
     }
 
     const cumplirButton = tarea.sePuedeCumplir() &&
@@ -77,7 +78,7 @@ export const TareaRow = ({ tarea, actualizar, history }) => {
 
 TareaRow.propTypes = {
     tarea: PropTypes.instanceOf(Tarea),
-    history: PropTypes.object,
+    navigate: PropTypes.func,
     actualizar: PropTypes.func,
 }
 

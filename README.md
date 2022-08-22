@@ -162,11 +162,8 @@ export const TareasRoutes = () => (
 )
 ```
 
-para lo cual hay que decorar el componente TareaRow con el router de React:
-
-```js
-export default withRouter(TareaRow)
-```
+TODO: revisar
+Hay que decorar withParams + withRouter porque v6 de react-router-dom solo trae versión de Hooks
 
 Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
 

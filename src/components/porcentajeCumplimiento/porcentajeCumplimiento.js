@@ -1,4 +1,4 @@
-import Avatar from '@material-ui/core/Avatar'
+import Avatar from '@mui/material/Avatar'
 import PropTypes from 'prop-types'
 import React from 'react'
 

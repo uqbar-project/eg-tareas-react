@@ -1,10 +1,9 @@
 import './asignarTarea.css'
 
-import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@material-ui/core'
-import Card from '@material-ui/core/Card'
-import CardActions from '@material-ui/core/CardActions'
-import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
 import { PropTypes } from 'prop-types'
 import React, { Component } from 'react'
 
@@ -12,8 +11,11 @@ import { Tarea } from '../domain/tarea'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
 import { obtenerMensaje } from '../utils/obtenerMensaje'
+import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
+import { withRouter } from '../utils/withRouter'
+import { withParams } from '../utils/withParams'
 
-export default class AsignarTareaComponent extends Component {
+class AsignarTareaComponent extends Component {
 
   state = {
     usuarios: [],
@@ -23,7 +25,8 @@ export default class AsignarTareaComponent extends Component {
   async componentDidMount() {
     try {
       const usuarios = await usuarioService.allInstances()
-      const tarea = await tareaService.getTareaById(this.props.match.params.id)
+      const { id } = this.props.params
+      const tarea = await tareaService.getTareaById(id)
       this.setState({
         usuarios,
         tarea,
@@ -69,7 +72,7 @@ export default class AsignarTareaComponent extends Component {
   }
 
   volver = () => {
-    this.props.history.push('/')
+    this.props.navigate('/')
   }
 
   render() {
@@ -93,7 +96,7 @@ export default class AsignarTareaComponent extends Component {
         </CardContent>
         <CardContent>
           <Select
-            /*Aca podemos ver cómo esta declarado nombreAsignatario */
+            /* Acá podemos ver cómo esta declarado nombreAsignatario */
             value={tarea.nombreAsignatario || ' '}
             onChange={(event) => this.asignar(event.target.value)}
             className="formControl"
@@ -136,3 +139,5 @@ export default class AsignarTareaComponent extends Component {
     }
   }
 }
+
+export default withParams(withRouter(AsignarTareaComponent))
