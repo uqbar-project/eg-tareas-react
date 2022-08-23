@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import React from 'react'
 
 import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
@@ -15,17 +15,17 @@ import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
  */
 describe('porcentaje de cumplimiento', () => {
   test('porcentaje en el límite superior', () => {
-    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={99} />)
-    expect(getByTestId('green')).toBeInTheDocument()
+    render(<PorcentajeCumplimiento porcentaje={99} />)
+    expect(screen.getByTestId('alto')).toBeInTheDocument()
   })
   test('porcentaje intermedio', () => {
-    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={75} />)
-    expect(getByTestId('gold')).toBeInTheDocument()
+    render(<PorcentajeCumplimiento porcentaje={75} />)
+    expect(screen.getByTestId('medio')).toBeInTheDocument()
   })
 
   test('porcentaje más bajo', () => {
-    const { getByTestId } = render(<PorcentajeCumplimiento porcentaje={25} />)
-    expect(getByTestId('darkred')).toBeInTheDocument()
+    render(<PorcentajeCumplimiento porcentaje={25} />)
+    expect(screen.getByTestId('bajo')).toBeInTheDocument()
   })
 
   test('cuando no se le pasa porcentaje no renderiza un avatar', () => {
