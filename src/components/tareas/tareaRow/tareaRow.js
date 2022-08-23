@@ -42,14 +42,14 @@ export const TareaRow = ({ tarea, actualizar, navigate }) => {
     const cumplirButton = tarea.sePuedeCumplir() &&
         <Tooltip data-testid="tooltip-fab" title="Cumplir tarea">
             <IconButton data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
-                <CheckCircleIcon />
+                <CheckCircleIcon color="success"/>
             </IconButton>
         </Tooltip>
 
     const asignarButton = tarea.sePuedeAsignar() &&
         <Tooltip data-testid="tooltip-asignar" title="Asignar persona a tarea">
             <IconButton aria-label="Asignar" onClick={goToAsignarTarea} data-testid={`asignar_${tarea.id}`}>
-                <AccountBoxIcon />
+                <AccountBoxIcon color="warning"/>
             </IconButton>
         </Tooltip>
 
