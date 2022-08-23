@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createMemoryHistory } from 'history'
 import React from 'react'
-import { BrowserRouter, useNavigate } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { Usuario } from '../domain/usuario'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'

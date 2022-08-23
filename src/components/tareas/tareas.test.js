@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -16,11 +16,9 @@ describe('TareasComponent', () => {
   describe('cuando el servicio responde correctamente', () => {
     test('se muestran las tareas en la tabla', async () => {
       tareaService.allInstances = () => Promise.resolve(mockTareas)
-      const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      await waitFor(() => {
-        expect(getByTestId('tarea_159')).toBeInTheDocument()
-        expect(getByTestId('tarea_68')).toBeInTheDocument()
-      })
+      render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+      expect(await screen.findByTestId('tarea_159')).toBeInTheDocument()
+      expect(await screen.findByTestId('tarea_68')).toBeInTheDocument()
     })
   })
 })
