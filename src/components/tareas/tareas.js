@@ -1,3 +1,4 @@
+import { TableContainer } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import Table from '@mui/material/Table'
@@ -42,12 +43,12 @@ export class TareasComponent extends Component {
     const snackbarOpen = !!this.state.errorMessage
 
     return (
-      <Paper>
+      <TableContainer component={Paper}>
         <br />
         <h1>Tareas a realizar</h1>
-        <Table>
+        <Table aria-label="simple table">
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ fontWeight: 'bold' }}>
               <TableCell>Tarea</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Asignatario</TableCell>
@@ -70,7 +71,7 @@ export class TareasComponent extends Component {
           message={this.state.errorMessage}
           autoHideDuration={4}
         />
-      </Paper>
+      </TableContainer>
     )
   }
 

@@ -14,14 +14,6 @@ import { obtenerMensaje } from '../utils/obtenerMensaje'
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { withRouter } from '../utils/withRouter'
 import { withParams } from '../utils/withParams'
-import { styled } from "@mui/material/styles"
-
-const CardContentNoPadding = styled(CardContent)(`
-  padding: 0;
-  &:last-child {
-    padding-bottom: 0;
-  }
-`)
 
 class AsignarTareaComponent extends Component {
 
@@ -87,56 +79,54 @@ class AsignarTareaComponent extends Component {
     const { tarea, usuarios, errorMessage } = this.state
     const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h5" component="h2">
-            Asignar tarea
-        </Typography>
-        </CardContent>
-        <CardContent className="linea">
-          <FormLabel>Descripción:</FormLabel>
-        </CardContent>
-        <CardContent>
-          <TextField inputProps={{"data-testid":"descripcion"}} id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} className="formControl" />
-        </CardContent>
-        <CardContent className="linea">
-          <FormLabel>Asignatario:</FormLabel>
-        </CardContent>
-        <CardContent>
-          <Select
-            /* Acá podemos ver cómo esta declarado nombreAsignatario */
-            value={tarea.nombreAsignatario || ' '}
-            onChange={(event) => this.asignar(event.target.value)}
-            className="formControl"
-            inputProps={{
-              name: 'asignatario',
-              id: 'asignatario'
-            }}
-          >
-            <MenuItem value=" ">
-              <em>Sin Asignar</em>
-            </MenuItem>
-            {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
-          </Select>
-        </CardContent>
-        <CardActions className="botonera">
+      <div class="form">
+        <Card>
           <CardContent>
-            <Button variant="contained" color="primary" onClick={this.aceptarCambios}>
+            <Typography variant="h5" component="h1">
+              Asignar tarea
+          </Typography>
+          </CardContent>
+          <CardContent className="linea">
+            <FormLabel>Descripción:</FormLabel>
+          </CardContent>
+          <CardContent>
+            <TextField inputProps={{"data-testid":"descripcion"}} id="descripcion" value={tarea.descripcion} onChange={this.cambiarDescripcion} className="formControl" />
+          </CardContent>
+          <CardContent className="linea">
+            <FormLabel>Asignatario:</FormLabel>
+          </CardContent>
+          <CardContent>
+            <Select
+              /* Acá podemos ver cómo esta declarado nombreAsignatario */
+              value={tarea.nombreAsignatario || ' '}
+              onChange={(event) => this.asignar(event.target.value)}
+              className="formControl"
+              inputProps={{
+                name: 'asignatario',
+                id: 'asignatario'
+              }}
+            >
+              <MenuItem value=" ">
+                <em>Sin Asignar</em>
+              </MenuItem>
+              {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
+            </Select>
+          </CardContent>
+          <CardActions className="botonera">
+            <Button variant="contained" color="warning" onClick={this.aceptarCambios}>
               Aceptar
             </Button>
-          </CardContent>
-          <CardContentNoPadding>
-            <Button variant="contained" color="secondary" onClick={this.volver}>
+            <Button variant="outlined" color="warning" onClick={this.volver}>
               Cancelar
             </Button>
-          </CardContentNoPadding>
-        </CardActions>
-        <Snackbar
-          open={snackbarOpen}
-          message={errorMessage}
-          autoHideDuration={4}
-        />
-      </Card>
+          </CardActions>
+          <Snackbar
+            open={snackbarOpen}
+            message={errorMessage}
+            autoHideDuration={4}
+          />
+        </Card>
+      </div>
     )
   }
 

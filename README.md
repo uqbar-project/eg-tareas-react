@@ -3,7 +3,7 @@
 
 [![Build React App](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml) ![coverage](./badges/coverage/coverage.svg?refresh=1)
 
-![video](video/demo2.gif)
+![video](video/demo2022.gif)
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 

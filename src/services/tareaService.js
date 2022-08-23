@@ -11,7 +11,8 @@ class TareaService {
 
   async allInstances() {
     const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
-    return tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    const tareas = tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    return tareas.sort((a, b) => (a.descripcion < b.descripcion ? -1 : 1))
   }
 
   async getTareaById(id) {
