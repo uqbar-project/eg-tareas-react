@@ -14,6 +14,14 @@ import { obtenerMensaje } from '../utils/obtenerMensaje'
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { withRouter } from '../utils/withRouter'
 import { withParams } from '../utils/withParams'
+import { styled } from "@mui/material/styles"
+
+const CardContentNoPadding = styled(CardContent)(`
+  padding: 0;
+  &:last-child {
+    padding-bottom: 0;
+  }
+`)
 
 class AsignarTareaComponent extends Component {
 
@@ -117,11 +125,11 @@ class AsignarTareaComponent extends Component {
               Aceptar
             </Button>
           </CardContent>
-          <CardContent>
-            <Button variant="contained" onClick={this.volver}>
+          <CardContentNoPadding>
+            <Button variant="contained" color="secondary" onClick={this.volver}>
               Cancelar
-        </Button>
-          </CardContent>
+            </Button>
+          </CardContentNoPadding>
         </CardActions>
         <Snackbar
           open={snackbarOpen}

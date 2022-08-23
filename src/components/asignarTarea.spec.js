@@ -1,7 +1,7 @@
-import { fireEvent, render, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createMemoryHistory } from 'history'
 import React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, useNavigate } from 'react-router-dom'
 import { Usuario } from '../domain/usuario'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
@@ -30,27 +30,31 @@ describe('tests de asignar tarea', () => {
   })
  
   test('al inicio muestra la información de la tarea', async () => {
-    const { getByTestId, getByText } = render(<BrowserRouter><AsignarTareaComponent match={match} history={history}/></BrowserRouter>)
+    render(<BrowserRouter><AsignarTareaComponent match={match} history={history}/></BrowserRouter>)
     await waitFor(() => {
-      expect(getByTestId("descripcion").value).toBe("Construir test TODO List")
+      expect(screen.getByTestId("descripcion").value).toBe("Construir test TODO List")
       // Material hace muy complicado poder encontrar el selector por data-testid
-      expect(getByText("Marcos Rojo")).toBeInTheDocument()
+    })
+    await waitFor(() => {
+      expect(screen.getByText("Marcos Rojo")).toBeInTheDocument()
     })
   })
 
   test('al reasignar cambia el asignatario de la tarea', async () => {
-    const { getByText, getByRole } = render(<BrowserRouter><AsignarTareaComponent match={match} history={history}/></BrowserRouter>)
-    await waitFor(() => {
-      // Opción "recomendada" es en realidad super frágil
-      // simulamos presionar el botón para expandir las opciones
-      // y seleccionar otra pesrsona
-      const selectButton = getByText(/Marcos Rojo/i)
-      fireEvent.mouseDown(selectButton)
-      const reasignacion = within(getByRole('listbox'))
-      fireEvent.click(reasignacion.getByText(/Delia Negro/i))
-      // Material hace muy complicado poder encontrar el selector por data-testid
-      expect(reasignacion.getByText("Delia Negro")).toBeInTheDocument()
-    })
+    render(<BrowserRouter><AsignarTareaComponent match={match}/></BrowserRouter>)
+    // Opción "recomendada" es en realidad super frágil
+    // simulamos presionar el botón para expandir las opciones
+    // y seleccionar otra pesrsona
+    const selectButton = await screen.findByText(/Marcos Rojo/i)
+
+    fireEvent.mouseDown(selectButton)
+    const reasignacion = within(await screen.findByRole('listbox'))
+
+    const delia = await screen.findByText(/Delia Negro/i)
+    fireEvent.click(delia)
+
+    // Material hace muy complicado poder encontrar el selector por data-testid
+    expect(await reasignacion.findByText('Delia Negro')).toBeInTheDocument()
   })
 
   // Estaría bárbaro agregar más cobertura pero:
