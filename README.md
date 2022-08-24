@@ -25,7 +25,7 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 - **TareaRow**: conoce cómo mostrar una tarea dentro de una fila de la tabla
 - **PorcentajeCumplimiento**: es un componente que muestra un avatar con el % de cumplimiento en diferentes colores. En rojo se visualizan las tareas cuyo % de cumplimiento es menor a 50, luego de 50 a 90% exclusive aparecen en amarillo y por último las que tienen 90% ó más se ven en verde.
 
-![image](images/ArquitecturaTareas.png)
+![image](images/ArquitecturaTareas2.png)
 
 En el componente que muestra las tareas disparamos la búsqueda de tareas (evento `componentDidMount` porque `tareas` está definido como clase):
 
@@ -194,7 +194,7 @@ export const TareasRoutes = () =>
 
 Para más información pueden ver [esta página del Router de React](https://reactrouter.com/docs/en/v6).
 
-![image](images/ArquitecturaTareasAsignacion.png)
+![image](images/ArquitecturaAsignarTarea.png)
 
 ### Llamadas asincrónicas
 
