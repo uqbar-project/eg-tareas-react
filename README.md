@@ -19,7 +19,7 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 ## Página principal: ver tareas
 
-![master](images/componentesVistaMaster.png)
+![master](images/ComponentesReact.png)
 
 - **TareasComponent**: es el que sabe mostrar la tabla y delega en TareaRow la visualización de cada ítem
 - **TareaRow**: conoce cómo mostrar una tarea dentro de una fila de la tabla
@@ -41,17 +41,18 @@ En el componente que muestra las tareas disparamos la búsqueda de tareas (event
       ...
 ```
 
-El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios):
+El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea y ordenándolas por descripción:
 
 ```js
 class TareaService {
   async allInstances() {
     const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
-    return tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    const tareas = tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    return tareas.sort((a, b) => (a.descripcion < b.descripcion ? -1 : 1)) // las ordenamos por descripción
   }
 ```
 
-Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente React, transformando la lista de objetos JSON en objetos Tarea:
+Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente React:
 
 ```js
 class TareasComponent {
@@ -101,17 +102,20 @@ En el método del componente delegamos el cumplimiento al objeto de dominio Tare
 ```js
 // en el componente funcional TareaRow
 const cumplirTarea = async () => {
-  try {
-      tarea.cumplir()
-      await tareaService.actualizarTarea(tarea)
-      props.actualizar()
+    // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
+    try {
+        tarea.cumplir()
+        await tareaService.actualizarTarea(tarea)
     } catch (error) {
-      this.generarError(error)
+        generarError(error)
+    } finally {
+        // independientemente de si anduvo bien o no actualizamos la información del backend
+        await actualizar()
     }
 }
 ```
 
-`props.actualizar()` lo recibimos como una función:
+`props.actualizar()` lo recibimos como una función en el componente `TareaRow`:
 
 ```js
 // en Tarea se envía para cada uno de los elementos de la lista
@@ -124,8 +128,8 @@ const cumplirTarea = async () => {
 ```js
 TareaRow.propTypes = {
     tarea: PropTypes.instanceOf(Tarea),
-    history: PropTypes.object,
-    actualizar: PropTypes.func,  // <== aquí lo recibimos
+    navigate: PropTypes.func,
+    actualizar: PropTypes.func,
 }
 ```
 
@@ -147,25 +151,48 @@ El botón de asignación dispara la navegación de la ruta '/asignarTarea' (en T
 
 ```js
 const goToAsignarTarea = () => {
-    props.history.push(`/asignarTarea/${tarea.id}`)
+    navigate(`/asignarTarea/${tarea.id}`)
 }
 ```
 
-según lo definido en las rutas del archivo `routes.js`:
+`navigate` es una función que recibimos cuando decoramos nuestro componente `TareaRow` al exportarlo:
 
 ```js
-export const TareasRoutes = () => (
-    <Router>
-        <Route exact={true} path="/" component={TareasComponent} />
-        <Route path="/asignarTarea/:id" component={AsignarTareaComponent} />
-    </Router>
-)
+export default withRouter(TareaRow)
 ```
 
-TODO: revisar
-Hay que decorar withParams + withRouter porque v6 de react-router-dom solo trae versión de Hooks
+`withRouter` es una función que estaba originalmente en react-router pero que ahora tuvimos que agregar manualmente, y permite recibir un componente y **decorarlo** pasándole como prop la función `useNavigate` que nosotros llamamos `navigate` y que sirve para movernos de página:
 
-Esto permite que se le inyecte dentro del mapa `props` la referencia `history` que guarda la lista de URLs visitadas y además maneja la navegación de la SPA. Podemos utilizar el mismo history para volver a la página anterior con `props.history.goBack()`. Para más información pueden ver [esta página del Router de React](https://reacttraining.com/react-router/core/guides/philosophy).
+```js
+export const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const navigate = useNavigate()
+    
+    return (
+      <Component
+        navigate={navigate}
+        {...props}
+        />
+    )
+  }
+  
+  return Wrapper
+}
+```
+
+A su vez, en el archivo `routes.js` definimos que el path `/asignarTarea/:id` se mapea con el componente de React que permite asignar la tarea:
+
+```js
+export const TareasRoutes = () => 
+    <Router>
+        <Routes>
+            <Route exact={true} path="/" element={<TareasComponent/>} />
+            <Route path="/asignarTarea/:id" element={<AsignarTareaComponent/>} />
+        </Routes>
+    </Router>
+```
+
+Para más información pueden ver [esta página del Router de React](https://reactrouter.com/docs/en/v6).
 
 ![image](images/ArquitecturaTareasAsignacion.png)
 
@@ -225,7 +252,8 @@ El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el
 ```js
 asignar = (asignatario) => {
   const tarea = this.state.tarea
-  tarea.asignarA(asignatario)
+  const asignatarioNuevo = asignatario.trim() ? asignatario : null
+  tarea.asignarA(asignatarioNuevo)
   this.cambiarEstado(tarea)
 }
 
@@ -293,8 +321,6 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
 </TableBody>
 ```
 
-![Misma clave](./video/sameKey.gif)
-
 - por un lado en la consola nos aparece un error en runtime, donde nos alerta que definir la misma clave puede producir inconsistencias en las actualizaciones de la página
 - por otro lado, cuando cumplimos una tarea, se actualizan innecesariamente todas las filas de la tabla. Podría pasar incluso que se actualice la información de las filas incorrectas
 
@@ -307,36 +333,39 @@ Ahora que separamos todo en componentes más chicos y con menos responsabilidade
 ## TareaRow
 
 A este componente le pasamos una tarea por `props` y basándonos en los diferentes estados de la misma hacemos lo siguiente:
+
 - si está asignada nos aparece el botón que permite marcarla como cumplida
 - si está asignada pero su porcentaje de cumplimiento está completo no aparece el botón cumplir
 - cuando tocamos el botón asignar nos redirige hacia otra página
 - si no está asignada no aparece dicho botón
 
-El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/components/tareas/tareaRow/tareaRow.spec.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId`:
+El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/components/tareas/tareaRow/tareaRow.spec.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId` del objeto `screen`:
 
 ```js
-  test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
-      tareaAsignada.cumplir()
-      const { queryByTestId } = render(<TareaRow tarea={tareaAsignada} />)
-      expect(queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
-  })
+test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
+    tareaAsignada.cumplir()
+    render(<TareaRow tarea={tareaAsignada} />)
+    expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
+})
 ```
 
 Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cuando la asignación se hizo correctamente:
 
 ```js
-  test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', () => {
-      tareaAsignada.porcentajeCumplimiento = 45
-      const pushEspia = jest.fn()
-      const { getByTestId } = render(
-          <TareaRow
-              tarea={tareaAsignada}
-              history={{ push: pushEspia }}
-          />)
+test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', async () => {
+    tareaAsignada.porcentajeCumplimiento = 45
+    const pushEspia = jest.fn()
+    render(
+        <TareaRow
+            tarea={tareaAsignada}
+            navigate={pushEspia}
+        />)
 
-      fireEvent.click(getByTestId('asignar_' + tareaAsignada.id))
-      expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
-  })
+    fireEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
+    await waitFor(() => {
+        expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
+    })
+})
 ```
 
 ## Tareas
@@ -352,21 +381,17 @@ tareaService.allInstances = () => Promise.resolve(mockTareas)
 Y nuestro test queda de la siguiente forma :
 
 ```js
-  describe('cuando el servicio responde correctamente', () => {
-    test('se muestran las tareas en la tabla', async () => {
-      tareaService.allInstances = () => Promise.resolve(mockTareas)
-      const { getByTestId } = render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      // nueva variante -> waitFor
-      await waitFor(() => {
-        expect(getByTestId('tarea_159')).toBeInTheDocument()
-        expect(getByTestId('tarea_68')).toBeInTheDocument()
-      })
-      //
-    })
+describe('cuando el servicio responde correctamente', () => {
+  test('se muestran las tareas en la tabla', async () => {
+    tareaService.allInstances = () => Promise.resolve(mockTareas)
+    render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+    expect(await screen.findByTestId('tarea_159')).toBeInTheDocument()
+    expect(await screen.findByTestId('tarea_68')).toBeInTheDocument()
   })
+})
 ```
 
 Cosas interesantes para comentar:
 
 - [waitFor](https://testing-library.com/docs/dom-testing-library/api-async) nos permite esperar a que la promise que devuelve las tareas mockeadas se resuelva y hacer las aserciones correspondientes
-- es necesario envolver TareasComponent en el **BrowserRouter** para recibir la props.history y funcionar correctamente.
+- es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.

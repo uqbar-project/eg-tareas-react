@@ -116,7 +116,7 @@ class AsignarTareaComponent extends Component {
             <Button variant="contained" color="warning" onClick={this.aceptarCambios}>
               Aceptar
             </Button>
-            <Button variant="outlined" color="warning" onClick={this.volver}>
+            <Button variant="outlined" color="warning"onClick={this.volver}>
               Cancelar
             </Button>
           </CardActions>
