@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { createMemoryHistory } from 'history'
 import React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, createMemoryRouter } from 'react-router-dom'
 import { Usuario } from '../domain/usuario'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
@@ -9,7 +8,7 @@ import { crearTarea } from '../testsUtils/crearTarea'
 import { AsignarTareaComponent } from './asignarTarea'
 
 describe('tests de asignar tarea', () => {
-  let history
+  let router
   let match
 
   beforeEach(() => {
@@ -22,15 +21,15 @@ describe('tests de asignar tarea', () => {
       new Usuario('Delia Negro'), 
       new Usuario('Valeria Blanco')
     ])
-    history = createMemoryHistory()
-    history.push('/asignarTarea/159')
-    match = {
-      params: { id: 159 },
-    }
+    router = createMemoryRouter([
+      {
+        path: '/asignarTarea/159',
+      }
+    ])
   })
  
   test('al inicio muestra la información de la tarea', async () => {
-    render(<BrowserRouter><AsignarTareaComponent match={match} history={history}/></BrowserRouter>)
+    render(<BrowserRouter router={router}><AsignarTareaComponent match={match} history={router}/></BrowserRouter>)
     await waitFor(() => {
       expect(screen.getByTestId('descripcion').value).toBe('Construir test TODO List')
       // Material hace muy complicado poder encontrar el selector por data-testid
@@ -42,7 +41,7 @@ describe('tests de asignar tarea', () => {
   
 
   test('al reasignar cambia el asignatario de la tarea', async () => {
-    render(<BrowserRouter><AsignarTareaComponent match={match}/></BrowserRouter>)
+    render(<BrowserRouter router={router}><AsignarTareaComponent match={match}/></BrowserRouter>)
     // Opción 'recomendada' es en realidad super frágil
     // simulamos presionar el botón para expandir las opciones
     // y seleccionar otra pesrsona

@@ -49,7 +49,7 @@ export const AsignarTareaComponent = () => {
   }
 
   const generarNuevaTarea = (tarea) => {
-    const nuevaTarea = Tarea.fromJson(tarea.toJSON())
+    const nuevaTarea = Object.assign(new Tarea(), tarea)
     setTarea(nuevaTarea)
     setErrorMessage('')
   }
