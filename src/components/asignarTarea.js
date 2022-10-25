@@ -21,13 +21,13 @@ export const AsignarTareaComponent = () => {
   const params = useParams()
   const navigate = useNavigate()
 
+  const { id } = params
+
   useEffect(() => {
     const inicio = async () => {
       try {
         const usuarios = await usuarioService.allInstances()
-        const { id } = params
         const tarea = await tareaService.getTareaById(id)
-        console.info('claro', tarea)
         setUsuarios(usuarios)
         setTarea(tarea)
       } catch (e) {
@@ -36,7 +36,7 @@ export const AsignarTareaComponent = () => {
     }
 
     inicio()
-  }, [params])
+  }, [id])
     
   const generarError = (error) => {
     setErrorMessage(obtenerMensaje(error))
@@ -45,17 +45,18 @@ export const AsignarTareaComponent = () => {
   const asignar = (asignatario) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
     tarea.asignarA(asignatarioNuevo)
-    const nuevaTarea = Object.assign(tarea)
-    console.info('asigno', nuevaTarea)
+    generarNuevaTarea(tarea)
+  }
+
+  const generarNuevaTarea = (tarea) => {
+    const nuevaTarea = Tarea.fromJson(tarea.toJSON())
     setTarea(nuevaTarea)
     setErrorMessage('')
   }
 
   const cambiarDescripcion = (event) => {
     tarea.descripcion = event.target.value
-    const nuevaTarea = Object.assign(tarea)
-    setTarea(nuevaTarea)
-    setErrorMessage('')
+    generarNuevaTarea(tarea)
   }
 
   const aceptarCambios = async () => {
@@ -73,8 +74,6 @@ export const AsignarTareaComponent = () => {
   }
 
   const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
-
-  console.info(tarea.nombreAsignatario)
 
   return (
     <div className="form">
