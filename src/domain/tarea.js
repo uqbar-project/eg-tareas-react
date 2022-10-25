@@ -12,7 +12,7 @@ export class Tarea {
   }
 
   contiene(palabra) {
-    return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
+    return this.descripcion.includes(palabra) || this.asignatario?.nombre?.includes(palabra)
   }
 
   cumplio(porcentaje) {
@@ -40,7 +40,7 @@ export class Tarea {
   }
 
   asignarA(asignatario) {
-    this.asignatario = new Usuario(asignatario)
+    this.asignatario = asignatario
   }
 
   sePuedeAsignar() {

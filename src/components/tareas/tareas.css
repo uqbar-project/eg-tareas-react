@@ -1,0 +1,12 @@
+* {
+  font-size: 20px;
+}
+
+thead {
+  background-color: aliceblue;
+}
+
+.MuiTableCell-head {
+  font-weight: bold !important;
+}
+

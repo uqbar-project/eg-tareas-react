@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
 
 import { crearTarea } from '../../../testsUtils/crearTarea'
 import { TareaRow } from './tareaRow'
@@ -11,28 +12,31 @@ describe('TareaRow', () => {
             tareaAsignada = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
         })
         test('puede cumplirse', () => {
-            render(<TareaRow tarea={tareaAsignada} />)
+            render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
             expect(screen.getByTestId('cumplir_' + tareaAsignada.id)).toBeInTheDocument()
         })
         test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
             tareaAsignada.cumplir()
-            render(<TareaRow tarea={tareaAsignada} />)
+            render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
             expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
         })
         describe('si su porcentaje de cumplimiento NO está completo', () => {
             test('se puede asignar', () => {
                 tareaAsignada.porcentajeCumplimiento = 50
-                render(<TareaRow tarea={tareaAsignada} />)
+                render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
                 expect(screen.getByTestId('asignar_' + tareaAsignada.id)).toBeInTheDocument()
             })
             test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', async () => {
                 tareaAsignada.porcentajeCumplimiento = 45
                 const pushEspia = jest.fn()
                 render(
-                    <TareaRow
-                        tarea={tareaAsignada}
-                        navigate={pushEspia}
-                    />)
+                    <BrowserRouter>
+                        <TareaRow
+                            tarea={tareaAsignada}
+                            navigate={pushEspia}
+                            />
+                    </BrowserRouter>
+                )
 
                 fireEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
                 await waitFor(() => {
@@ -46,7 +50,7 @@ describe('TareaRow', () => {
         test('no puede cumplirse', () => {
             const tareaNoAsignada = crearTarea(159, 'Construir test TODO List', 0, 'Marcos Rojo')
             tareaNoAsignada.desasignar()
-            render(<TareaRow tarea={tareaNoAsignada} />)
+            render(<BrowserRouter><TareaRow tarea={tareaNoAsignada} /></BrowserRouter>)
             expect(screen.queryByTestId('cumplir_' + tareaNoAsignada.id)).toBeNull()
         })
     })

@@ -1,4 +1,5 @@
 import { Tarea } from "./tarea"
+import { Usuario } from "./usuario"
 
 const nombrePersona = 'Alguien'
 
@@ -22,7 +23,7 @@ describe('tests de tarea', () => {
   test('contiene palabra por asignatario - caso feliz', () => {
     const tarea = new Tarea()
     tarea.descripcion = 'Testear el componente login'
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(new Usuario(nombrePersona))
     expect(tarea.contiene('Algu')).toBeTruthy()
   })
 
@@ -86,13 +87,7 @@ describe('tests de tarea', () => {
 
   test('la tarea conoce el nombre del asignatario', () => {
     const tarea = new Tarea()
-    tarea.asignarA(nombrePersona)
-    expect(tarea.nombreAsignatario).toBe(nombrePersona)
-  })
-
-  test('la tarea conoce el nombre del asignatario', () => {
-    const tarea = new Tarea()
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(new Usuario(nombrePersona))
     expect(tarea.nombreAsignatario).toBe(nombrePersona)
   })
 
@@ -100,7 +95,7 @@ describe('tests de tarea', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 20
     tarea.iteracion = 'Sprint 3'
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(new Usuario(nombrePersona))
     const tareaJson = tarea.toJSON()
     expect(tareaJson.asignadoA).toBe(nombrePersona)
     expect(tareaJson.porcentajeCumplimiento).toBe(20)
@@ -121,6 +116,7 @@ describe('tests de tarea', () => {
     expect(tarea.asignadoA).toBeUndefined()
   })
   test('una tarea sin asignatario no es válida', () => {
+    const tarea = new Tarea()
     expect(() => { tarea.validarAsignacion() }).toThrowError()
   })
 

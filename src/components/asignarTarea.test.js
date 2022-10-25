@@ -6,7 +6,7 @@ import { Usuario } from '../domain/usuario'
 import { tareaService } from '../services/tareaService'
 import { usuarioService } from '../services/usuarioService'
 import { crearTarea } from '../testsUtils/crearTarea'
-import AsignarTareaComponent from './asignarTarea'
+import { AsignarTareaComponent } from './asignarTarea'
 
 describe('tests de asignar tarea', () => {
   let history
@@ -32,17 +32,18 @@ describe('tests de asignar tarea', () => {
   test('al inicio muestra la información de la tarea', async () => {
     render(<BrowserRouter><AsignarTareaComponent match={match} history={history}/></BrowserRouter>)
     await waitFor(() => {
-      expect(screen.getByTestId("descripcion").value).toBe("Construir test TODO List")
+      expect(screen.getByTestId('descripcion').value).toBe('Construir test TODO List')
       // Material hace muy complicado poder encontrar el selector por data-testid
     })
     await waitFor(() => {
-      expect(screen.getByText("Marcos Rojo")).toBeInTheDocument()
+      expect(screen.getByText('Marcos Rojo')).toBeInTheDocument()
     })
   })
+  
 
   test('al reasignar cambia el asignatario de la tarea', async () => {
     render(<BrowserRouter><AsignarTareaComponent match={match}/></BrowserRouter>)
-    // Opción "recomendada" es en realidad super frágil
+    // Opción 'recomendada' es en realidad super frágil
     // simulamos presionar el botón para expandir las opciones
     // y seleccionar otra pesrsona
     const selectButton = await screen.findByText(/Marcos Rojo/i)
