@@ -6,13 +6,13 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import React, { useEffect, useState } from 'react'
 
-import { Tarea } from '../domain/tarea'
-import { tareaService } from '../services/tareaService'
-import { usuarioService } from '../services/usuarioService'
-import { obtenerMensaje } from '../utils/obtenerMensaje'
+import { tareaService } from '../../services/tareaService'
+import { usuarioService } from '../../services/usuarioService'
+import { obtenerMensaje } from '../../utils/obtenerMensaje'
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
-
+import { Tarea } from '../../domain/tarea'
+  
 export const AsignarTareaComponent = () => {
 
   const [usuarios, setUsuarios] = useState([])

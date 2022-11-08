@@ -1,10 +1,10 @@
+import { usuarioService } from './../../services/usuarioService';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import React from 'react'
 import { BrowserRouter, createMemoryRouter } from 'react-router-dom'
-import { Usuario } from '../domain/usuario'
-import { tareaService } from '../services/tareaService'
-import { usuarioService } from '../services/usuarioService'
-import { crearTarea } from '../testsUtils/crearTarea'
+import { Usuario } from '../../domain/usuario'
+import { crearTarea } from '../../testsUtils/crearTarea'
+import { tareaService } from '../../services/tareaService'
 import { AsignarTareaComponent } from './asignarTarea'
 
 describe('tests de asignar tarea', () => {
@@ -29,7 +29,7 @@ describe('tests de asignar tarea', () => {
   })
  
   test('al inicio muestra la información de la tarea', async () => {
-    render(<BrowserRouter router={router}><AsignarTareaComponent match={match} history={router}/></BrowserRouter>)
+    render(<BrowserRouter router={router}><AsignarTareaComponent match={match}/></BrowserRouter>)
     await waitFor(() => {
       expect(screen.getByTestId('descripcion').value).toBe('Construir test TODO List')
       // Material hace muy complicado poder encontrar el selector por data-testid
