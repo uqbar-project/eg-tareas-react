@@ -24,7 +24,7 @@ export const TareasComponent = (props) => {
       const tareas = await tareaService.allInstances()
       setTareas(tareas)
     } catch (error) {
-      setErrorMessage({ errorMessage: obtenerMensaje(error) })
+      setErrorMessage(obtenerMensaje(error))
     }
   }
 
