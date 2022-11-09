@@ -1,6 +1,6 @@
 import './App.css'
 
-import React, { Component } from 'react'
+import React from 'react'
 
 import { TareasRoutes } from './routes'
 import { createTheme } from '@mui/material'
@@ -18,16 +18,14 @@ const theme = createTheme({
   }
 })
 
-class App extends Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <div className="App">
-          <TareasRoutes />
-        </div>
-      </ThemeProvider>
-    )
-  }
+const App = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <div className="App">
+        <TareasRoutes />
+      </div>
+    </ThemeProvider>
+  )
 }
 
 export default App
