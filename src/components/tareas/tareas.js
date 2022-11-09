@@ -30,7 +30,7 @@ export const TareasComponent = (props) => {
 
   useEffect(() => {
     traerTareas()
-  })
+  }, [])
 
   const snackbarOpen = !!errorMessage
 
