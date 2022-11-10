@@ -18,9 +18,9 @@ export const AsignarTareaComponent = () => {
   const [usuarios, setUsuarios] = useState([])
   const [tarea, setTarea] = useState(new Tarea())
   const [errorMessage, setErrorMessage] = useState('')
-  const params = useParams()
   const navigate = useNavigate()
 
+  const params = useParams()
   const { id } = params
 
   useEffect(() => {
