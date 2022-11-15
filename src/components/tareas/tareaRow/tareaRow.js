@@ -11,8 +11,8 @@ import React, { useState } from 'react'
 
 import { Tarea } from '../../../domain/tarea'
 import { tareaService } from '../../../services/tareaService'
-import { obtenerMensaje } from '../../../utils/obtenerMensaje'
 import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
+import { mostrarMensajeError } from '../../../utils/error-handling'
 
 export const TareaRow = ({ tarea, actualizar }) => {
   const [errorMessage, setErrorMessage] = useState('')
@@ -24,16 +24,11 @@ export const TareaRow = ({ tarea, actualizar }) => {
       tarea.cumplir()
       await tareaService.actualizarTarea(tarea)
     } catch (error) {
-      generarError(error)
+      mostrarMensajeError(error, setErrorMessage)
     } finally {
       // viene como props
       await actualizar()
     }
-  }
-
-  const generarError = (error) => {
-    const mensaje = obtenerMensaje(error)
-    setErrorMessage(mensaje)
   }
 
   const goToAsignarTarea = () => {

@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react'
 
 import { tareaService } from '../../services/tareaService'
 import { usuarioService } from '../../services/usuarioService'
-import { obtenerMensaje } from '../../utils/obtenerMensaje'
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Tarea } from '../../domain/tarea'
+import { mostrarMensajeError } from '../../utils/error-handling'
   
 export const AsignarTareaComponent = () => {
 
@@ -41,10 +41,6 @@ export const AsignarTareaComponent = () => {
     initUsuarios()
   }, [])
     
-  const generarError = (error) => {
-    setErrorMessage(obtenerMensaje(error))
-  }
-
   const asignar = (asignatario) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
     tarea.asignarA(asignatarioNuevo)
@@ -67,8 +63,8 @@ export const AsignarTareaComponent = () => {
       tarea.validarAsignacion()
       await tareaService.actualizarTarea(tarea)
       volver()
-    } catch (e) {
-      generarError(e)
+    } catch (error) {
+      mostrarMensajeError(error, setErrorMessage)
     }
   }
 

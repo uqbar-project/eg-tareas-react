@@ -1,17 +1,17 @@
-import './tareas.css'
+import './tareas.css';
 
-import { TableContainer } from '@mui/material'
-import Paper from '@mui/material/Paper'
-import Snackbar from '@mui/material/Snackbar'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableHead from '@mui/material/TableHead'
+import { TableContainer } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Snackbar from '@mui/material/Snackbar';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow'
 import { useEffect, useState } from 'react'
 
 import { tareaService } from '../../services/tareaService'
-import { obtenerMensaje } from '../../utils/obtenerMensaje'
+import { mostrarMensajeError } from '../../utils/error-handling'
 import TareaRow from './tareaRow/tareaRow'
 
 export const TareasComponent = (props) => {
@@ -24,7 +24,7 @@ export const TareasComponent = (props) => {
       const tareas = await tareaService.allInstances()
       setTareas(tareas)
     } catch (error) {
-      setErrorMessage(obtenerMensaje(error))
+      mostrarMensajeError(error, setErrorMessage)
     }
   }
 
