@@ -24,19 +24,22 @@ export const AsignarTareaComponent = () => {
   const { id } = params
 
   useEffect(() => {
-    const inicio = async () => {
-      try {
-        const usuarios = await usuarioService.allInstances()
-        const tarea = await tareaService.getTareaById(id)
-        setUsuarios(usuarios)
-        setTarea(tarea)
-      } catch (e) {
-        generarError(e)
-      }
+    const initTareas = async () => {
+      const nuevaTarea = await tareaService.getTareaById(id)
+      setTarea(nuevaTarea)
     }
 
-    inicio()
+    initTareas()
   }, [id])
+
+  useEffect(() => {
+    const initUsuarios = async () => {
+      const nuevosUsuarios = await usuarioService.allInstances()
+      setUsuarios(nuevosUsuarios)
+    }
+
+    initUsuarios()
+  }, [])
     
   const generarError = (error) => {
     setErrorMessage(obtenerMensaje(error))
