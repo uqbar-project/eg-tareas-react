@@ -36,8 +36,7 @@ describe('TareaRow', () => {
                 render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
                 expect(screen.getByTestId('asignar_' + tareaAsignada.id)).toBeInTheDocument()
             })
-            test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', async () => {
-                tareaAsignada.porcentajeCumplimiento = 45
+            test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id de la tarea', () => {
                 render(
                     <BrowserRouter>
                         <TareaRow
@@ -47,9 +46,7 @@ describe('TareaRow', () => {
                 )
 
                 fireEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
-                await waitFor(() => {
-                    expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
-                })
+                expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
             })
         })
     })
