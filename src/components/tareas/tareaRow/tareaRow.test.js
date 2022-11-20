@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -45,7 +46,7 @@ describe('TareaRow', () => {
                     </BrowserRouter>
                 )
 
-                fireEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
+                userEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
                 expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
             })
         })
