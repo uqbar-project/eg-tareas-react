@@ -1,10 +1,10 @@
 import './App.css'
 
+import { ThemeProvider } from '@emotion/react'
+import { createTheme } from '@mui/material'
 import React from 'react'
 
 import { TareasRouter } from './routes'
-import { createTheme } from '@mui/material'
-import { ThemeProvider } from '@emotion/react'
 
 const theme = createTheme({
   typography: {

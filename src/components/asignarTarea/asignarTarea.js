@@ -20,8 +20,7 @@ export const AsignarTareaComponent = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
 
-  const params = useParams()
-  const { id } = params
+  const { id } = useParams()
 
   useEffect(() => {
     const initUsuarios = async () => {
