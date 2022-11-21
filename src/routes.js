@@ -5,10 +5,13 @@ import { AsignarTareaComponent } from './components/asignarTarea/asignarTarea'
 import { TareasComponent } from './components/tareas/tareas'
 
 export const TareasRoutes = () => 
+    <Routes>
+        <Route exact={true} path="/" element={<TareasComponent/>} />
+        <Route path="/asignarTarea/:id" element={<AsignarTareaComponent/>} />
+    </Routes>
+
+export const TareasRouter = () => 
     <Router>
-        <Routes>
-            <Route exact={true} path="/" element={<TareasComponent/>} />
-            <Route path="/asignarTarea/:id" element={<AsignarTareaComponent/>} />
-        </Routes>
+        <TareasRoutes/>
     </Router>
 

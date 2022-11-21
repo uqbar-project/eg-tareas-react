@@ -2,7 +2,7 @@ import './App.css'
 
 import React from 'react'
 
-import { TareasRoutes } from './routes'
+import { TareasRouter } from './routes'
 import { createTheme } from '@mui/material'
 import { ThemeProvider } from '@emotion/react'
 
@@ -22,7 +22,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <TareasRoutes />
+        <TareasRouter />
       </div>
     </ThemeProvider>
   )

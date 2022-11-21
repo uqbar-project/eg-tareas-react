@@ -24,15 +24,6 @@ export const AsignarTareaComponent = () => {
   const { id } = params
 
   useEffect(() => {
-    const initTareas = async () => {
-      const nuevaTarea = await tareaService.getTareaById(id)
-      setTarea(nuevaTarea)
-    }
-
-    initTareas()
-  }, [id])
-
-  useEffect(() => {
     const initUsuarios = async () => {
       const nuevosUsuarios = await usuarioService.allInstances()
       setUsuarios(nuevosUsuarios)
@@ -41,6 +32,15 @@ export const AsignarTareaComponent = () => {
     initUsuarios()
   }, [])
     
+  useEffect(() => {
+    const initTareas = async () => {
+      const nuevaTarea = await tareaService.getTareaById(id)
+      setTarea(nuevaTarea)
+    }
+
+    initTareas()
+  }, [id])
+
   const asignar = (asignatario) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
     tarea.asignarA(asignatarioNuevo)
@@ -97,9 +97,10 @@ export const AsignarTareaComponent = () => {
             value={tarea.nombreAsignatario || ' '}
             onChange={(event) => asignar(event.target.value)}
             className="formControl"
+            title="asignatario"
             inputProps={{
               name: 'asignatario',
-              id: 'asignatario'
+              id: 'asignatario',
             }}
           >
             <MenuItem value=" ">
