@@ -2,7 +2,6 @@ import './App.css'
 
 import { ThemeProvider } from '@emotion/react'
 import { createTheme } from '@mui/material'
-import React from 'react'
 
 import { TareasRouter } from './routes'
 
