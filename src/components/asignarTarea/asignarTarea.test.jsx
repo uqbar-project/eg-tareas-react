@@ -1,20 +1,20 @@
 import { render, screen, waitFor, } from '@testing-library/react'
 import axios from 'axios'
-import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { Usuario } from '../../domain/usuario'
 import { TareasRoutes } from '../../routes'
 import { REST_SERVER_URL } from '../../services/constants'
 import { crearTarea } from '../../testsUtils/crearTarea'
+import { vi, expect, test, beforeEach } from 'vitest'
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
   let spyGetAxios
 
   beforeEach(() => {
-    jest.mock('axios')
-    spyGetAxios = jest.spyOn(axios, 'get')
+    vi.mock('axios')
+    spyGetAxios = vi.spyOn(axios, 'get')
 
     spyGetAxios.mockResolvedValueOnce(({
       data: [ new Usuario('Carlos Rojo') ]
@@ -26,7 +26,7 @@ describe('tests de asignar tarea', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+     vi.clearAllMocks()
   })
 
 

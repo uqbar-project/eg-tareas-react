@@ -343,28 +343,39 @@ El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/co
 
 ```js
 test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
-    tareaAsignada.cumplir()
-    render(<TareaRow tarea={tareaAsignada} />)
-    expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
+  tareaAsignada.cumplir()
+  render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
+  expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
 })
 ```
 
 Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cuando la asignación se hizo correctamente:
 
 ```js
-test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id', async () => {
-    tareaAsignada.porcentajeCumplimiento = 45
-    const pushEspia = jest.fn()
-    render(
-        <TareaRow
-            tarea={tareaAsignada}
-            navigate={pushEspia}
-        />)
+...
+const mockedNavigate = vi.fn()
+vi.mock('react-router-dom', async () => {
+    const mockedRouter = await vi.importActual('react-router-dom')
 
-    fireEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
-    await waitFor(() => {
-        expect(pushEspia).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
-    })
+    return {
+        ...mockedRouter,
+        useNavigate: () => mockedNavigate,
+    }
+})
+
+...
+
+test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id de la tarea', async () => {
+  render(
+    <BrowserRouter>
+      <TareaRow
+        tarea={tareaAsignada}
+      />
+    </BrowserRouter>
+  )
+
+  await userEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
+  expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
 })
 ```
 
@@ -391,7 +402,6 @@ describe('cuando el servicio responde correctamente', () => {
 })
 ```
 
-Cosas interesantes para comentar:
+De todas maneras este approach nos deja el comportamiento de tareaService fijo para que siempre devuelva `mockTareas`. **Si queremos que luego del test vuelva a su comportamiento original deberíamos utilizar el mock que nos proporciona `vi`**.
 
-- [waitFor](https://testing-library.com/docs/dom-testing-library/api-async) nos permite esperar a que la promise que devuelve las tareas mockeadas se resuelva y hacer las aserciones correspondientes
-- es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.
+Es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.
