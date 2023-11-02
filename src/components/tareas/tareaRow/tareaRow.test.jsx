@@ -1,20 +1,23 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
+import { vi, expect, test, beforeEach } from 'vitest'
 
 import { crearTarea } from '../../../testsUtils/crearTarea'
 import { TareaRow } from './tareaRow'
+  
+const mockedNavigate = vi.fn()
+vi.mock('react-router-dom', async () => {
+    const mockedRouter = await vi.importActual('react-router-dom')
 
-const mockedNavigate = jest.fn()
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockedNavigate,
-}))
+    return {
+        ...mockedRouter,
+        useNavigate: () => mockedNavigate,
+    }
+})
 
 describe('TareaRow', () => {
-
+    
     describe('cuando una tarea está asignada', () => {
         let tareaAsignada
 
@@ -37,7 +40,7 @@ describe('TareaRow', () => {
                 render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
                 expect(screen.getByTestId('asignar_' + tareaAsignada.id)).toBeInTheDocument()
             })
-            test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id de la tarea', () => {
+            test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion con el id de la tarea', async () => {
                 render(
                     <BrowserRouter>
                         <TareaRow
@@ -46,7 +49,7 @@ describe('TareaRow', () => {
                     </BrowserRouter>
                 )
 
-                userEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
+                await userEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
                 expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
             })
         })
