@@ -9,13 +9,13 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      src: "/src",
-      components: "/src/components",      
+      src: '/src',
+      components: '/src/components',
     },
   },
   test: {
     globals: true,
-    setupFiles: ["./setupTests.js"],
+    setupFiles: ['./setupTests.js'],
     environment: 'jsdom',
     coverage: {
       reporter: ['text', 'json', 'html', 'json-summary'],
