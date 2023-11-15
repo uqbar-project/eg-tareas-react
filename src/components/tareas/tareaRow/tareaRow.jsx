@@ -7,12 +7,12 @@ import TableRow from '@mui/material/TableRow'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { PropTypes } from 'prop-types'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-import { Tarea } from '../../../domain/tarea'
-import { tareaService } from '../../../services/tareaService'
-import { PorcentajeCumplimiento } from '../../porcentajeCumplimiento/porcentajeCumplimiento'
-import { mostrarMensajeError } from '../../../utils/error-handling'
+import { mostrarMensajeError } from 'src/utils/error-handling'
+import { tareaService } from 'src/services/tareaService'
+import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
+import { Tarea } from 'src/domain/tarea'
 
 export const TareaRow = ({ tarea, actualizar }) => {
   const [errorMessage, setErrorMessage] = useState('')

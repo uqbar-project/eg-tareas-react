@@ -1,5 +1,5 @@
-import { Tarea } from '../domain/tarea'
-import { Usuario } from '../domain/usuario'
+import { Tarea } from 'src/domain/tarea'
+import { Usuario } from 'src/domain/usuario'
 
 export function crearTarea(id, descripcion, porcentajeCumplimiento, asignado) {
     return Object.assign(new Tarea(), {

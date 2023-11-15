@@ -1,24 +1,25 @@
-import './tareas.css';
+import './tareas.css'
 
-import { TableContainer } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import Snackbar from '@mui/material/Snackbar';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
+import { TableContainer } from '@mui/material'
+import Paper from '@mui/material/Paper'
+import Snackbar from '@mui/material/Snackbar'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { tareaService } from '../../services/tareaService'
-import { mostrarMensajeError } from '../../utils/error-handling'
 import TareaRow from './tareaRow/tareaRow'
+import { useOnInit } from 'src/customHooks/hooks'
+import { mostrarMensajeError } from 'src/utils/error-handling'
+import { tareaService } from 'src/services/tareaService'
 
-export const TareasComponent = (props) => {
+export const TareasComponent = () => {
 
   const [tareas, setTareas] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
-
+  
   const traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
@@ -28,9 +29,7 @@ export const TareasComponent = (props) => {
     }
   }
 
-  useEffect(() => {
-    traerTareas()
-  }, [])
+  useOnInit(traerTareas)
 
   const snackbarOpen = !!errorMessage
 

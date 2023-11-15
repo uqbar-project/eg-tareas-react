@@ -1,6 +1,5 @@
 import Avatar from '@mui/material/Avatar'
 import PropTypes from 'prop-types'
-import React from 'react'
 
 const limiteSuperior = 80
 const limiteInferior = 50
@@ -17,7 +16,7 @@ const getBackgroundColor = (porcentaje) => {
   return '#FBEC5D'
 }
 
-const getColor = (_) => 'black'
+const getColor = () => 'black'
 
 export const PorcentajeCumplimiento = ({ porcentaje }) => {
   if (!porcentaje) return null // se puede comentar para ver como se muestra el avatar en 0%

@@ -4,14 +4,15 @@ import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { tareaService } from '../../services/tareaService'
-import { usuarioService } from '../../services/usuarioService'
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Tarea } from '../../domain/tarea'
-import { mostrarMensajeError } from '../../utils/error-handling'
+import { Tarea } from 'src/domain/tarea'
+import { mostrarMensajeError } from 'src/utils/error-handling'
+import { tareaService } from 'src/services/tareaService'
+import { usuarioService } from 'src/services/usuarioService'
+import { useOnInit } from 'src/customHooks/hooks'
   
 export const AsignarTareaComponent = () => {
 
@@ -22,23 +23,15 @@ export const AsignarTareaComponent = () => {
 
   const { id } = useParams()
 
-  useEffect(() => {
-    const initUsuarios = async () => {
-      const nuevosUsuarios = await usuarioService.allInstances()
-      setUsuarios(nuevosUsuarios)
-    }
-
-    initUsuarios()
-  }, [])
+  useOnInit(async () => {
+    const nuevosUsuarios = await usuarioService.allInstances()
+    setUsuarios(nuevosUsuarios)
+  })
     
-  useEffect(() => {
-    const initTareas = async () => {
-      const nuevaTarea = await tareaService.getTareaById(id)
-      setTarea(nuevaTarea)
-    }
-
-    initTareas()
-  }, [id])
+  useOnInit(async () => {
+    const nuevaTarea = await tareaService.getTareaById(id)
+    setTarea(nuevaTarea)
+  })
 
   const asignar = (asignatario) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
@@ -93,7 +86,7 @@ export const AsignarTareaComponent = () => {
         <CardContent>
           <Select
             /* Acá podemos ver cómo esta declarado nombreAsignatario */
-            value={tarea.nombreAsignatario || ' '}
+            value={tarea.nombreAsignatario ?? ' '}
             onChange={(event) => asignar(event.target.value)}
             className="formControl"
             title="asignatario"

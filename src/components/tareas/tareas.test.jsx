@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 
-import { tareaService } from '../../services/tareaService'
-import { crearTarea } from '../../testsUtils/crearTarea'
 import { TareasComponent } from './tareas'
+import { crearTarea } from 'src/testsUtils/crearTarea'
+import { tareaService } from 'src/services/tareaService'
 
 const mockTareas =
   [

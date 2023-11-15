@@ -2,10 +2,10 @@ import { render, screen, waitFor, } from '@testing-library/react'
 import axios from 'axios'
 import { MemoryRouter } from 'react-router-dom'
 
-import { Usuario } from '../../domain/usuario'
-import { TareasRoutes } from '../../routes'
-import { REST_SERVER_URL } from '../../services/constants'
-import { crearTarea } from '../../testsUtils/crearTarea'
+import { Usuario } from 'src/domain/usuario'
+import { TareasRoutes } from 'src/routes'
+import { REST_SERVER_URL } from 'src/services/constants'
+import { crearTarea } from 'src/testsUtils/crearTarea'
 import { vi, expect, test, beforeEach } from 'vitest'
 
 describe('tests de asignar tarea', () => {

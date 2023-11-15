@@ -1,6 +1,7 @@
 import { Usuario } from './usuario'
 
 const PORCENTAJE_CUMPLIDA = 100
+
 export class Tarea {
   constructor() {
     this.id = 0
