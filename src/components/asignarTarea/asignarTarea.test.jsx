@@ -16,13 +16,13 @@ describe('tests de asignar tarea', () => {
     vi.mock('axios')
     spyGetAxios = vi.spyOn(axios, 'get')
 
-    spyGetAxios.mockResolvedValueOnce(({
+    spyGetAxios.mockResolvedValueOnce({
       data: [ new Usuario('Carlos Rojo') ]
-    }))
+    })
 
-    spyGetAxios.mockResolvedValueOnce(({
+    spyGetAxios.mockResolvedValueOnce({
       data: crearTarea(idTareaAsignada, 'Ejemplo', 0, 'Carlos Rojo')
-    }))
+    })
   })
 
   afterEach(() => {
