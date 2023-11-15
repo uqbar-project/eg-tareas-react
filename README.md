@@ -27,19 +27,22 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 ![image](images/ArquitecturaTareas2.png)
 
-En el componente que muestra las tareas disparamos la búsqueda de tareas (evento `componentDidMount` porque `tareas` está definido como clase):
+A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
 
 ```js
-  async componentDidMount() {
-    //debugger //  to show lifecycle
-    await this.traerTareas()
-  }
-
-  traerTareas = async () => {
+  const traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
-      ...
+      setTareas(tareas)
+    } catch (error) {
+      mostrarMensajeError(error, setErrorMessage)
+    }
+  }
+
+  useOnInit(traerTareas)
 ```
+
+Definimos la función aparte para poder usarla como prop a nuestro componente hijo.
 
 El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea y ordenándolas por descripción:
 
@@ -48,26 +51,11 @@ class TareaService {
   async allInstances() {
     const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
     const tareas = tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
-    return tareas.sort((a, b) => (a.descripcion < b.descripcion ? -1 : 1)) // las ordenamos por descripción
+    return tareas.sort((a, b) => a.descripcion < b.descripcion ? -1 : 1)
   }
 ```
 
-Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente React:
-
-```js
-class TareasComponent {
-
-  traerTareas = async () => {
-    try {
-      const tareas = await tareaService.allInstances()
-      this.setState({
-        tareas, // recordemos que equivale a tareas: tareas,
-      })
-    } catch (error) {
-      this.setState({ errorMessage: obtenerMensaje(error) })
-    }
-  }
-```
+Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente React: `setTareas(tareas)`
 
 También podríamos utilizar la sintaxis de promises común `then().catch()`.
 
@@ -75,12 +63,10 @@ También podríamos utilizar la sintaxis de promises común `then().catch()`.
 traerTareas() {
   tareaService.allInstances()
     .then((tareas) => {
-      this.setState({
-        tareas,
-      })
+      setTareas(tareas)
     })
     .catch ((error) => {
-      this.setState({ errorMessage: obtenerMensaje(error) })
+      mostrarMensajeError(error, setErrorMessage)
     })
 }
 ```
@@ -90,9 +76,9 @@ traerTareas() {
 El componente `TareaRow` captura el evento del botón:
 
 ```js
-export const TareaRow = (props) => {
+export const TareaRowexport const TareaRow = ({ tarea, actualizar }) => {
 
-  <IconButton aria-label="Cumplir" onClick={cumplirTarea}>
+  <IconButton ... onClick={cumplirTarea}>
       <CheckCircleIcon />
   </IconButton>
 ```
@@ -101,39 +87,32 @@ En el método del componente delegamos el cumplimiento al objeto de dominio Tare
 
 ```js
 // en el componente funcional TareaRow
-const cumplirTarea = async () => {
+  const cumplirTarea = async () => {
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
-        tarea.cumplir()
-        await tareaService.actualizarTarea(tarea)
+      tarea.cumplir()
+      await tareaService.actualizarTarea(tarea)
     } catch (error) {
-        generarError(error)
+      mostrarMensajeError(error, setErrorMessage)
     } finally {
-        // independientemente de si anduvo bien o no actualizamos la información del backend
-        await actualizar()
+      // viene como props
+      await actualizar()
     }
-}
+  }
 ```
 
-`props.actualizar()` lo recibimos como una función en el componente `TareaRow`:
+`TareaComponent` le pasa la función al componente `TareaRow`:
 
 ```js
 // en Tarea se envía para cada uno de los elementos de la lista
-<TareaRow
-  tarea={tarea}
-  key={tarea.id}
-  actualizar={this.traerTareas} />)
+tareas.map((tarea) =>
+  <TareaRow
+    tarea={tarea}
+    key={tarea.id}
+    actualizar={traerTareas} />)
 ```
 
-```js
-TareaRow.propTypes = {
-    tarea: PropTypes.instanceOf(Tarea),
-    navigate: PropTypes.func,
-    actualizar: PropTypes.func,
-}
-```
-
-El método traerTareas ya lo hemos visto, es el que se dispara inicialmente en el evento componentDidMount de `Tarea`.
+El método traerTareas ya lo hemos visto, es el que se dispara inicialmente en el componente principal.
 
 Por su parte, el método actualizarTarea del service dispara el pedido PUT al backend, pasando como body la conversión de nuestro objeto de dominio Tarea a JSON:
 
@@ -155,29 +134,10 @@ const goToAsignarTarea = () => {
 }
 ```
 
-`navigate` es una función que recibimos cuando decoramos nuestro componente `TareaRow` al exportarlo:
+`navigate` es una función que obtenemos mediante el hook _useNavigate_:
 
 ```js
-export default withRouter(TareaRow)
-```
-
-`withRouter` es una función que estaba originalmente en react-router pero que ahora tuvimos que agregar manualmente, y permite recibir un componente y **decorarlo** pasándole como prop la función `useNavigate` que nosotros llamamos `navigate` y que sirve para movernos de página:
-
-```js
-export const withRouter = (Component) => {
-  const Wrapper = (props) => {
-    const navigate = useNavigate()
-    
-    return (
-      <Component
-        navigate={navigate}
-        {...props}
-        />
-    )
-  }
-  
-  return Wrapper
-}
+const navigate = useNavigate()
 ```
 
 A su vez, en el archivo `routes.js` definimos que el path `/asignarTarea/:id` se mapea con el componente de React que permite asignar la tarea:
@@ -192,7 +152,7 @@ export const TareasRoutes = () =>
     </Router>
 ```
 
-Para más información pueden ver [esta página del Router de React](https://reactrouter.com/docs/en/v6).
+Para más información pueden ver [esta página del Router de React](https://reactrouter.com/en/main).
 
 ![image](images/ArquitecturaAsignarTarea.png)
 
@@ -216,19 +176,21 @@ Además de los usuarios, agregamos en el combo la opción "Sin Asignar", para po
 
 ```js
 <Select
-    value={this.state.tarea.nombreAsignatario}
-    onChange={(event) => this.asignar(event.target.value)}
-    className="formControl"
-    inputProps={{
-        name: 'asignatario',
-        id: 'asignatario'
-    }}
+  /* Acá podemos ver cómo esta declarado nombreAsignatario */
+  value={tarea.nombreAsignatario ?? ' '}
+  onChange={(event) => asignar(event.target.value)}
+  className="formControl"
+  title="asignatario"
+  inputProps={{
+    name: 'asignatario',
+    id: 'asignatario',
+  }}
 >
     >
         <MenuItem value=" ">
         <em>Sin Asignar</em>
     </MenuItem>
-    {this.state.usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.id}>{usuario.nombre}</MenuItem>)}
+    {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
 </Select>
 ```
 
@@ -250,20 +212,16 @@ Para entender cómo funciona la asignación, el combo dispara el evento de cambi
 El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el identificador, pero lamentablemente el servicio REST solo nos da el nombre), entonces delegamos a un método más general que actualiza el estado de la tarea. En el componente AsignarTareaComponent:
 
 ```js
-asignar = (asignatario) => {
-  const tarea = this.state.tarea
-  const asignatarioNuevo = asignatario.trim() ? asignatario : null
+const asignar = (asignatario) => {
+  const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
   tarea.asignarA(asignatarioNuevo)
-  this.cambiarEstado(tarea)
+  generarNuevaTarea(tarea)
 }
 
-cambiarEstado = (tarea) => {
-  // generamos una copia de la tarea, sabiendo que no necesita una copia profunda
-  const newTarea = Object.assign(tarea)
-  this.setState({
-    tarea: newTarea,
-    errorMessage: '',
-  })
+const generarNuevaTarea = (tarea) => {
+  const nuevaTarea = Object.assign(new Tarea(), tarea)
+  setTarea(nuevaTarea)
+  setErrorMessage('')
 }
 ```
 
@@ -276,13 +234,13 @@ Al actualizar el estado se dispara el render que refleja el nuevo valor para el 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
 ```js
-aceptarCambios = async () => {
+const aceptarCambios = async () => {
   try {
-    this.state.tarea.validarAsignacion()
-    await tareaService.actualizarTarea(this.state.tarea)
-    this.volver()
-  } catch (e) {
-    this.generarError(e)
+    tarea.validarAsignacion()
+    await tareaService.actualizarTarea(tarea)
+    volver()
+  } catch (error) {
+    mostrarMensajeError(error, setErrorMessage)
   }
 }
 ```
@@ -296,11 +254,11 @@ Veamos el código que muestra la lista de tareas:
 ```js
   <TableBody data-testid="resultados">
     {
-      this.state.tareas.map((tarea) =>
+      tareas.map((tarea) =>
         <TareaRow
           tarea={tarea}
           key={tarea.id}
-          actualizar={this.traerTareas} />)
+          actualizar={traerTareas} />)
     }
   </TableBody>
 ```
@@ -312,11 +270,11 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
 ```js
 <TableBody data-testid="resultados">
   {
-    this.state.tareas.map((tarea) =>
+    tareas.map((tarea) =>
       <TareaRow
         tarea={tarea}
         key={1}
-        actualizar={this.traerTareas} />)
+        actualizar={traerTareas} />)
   }
 </TableBody>
 ```
@@ -355,7 +313,7 @@ Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cu
 ...
 const mockedNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
-    const mockedRouter = await vi.importActual('react-router-dom')
+    const mockedRouter = await vi.importActua('react-router-dom')
 
     return {
         ...mockedRouter,
