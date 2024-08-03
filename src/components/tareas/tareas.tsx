@@ -44,7 +44,7 @@ export const TareasComponent = () => {
             <TableCell>Tarea</TableCell>
             <TableCell>Fecha</TableCell>
             <TableCell>Asignatario</TableCell>
-            <TableCell>% Cumplimiento</TableCell>
+            <TableCell>%</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>

@@ -14,5 +14,10 @@
 }
 
 .linea {
-  margin-top: 2.5em;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.formControl {
+  width: 100%;
 }
