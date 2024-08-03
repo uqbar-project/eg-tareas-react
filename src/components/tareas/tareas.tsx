@@ -42,8 +42,8 @@ export const TareasComponent = () => {
         <TableHead>
           <TableRow>
             <TableCell>Tarea</TableCell>
-            <TableCell>Fecha</TableCell>
-            <TableCell>Asignatario</TableCell>
+            <TableCell id="fecha">Fecha</TableCell>
+            <TableCell id="asignatario">Asignatario</TableCell>
             <TableCell>%</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>

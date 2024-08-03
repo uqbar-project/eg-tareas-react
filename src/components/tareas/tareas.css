@@ -2,6 +2,10 @@
   font-size: 20px;
 }
 
+.MuiPaper-root {
+  width: 100vw !important;
+}
+
 thead {
   background-color: aliceblue;
 }
@@ -10,3 +14,13 @@ thead {
   font-weight: bold !important;
 }
 
+table {
+  display: block;
+  overflow-x: auto;
+}
+
+@media (max-width: 414px) {
+  #fecha, #asignatario {
+    display: none;
+  }
+}

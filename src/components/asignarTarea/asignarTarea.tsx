@@ -1,5 +1,3 @@
-import './asignarTarea.css'
-
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -14,7 +12,9 @@ import { tareaService } from 'src/services/tareaService'
 import { usuarioService } from 'src/services/usuarioService'
 import { useOnInit } from 'src/customHooks/hooks'
 import { Usuario } from 'src/domain/usuario'
-  
+
+import './asignarTarea.css'
+
 export const AsignarTareaComponent = () => {
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([])

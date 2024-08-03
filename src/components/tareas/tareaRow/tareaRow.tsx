@@ -53,8 +53,8 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
       <TableCell component="th" scope="row">
         {tarea.descripcion}
       </TableCell>
-      <TableCell>{tarea.fecha}</TableCell>
-      <TableCell>{tarea.nombreAsignatario}</TableCell>
+      <TableCell id="fecha">{tarea.fecha}</TableCell>
+      <TableCell id="asignatario">{tarea.nombreAsignatario}</TableCell>
       <TableCell>
         <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
       </TableCell>

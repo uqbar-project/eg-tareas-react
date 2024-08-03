@@ -4,10 +4,6 @@
   width: 100vw !important;
 }
 
-.MuiPaper-root {
-  width: calc(100vw - 80px) !important;
-}
-
 h1 {
   background: linear-gradient(-20deg, #97e0cf, #93fae2);
   background-size: 100% 100%;

@@ -1,4 +1,8 @@
 .form {
+  width: calc(100vw - 80px) !important;
+}
+ 
+.form {
   margin: 2rem;
   display: flex;
   flex-direction: row;
