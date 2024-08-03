@@ -1,7 +1,7 @@
 
 # Tareas de un equipo de desarrollo
 
-[![Build React App](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml) ![coverage](./badges/coverage/coverage.svg?refresh=1)
+[![Build React App](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-tareas-react/graph/badge.svg?token=hVIcjudvLa)](https://codecov.io/gh/uqbar-project/eg-tareas-react)
 
 ![video](video/demo2022.gif)
 
