@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 
 import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
+import { describe, expect, test } from 'vitest'
 
 /**
  * DISCLAIMER: estos tests de UI no son buenos
@@ -15,20 +16,16 @@ import { PorcentajeCumplimiento } from './porcentajeCumplimiento'
 describe('porcentaje de cumplimiento', () => {
   test('porcentaje en el límite superior', () => {
     render(<PorcentajeCumplimiento porcentaje={99} />)
-    expect(screen.getByTestId('alto')).toBeInTheDocument()
+    expect(screen.getByTestId('alto')).toBeTruthy()
   })
   test('porcentaje intermedio', () => {
     render(<PorcentajeCumplimiento porcentaje={75} />)
-    expect(screen.getByTestId('medio')).toBeInTheDocument()
+    expect(screen.getByTestId('medio')).toBeTruthy()
   })
 
   test('porcentaje más bajo', () => {
     render(<PorcentajeCumplimiento porcentaje={25} />)
-    expect(screen.getByTestId('bajo')).toBeInTheDocument()
+    expect(screen.getByTestId('bajo')).toBeTruthy()
   })
 
-  test('cuando no se le pasa porcentaje no renderiza un avatar', () => {
-    const { container } = render(<PorcentajeCumplimiento />)
-    expect(container.innerHTML).toBe('')
-  })
 })

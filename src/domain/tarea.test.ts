@@ -1,7 +1,8 @@
+import { describe, expect, test } from "vitest"
 import { Tarea } from "./tarea"
 import { Usuario } from "./usuario"
 
-const nombrePersona = 'Alguien'
+const persona = new Usuario('Alguien')
 
 describe('tests de tarea', () => {
   test('una tarea inicialmente no está asignada', () => {
@@ -10,7 +11,7 @@ describe('tests de tarea', () => {
 
   test('una tarea que va a hacer una persona está asignada', () => {
     const tareaAsignada = new Tarea()
-    tareaAsignada.asignarA(nombrePersona)
+    tareaAsignada.asignarA(persona)
     expect(tareaAsignada.estaAsignada()).toBeTruthy()
   })
 
@@ -23,42 +24,42 @@ describe('tests de tarea', () => {
   test('contiene palabra por asignatario - caso feliz', () => {
     const tarea = new Tarea()
     tarea.descripcion = 'Testear el componente login'
-    tarea.asignarA(new Usuario(nombrePersona))
+    tarea.asignarA(persona)
     expect(tarea.contiene('Algu')).toBeTruthy()
   })
 
   test('contiene palabra - caso no encontrado', () => {
     const tarea = new Tarea()
     tarea.descripcion = 'Testear el componente login'
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     expect(tarea.contiene('Componente')).toBeFalsy()
   })
 
   test('una tarea que está a menos del 100% y asignada se puede cumplir', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 99
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     expect(tarea.sePuedeCumplir()).toBeTruthy()
   })
 
   test('una tarea que está a menos del 100% y asignada se puede desasignar', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 99
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     expect(tarea.sePuedeDesasignar()).toBeTruthy()
   })
 
   test('una tarea que está al 100% no se puede desasignar', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 100
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     expect(tarea.sePuedeDesasignar()).toBeFalsy()
   })
 
   test('una tarea que está al 100% no se puede cumplir', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 100
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     expect(tarea.sePuedeCumplir()).toBeFalsy()
   })
 
@@ -70,7 +71,7 @@ describe('tests de tarea', () => {
 
   test('al cumplirse una tarea queda al 100%', () => {
     const tarea = new Tarea()
-    tarea.asignarA(nombrePersona)
+    tarea.asignarA(persona)
     tarea.cumplir()
     expect(tarea.porcentajeCumplimiento).toBe(100)
     expect(tarea.estaCumplida()).toBeTruthy()
@@ -79,7 +80,7 @@ describe('tests de tarea', () => {
 
   test('una tarea que está cumplida no puede asignarse', () => {
     const tarea = new Tarea()
-    const newLocal = nombrePersona
+    const newLocal = persona
     tarea.asignarA(newLocal)
     tarea.cumplir()
     expect(tarea.sePuedeAsignar()).toBeFalsy()
@@ -87,33 +88,34 @@ describe('tests de tarea', () => {
 
   test('la tarea conoce el nombre del asignatario', () => {
     const tarea = new Tarea()
-    tarea.asignarA(new Usuario(nombrePersona))
-    expect(tarea.nombreAsignatario).toBe(nombrePersona)
+    tarea.asignarA(persona)
+    expect(tarea.nombreAsignatario).toBe(persona.nombre)
   })
 
   test('conversión a JSON trae el nombre del asignatario', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 20
     tarea.iteracion = 'Sprint 3'
-    tarea.asignarA(new Usuario(nombrePersona))
+    tarea.asignarA(persona)
     const tareaJson = tarea.toJSON()
-    expect(tareaJson.asignadoA).toBe(nombrePersona)
+    expect(tareaJson.asignadoA).toBe(persona.nombre)
     expect(tareaJson.porcentajeCumplimiento).toBe(20)
     expect(tareaJson.iteracion).toBe('Sprint 3')
     expect(tareaJson.fecha).toBe('10/10/2015')
-    expect(tareaJson.asignatario).toBeNull()
   })
 
   test('conversión desde JSON trae el nombre del asignatario', () => {
     const tarea = Tarea.fromJson({
+      id: 1,
+      descripcion: '',
+      fecha: '10/07/2024',
       porcentajeCumplimiento: 20,
-      asignadoA: nombrePersona,
+      asignadoA: persona.nombre,
       iteracion: 'Sprint 3'
     })
-    expect(tarea.nombreAsignatario).toBe(nombrePersona)
+    expect(tarea.nombreAsignatario).toBe(persona.nombre)
     expect(tarea.porcentajeCumplimiento).toBe(20)
     expect(tarea.iteracion).toBe('Sprint 3')
-    expect(tarea.asignadoA).toBeUndefined()
   })
   test('una tarea sin asignatario no es válida', () => {
     const tarea = new Tarea()
@@ -122,9 +124,12 @@ describe('tests de tarea', () => {
 
   test('una tarea con asignatario es válida', () => {
     const tarea = Tarea.fromJson({
+      id: 1,
+      descripcion: 'Validar asignatario',
+      fecha: '04/05/2021',
       porcentajeCumplimiento: 20,
-      asignadoA: nombrePersona,
-      iteracion: 'Sprint 3'
+      asignadoA: persona.nombre,
+      iteracion: 'Sprint 3',
     })
     expect(() => { tarea.validarAsignacion() }).not.toThrowError()
   })

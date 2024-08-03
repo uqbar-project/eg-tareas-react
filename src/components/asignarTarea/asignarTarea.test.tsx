@@ -6,11 +6,11 @@ import { Usuario } from 'src/domain/usuario'
 import { TareasRoutes } from 'src/routes'
 import { REST_SERVER_URL } from 'src/services/constants'
 import { crearTarea } from 'src/testsUtils/crearTarea'
-import { vi, expect, test, beforeEach } from 'vitest'
+import { vi, expect, test, beforeEach, describe, afterEach, MockInstance } from 'vitest'
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
-  let spyGetAxios
+  let spyGetAxios: MockInstance
 
   beforeEach(() => {
     vi.mock('axios')
@@ -40,7 +40,7 @@ describe('tests de asignar tarea', () => {
     expect(spyGetAxios).toHaveBeenCalledWith(`${REST_SERVER_URL}/tareas/${idTareaAsignada}`)
 
     await waitFor(() => {
-      const textDescripcion = screen.getByTestId('descripcion').value
+      const textDescripcion = (screen.getByTestId('descripcion') as HTMLInputElement).value
       expect(textDescripcion).toBe('Ejemplo')
     })
 

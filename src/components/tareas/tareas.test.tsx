@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { TareasComponent } from './tareas'
 import { crearTarea } from 'src/testsUtils/crearTarea'
 import { tareaService } from 'src/services/tareaService'
+import { describe, expect, test } from 'vitest'
 
 const mockTareas =
   [
@@ -16,8 +17,8 @@ describe('TareasComponent', () => {
     test('se muestran las tareas en la tabla', async () => {
       tareaService.allInstances = () => Promise.resolve(mockTareas)
       render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      expect(await screen.findByTestId('tarea_159')).toBeInTheDocument()
-      expect(await screen.findByTestId('tarea_68')).toBeInTheDocument()
+      expect(await screen.findByTestId('tarea_159')).toBeTruthy()
+      expect(await screen.findByTestId('tarea_68')).toBeTruthy()
     })
   })
 })

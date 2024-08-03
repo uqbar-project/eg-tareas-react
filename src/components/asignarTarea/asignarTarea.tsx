@@ -4,19 +4,20 @@ import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 
 import { Button, FormLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Tarea } from 'src/domain/tarea'
-import { mostrarMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, mostrarMensajeError } from 'src/utils/error-handling'
 import { tareaService } from 'src/services/tareaService'
 import { usuarioService } from 'src/services/usuarioService'
 import { useOnInit } from 'src/customHooks/hooks'
+import { Usuario } from 'src/domain/usuario'
   
 export const AsignarTareaComponent = () => {
 
-  const [usuarios, setUsuarios] = useState([])
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
@@ -29,24 +30,24 @@ export const AsignarTareaComponent = () => {
   })
     
   useOnInit(async () => {
-    const nuevaTarea = await tareaService.getTareaById(id)
+    const nuevaTarea = await tareaService.getTareaById(+id!)
     setTarea(nuevaTarea)
   })
 
-  const asignar = (asignatario) => {
+  const asignar = (asignatario: string) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
-    tarea.asignarA(asignatarioNuevo)
+    tarea.asignarA(asignatarioNuevo!)
     generarNuevaTarea(tarea)
   }
 
-  const generarNuevaTarea = (tarea) => {
+  const generarNuevaTarea = (tarea: Tarea) => {
     const nuevaTarea = Object.assign(new Tarea(), tarea)
     setTarea(nuevaTarea)
     setErrorMessage('')
   }
 
-  const cambiarDescripcion = (event) => {
-    tarea.descripcion = event.target.value
+  const cambiarDescripcion = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    tarea.descripcion = event?.target.value
     generarNuevaTarea(tarea)
   }
 
@@ -55,8 +56,8 @@ export const AsignarTareaComponent = () => {
       tarea.validarAsignacion()
       await tareaService.actualizarTarea(tarea)
       volver()
-    } catch (error) {
-      mostrarMensajeError(error, setErrorMessage)
+    } catch (error: unknown) {
+      mostrarMensajeError(error as ErrorResponse, setErrorMessage)
     }
   }
 

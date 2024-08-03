@@ -11,11 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
     - name: Cache node modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -27,8 +27,7 @@ jobs:
     - run: npm run build --if-present
     - name: Run the tests and generate coverage report
       run: npm test -- --coverage
-    - name: Adding coverage badge
-      uses: demyanets/angular-coverage-badges-action@v1
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.5.0
       with:
-        coverage-summary-path: ./coverage/coverage-summary.json
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.CODECOV_TOKEN }} 

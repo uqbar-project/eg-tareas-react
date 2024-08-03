@@ -6,15 +6,14 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { PropTypes } from 'prop-types'
 import { useState } from 'react'
 
-import { mostrarMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, mostrarMensajeError } from 'src/utils/error-handling'
 import { tareaService } from 'src/services/tareaService'
 import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { Tarea } from 'src/domain/tarea'
 
-export const TareaRow = ({ tarea, actualizar }) => {
+export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
 
@@ -23,8 +22,8 @@ export const TareaRow = ({ tarea, actualizar }) => {
     try {
       tarea.cumplir()
       await tareaService.actualizarTarea(tarea)
-    } catch (error) {
-      mostrarMensajeError(error, setErrorMessage)
+    } catch (error: unknown) {
+      mostrarMensajeError(error as ErrorResponse, setErrorMessage)
     } finally {
       // viene como props
       await actualizar()
@@ -70,12 +69,6 @@ export const TareaRow = ({ tarea, actualizar }) => {
       />
     </TableRow>
   )
-}
-
-TareaRow.propTypes = {
-  tarea: PropTypes.instanceOf(Tarea),
-  navigate: PropTypes.func,
-  actualizar: PropTypes.func,
 }
 
 export default TareaRow

@@ -10,22 +10,23 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { useState } from 'react'
 
-import TareaRow from './tareaRow/tareaRow'
 import { useOnInit } from 'src/customHooks/hooks'
-import { mostrarMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, mostrarMensajeError } from 'src/utils/error-handling'
 import { tareaService } from 'src/services/tareaService'
+import TareaRow from './tareaRow/tareaRow'
+import { Tarea } from 'src/domain/tarea'
 
 export const TareasComponent = () => {
 
-  const [tareas, setTareas] = useState([])
+  const [tareas, setTareas] = useState<Tarea[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   
   const traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
       setTareas(tareas)
-    } catch (error) {
-      mostrarMensajeError(error, setErrorMessage)
+    } catch (error: unknown) {
+      mostrarMensajeError(error as ErrorResponse, setErrorMessage)
     }
   }
 

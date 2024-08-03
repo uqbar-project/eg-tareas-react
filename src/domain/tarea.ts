@@ -1,26 +1,22 @@
-import { Usuario } from './usuario'
+import { Usuario } from "./usuario"
 
 const PORCENTAJE_CUMPLIDA = 100
 
 export class Tarea {
-  constructor() {
-    this.id = 0
-    this.descripcion = ''
-    this.iteracion = ''
-    this.asignatario = null
-    this.fecha = '10/10/2015'
-    this.porcentajeCumplimiento = 0
+  id = 0
+
+  constructor(public descripcion = '', public iteracion = '', public asignatario: Usuario | null = null, public fecha = '10/10/2015', public porcentajeCumplimiento = 0) {
   }
 
-  contiene(palabra) {
+  contiene(palabra: string) {
     return this.descripcion.includes(palabra) || this.asignatario?.nombre?.includes(palabra)
   }
 
-  cumplio(porcentaje) {
+  cumplio(porcentaje: number) {
     return this.porcentajeCumplimiento === porcentaje
   }
 
-  cumplioMenosDe(porcentaje) {
+  cumplioMenosDe(porcentaje: number) {
     return this.porcentajeCumplimiento < porcentaje
   }
 
@@ -40,7 +36,7 @@ export class Tarea {
     return this.sePuedeCumplir()
   }
 
-  asignarA(asignatario) {
+  asignarA(asignatario: Usuario) {
     this.asignatario = asignatario
   }
 
@@ -56,7 +52,7 @@ export class Tarea {
     return !!this.asignatario
   }
 
-  static fromJson(tareaJSON) {
+  static fromJson(tareaJSON: TareaJSON): Tarea {
     const result = Object.assign(new Tarea(),
       tareaJSON,
       { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : null }
@@ -70,7 +66,7 @@ export class Tarea {
     return this.asignatario?.nombre
   }
 
-  toJSON() {
+  toJSON(): TareaJSON {
     return {
       ...this,
       asignatario: null, // o podríamos pisarlo
@@ -89,4 +85,13 @@ class UserException extends Error {
   toString() {
     return this.message
   }
+}
+
+export type TareaJSON = {
+  id: number
+  descripcion: string
+  iteracion: string
+  porcentajeCumplimiento: number
+  asignadoA?: string
+  fecha: string
 }
