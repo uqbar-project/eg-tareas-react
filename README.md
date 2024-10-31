@@ -313,12 +313,12 @@ Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cu
 ...
 const mockedNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
-    const mockedRouter = await vi.importActua('react-router-dom')
+  const mockedRouter = await vi.importActua('react-router-dom')
 
-    return {
-        ...mockedRouter,
-        useNavigate: () => mockedNavigate,
-    }
+  return {
+    ...mockedRouter,
+    useNavigate: () => mockedNavigate,
+  }
 })
 
 ...
