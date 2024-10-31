@@ -3,8 +3,8 @@ import { BrowserRouter } from 'react-router-dom'
 
 import { TareasComponent } from './tareas'
 import { crearTarea } from 'src/testsUtils/crearTarea'
-import { tareaService } from 'src/services/tareaService'
-import { describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { Tarea } from 'src/domain/tarea'
 
 const mockTareas =
   [
@@ -13,12 +13,22 @@ const mockTareas =
   ]
 
 describe('TareasComponent', () => {
+
+  beforeEach(() => {
+    vi.mock('./src/services/tareaService', () => ({
+      allInstances(): Promise<Tarea[]> { return Promise.resolve(mockTareas) }
+    }))
+  })
+
   describe('cuando el servicio responde correctamente', () => {
     test('se muestran las tareas en la tabla', async () => {
-      tareaService.allInstances = () => Promise.resolve(mockTareas)
       render(<BrowserRouter><TareasComponent /></BrowserRouter>)
       expect(await screen.findByTestId('tarea_159')).toBeTruthy()
       expect(await screen.findByTestId('tarea_68')).toBeTruthy()
     })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 })

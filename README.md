@@ -263,7 +263,7 @@ Veamos el código que muestra la lista de tareas:
   </TableBody>
 ```
 
-Como lo cuenta [la documentación de React](https://es.reactjs.org/docs/lists-and-keys.html), es importante dar a cada uno de nuestros componentes custom (`TareaRow` en este caso) una **key** para identificar rápidamente qué componentes están asociados a un cambio de estado (el Virtual DOM interno que maneja React). La restricción que deben cumplir los componentes hermanos es que a) sus **key** sean únicas, b) que existan.
+Como lo cuenta [la documentación de React](https://es.react.dev/learn/rendering-lists), es importante dar a cada uno de nuestros componentes custom (`TareaRow` en este caso) una **key** para identificar rápidamente qué componentes están asociados a un cambio de estado (el Virtual DOM interno que maneja React). La restricción que deben cumplir los componentes hermanos es que a) sus **key** sean únicas, b) que no cambien durante el flujo de trabajo, ya que es lo que React utiliza para poder ubicar un componente en el DOM de HTML. Si trabajamos con el índice o con un valor al azar (`Math.random`) eso hace que cada vez que se dispare el render haya que redibujar toda la tabla. [Este artículo](https://kuldipem.medium.com/say-no-to-array-index-as-key-in-react-my-approaches-to-tackle-it-that-you-can-use-51153bfa8901) cuenta alternativas, entre los que se incluye un hook propio de React: `useId()`.
 
 Si eliminamos la línea que genera la key, el Linter de React nos muestra un mensaje de error: `Missing "key" prop for element in iterator`. Pero qué ocurre si definimos una clave constante, como por ejemplo `1`:
 
@@ -337,29 +337,42 @@ test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion 
 })
 ```
 
+Para el testeo de la página de Asignación, en lugar de `BrowserRouter` elegimos `MemoryRouter` que simula fácilmente la navegación hacia la página de asignación.
+
 ## Tareas
 
 ### Mockear el servicio
 
-La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a nuestros **services**, lo primero es crear nuestros datos de mock (pueden ver la implementación en el archivo [crearTarea.js](./src/testsUtils/crearTarea.js)). Y ahora sí podemos construir una _promise mockeada_, dentro de nuestros tests. Como nuestro servicio de tareas es un singleton, podemos pisar el método en el contexto de los tests haciendo que devuelva una promesa con lo que nosotros queramos directamente, de la siguiente manera:
+La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a nuestros **services**, lo primero es crear nuestros datos de mock (pueden ver la implementación en el archivo [crearTarea.js](./src/testsUtils/crearTarea.js)). Y ahora sí podemos construir una _promise mockeada_, dentro de nuestros tests. Como nuestro servicio de tareas es un singleton, podríamos pisar el método en el contexto de los tests haciendo que devuelva una promesa con lo que nosotros queramos directamente, de la siguiente manera:
 
 ```js
 tareaService.allInstances = () => Promise.resolve(mockTareas)
 ```
 
-Y nuestro test queda de la siguiente forma :
+De todas maneras este approach nos deja el comportamiento de tareaService fijo para que siempre devuelva `mockTareas`. **Si queremos que luego del test vuelva a su comportamiento original deberíamos utilizar el mock que nos proporciona `vi`**:
 
 ```js
-describe('cuando el servicio responde correctamente', () => {
-  test('se muestran las tareas en la tabla', async () => {
-    tareaService.allInstances = () => Promise.resolve(mockTareas)
-    render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-    expect(await screen.findByTestId('tarea_159')).toBeInTheDocument()
-    expect(await screen.findByTestId('tarea_68')).toBeInTheDocument()
+describe('TareasComponent', () => {
+
+  beforeEach(() => {
+    vi.mock('./src/services/tareaService', () => ({
+      allInstances(): Promise<Tarea[]> { return Promise.resolve(mockTareas) }
+    }))
   })
-})
+
+  describe('cuando el servicio responde correctamente', () => {
+    test('se muestran las tareas en la tabla', async () => {
+      render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+      expect(await screen.findByTestId('tarea_159')).toBeTruthy()
+      expect(await screen.findByTestId('tarea_68')).toBeTruthy()
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 ```
 
-De todas maneras este approach nos deja el comportamiento de tareaService fijo para que siempre devuelva `mockTareas`. **Si queremos que luego del test vuelva a su comportamiento original deberíamos utilizar el mock que nos proporciona `vi`**.
+Al final de la ejecución de los tests llamamos a la función que nos permite recuperar el estado original de nuestro service, en caso de que tengamos más tests que necesiten la implementación verdadera.
 
-Es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.
+Por último, es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.
