@@ -280,9 +280,11 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
 ```
 
 - por un lado en la consola nos aparece un error en runtime, donde nos alerta que definir la misma clave puede producir inconsistencias en las actualizaciones de la página
-- por otro lado, cuando cumplimos una tarea, se actualizan innecesariamente todas las filas de la tabla. Podría pasar incluso que se actualice la información de las filas incorrectas
+- por otro lado, cuando cumplimos una tarea, se actualizan innecesariamente todas las filas de la tabla.
 
 La necesidad de trabajar con **key** únicas entre hermanos solo es necesaria cuando tenemos un loop, una iteración (no ocurre cuando estamos definiendo un componente solo).
+
+> Te dejamos un [muy buen video](https://www.youtube.com/watch?v=A8AxHueElo0) que explica lo que pasa cuando elegís una `key` mala (como el `index` de los elementos que recorrés) y además si tus componentes hermanos tienen estado.
 
 # Testing
 
