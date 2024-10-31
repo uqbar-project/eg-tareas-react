@@ -355,9 +355,7 @@ De todas maneras este approach nos deja el comportamiento de tareaService fijo p
 describe('TareasComponent', () => {
 
   beforeEach(() => {
-    vi.mock('./src/services/tareaService', () => ({
-      allInstances(): Promise<Tarea[]> { return Promise.resolve(mockTareas) }
-    }))
+    vi.spyOn(tareaService, 'allInstances').mockResolvedValue(Promise.resolve(mockTareas))
   })
 
   describe('cuando el servicio responde correctamente', () => {

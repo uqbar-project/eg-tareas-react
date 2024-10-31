@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { TareasComponent } from './tareas'
 import { crearTarea } from 'src/testsUtils/crearTarea'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { Tarea } from 'src/domain/tarea'
+import { tareaService } from 'src/services/tareaService'
 
 const mockTareas =
   [
@@ -15,9 +15,7 @@ const mockTareas =
 describe('TareasComponent', () => {
 
   beforeEach(() => {
-    vi.mock('./src/services/tareaService', () => ({
-      allInstances(): Promise<Tarea[]> { return Promise.resolve(mockTareas) }
-    }))
+    vi.spyOn(tareaService, 'allInstances').mockResolvedValue(Promise.resolve(mockTareas))
   })
 
   describe('cuando el servicio responde correctamente', () => {
