@@ -6,7 +6,7 @@ import { Usuario } from 'src/domain/usuario'
 import { TareasRoutes } from 'src/routes'
 import { REST_SERVER_URL } from 'src/services/constants'
 import { crearTarea } from 'src/testsUtils/crearTarea'
-import { vi, expect, test, beforeEach, describe, afterEach, MockInstance } from 'vitest'
+import { vi, expect, test, beforeEach, describe, afterEach } from 'vitest'
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
