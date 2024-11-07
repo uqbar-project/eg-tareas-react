@@ -27,13 +27,10 @@ export const AsignarTareaComponent = () => {
   useOnInit(async () => {
     const nuevosUsuarios = await usuarioService.allInstances()
     setUsuarios(nuevosUsuarios)
-  })
-    
-  useOnInit(async () => {
     const nuevaTarea = await tareaService.getTareaById(+id!)
     setTarea(nuevaTarea)
   })
-
+    
   const asignar = (asignatario: string) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
     tarea.asignarA(asignatarioNuevo!)
@@ -64,6 +61,8 @@ export const AsignarTareaComponent = () => {
   const volver = () => {
     navigate('/')
   }
+
+  console.info('usuarios', usuarios)
 
   const snackbarOpen = !!errorMessage // O se puede usar Boolean(errorMessage)
 

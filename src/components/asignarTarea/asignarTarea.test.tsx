@@ -10,19 +10,19 @@ import { vi, expect, test, beforeEach, describe, afterEach, MockInstance } from 
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
-  let spyGetAxios: MockInstance
+  let spyGetAxios: any
 
   beforeEach(() => {
     vi.mock('axios')
     spyGetAxios = vi.spyOn(axios, 'get')
 
-    spyGetAxios.mockResolvedValueOnce({
-      data: [ new Usuario('Carlos Rojo') ]
-    })
-
-    spyGetAxios.mockResolvedValueOnce({
-      data: crearTarea(idTareaAsignada, 'Ejemplo', 0, 'Carlos Rojo')
-    })
+    spyGetAxios
+      .mockResolvedValueOnce({
+        data: [ new Usuario('Carlos Rojo') ]
+      })
+      .mockResolvedValueOnce({
+        data: crearTarea(idTareaAsignada, 'Ejemplo', 0, 'Carlos Rojo')
+      })
   })
 
   afterEach(() => {
@@ -37,7 +37,10 @@ describe('tests de asignar tarea', () => {
       </MemoryRouter>
     )
 
-    expect(spyGetAxios).toHaveBeenCalledWith(`${REST_SERVER_URL}/tareas/${idTareaAsignada}`)
+    await waitFor(() => {
+      expect(spyGetAxios.mock.calls[0]).to.deep.equal([`${REST_SERVER_URL}/usuarios`])
+      expect(spyGetAxios.mock.calls[1]).to.deep.equal([`${REST_SERVER_URL}/tareas/${idTareaAsignada}`])
+    })
 
     await waitFor(() => {
       const textDescripcion = (screen.getByTestId('descripcion') as HTMLInputElement).value
