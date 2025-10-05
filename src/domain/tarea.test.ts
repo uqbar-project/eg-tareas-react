@@ -1,6 +1,6 @@
-import { describe, expect, test } from "vitest"
-import { Tarea } from "./tarea"
-import { Usuario } from "./usuario"
+import { describe, expect, test } from 'vitest'
+import { Tarea } from './tarea'
+import { Usuario } from './usuario'
 
 const persona = new Usuario('Alguien')
 

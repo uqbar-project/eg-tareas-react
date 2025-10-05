@@ -78,7 +78,7 @@ export const AsignarTareaComponent = () => {
           <FormLabel>Descripción</FormLabel>
         </CardContent>
         <CardContent>
-          <TextField inputProps={{"data-testid":"descripcion"}} id="descripcion" value={tarea.descripcion} onChange={cambiarDescripcion} className="formControl" />
+          <TextField inputProps={{'data-testid':'descripcion'}} id="descripcion" value={tarea.descripcion} onChange={cambiarDescripcion} className="formControl" />
         </CardContent>
         <CardContent className="linea">
           <FormLabel>Asignatario</FormLabel>

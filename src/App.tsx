@@ -8,12 +8,12 @@ import { TareasRouter } from './routes'
 const theme = createTheme({
   typography: {
     fontFamily: [
-      "Inter",
-      "Roboto",
-      "Helvetica Neue",
-      "Arial",
-      "sans-serif"
-    ].join(",")
+      'Inter',
+      'Roboto',
+      'Helvetica Neue',
+      'Arial',
+      'sans-serif'
+    ].join(',')
   }
 })
 

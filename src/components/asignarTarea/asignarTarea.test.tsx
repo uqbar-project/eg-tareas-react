@@ -1,16 +1,15 @@
 import { render, screen, waitFor, } from '@testing-library/react'
 import axios from 'axios'
 import { MemoryRouter } from 'react-router-dom'
-
 import { Usuario } from 'src/domain/usuario'
 import { TareasRoutes } from 'src/routes'
 import { REST_SERVER_URL } from 'src/services/constants'
 import { crearTarea } from 'src/testsUtils/crearTarea'
-import { vi, expect, test, beforeEach, describe, afterEach } from 'vitest'
+import { vi, expect, test, beforeEach, describe, afterEach, type MockInstance } from 'vitest'
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
-  let spyGetAxios: any
+  let spyGetAxios: MockInstance<typeof axios['get']>
 
   beforeEach(() => {
     vi.mock('axios')
@@ -28,7 +27,6 @@ describe('tests de asignar tarea', () => {
   afterEach(() => {
      vi.clearAllMocks()
   })
-
 
   test('al inicio muestra la información de la tarea', async () => {
     render(
