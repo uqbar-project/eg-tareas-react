@@ -30,7 +30,7 @@ export const AsignarTareaComponent = () => {
     const nuevaTarea = await tareaService.getTareaById(+id!)
     setTarea(nuevaTarea)
   })
-    
+
   const asignar = (asignatario: string) => {
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
     tarea.asignarA(asignatarioNuevo!)
