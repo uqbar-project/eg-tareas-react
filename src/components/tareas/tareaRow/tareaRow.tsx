@@ -1,21 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import Snackbar from '@mui/material/Snackbar'
-import Tooltip from '@mui/material/Tooltip'
-import IconButton from '@mui/material/IconButton'
-import TableCell from '@mui/material/TableCell'
-import TableRow from '@mui/material/TableRow'
-import AccountBoxIcon from '@mui/icons-material/AccountBox'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useState } from 'react'
 
-import { ErrorResponse, mostrarMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, getMensajeError } from 'src/utils/error-handling'
 import { tareaService } from 'src/services/tareaService'
 import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { Tarea } from 'src/domain/tarea'
+import { useToast } from 'src/customHooks/useToast'
+import { Toast } from 'src/components/common/toast'
 
 export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
-  const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
+
+  const { toast, showToast } = useToast()
 
   const cumplirTarea = async () => {
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
@@ -23,7 +18,8 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
       tarea.cumplir()
       await tareaService.actualizarTarea(tarea)
     } catch (error: unknown) {
-      mostrarMensajeError(error as ErrorResponse, setErrorMessage)
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
     } finally {
       // viene como props
       await actualizar()
@@ -35,39 +31,30 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
   }
 
   const cumplirButton = tarea.sePuedeCumplir() &&
-    <Tooltip data-testid="tooltip-fab" title="Cumplir tarea">
-      <IconButton data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea}>
-        <CheckCircleIcon color="success"/>
-      </IconButton>
-    </Tooltip>
+    <img className="icon" src="/finish.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
 
   const asignarButton = tarea.sePuedeAsignar() &&
-    <Tooltip data-testid="tooltip-asignar" title="Asignar persona a tarea">
-      <IconButton aria-label="Asignar" onClick={goToAsignarTarea} data-testid={`asignar_${tarea.id}`}>
-        <AccountBoxIcon color="warning"/>
-      </IconButton>
-    </Tooltip>
+    <img className="icon" src="/assign.png" title="Asignar tarea" data-testid={`asignar_${tarea.id}`} aria-label="Asignar" onClick={goToAsignarTarea} />
 
-  return (
-    <TableRow key={tarea.id} data-testid={'tarea_' + tarea.id}>
-      <TableCell component="th" scope="row">
+  return (<>
+    <tr key={tarea.id} data-testid={'tarea_' + tarea.id}>
+      <td>
         {tarea.descripcion}
-      </TableCell>
-      <TableCell id="fecha">{tarea.fecha}</TableCell>
-      <TableCell id="asignatario">{tarea.nombreAsignatario}</TableCell>
-      <TableCell>
+      </td>
+      <td id="fecha">{tarea.fecha}</td>
+      <td id="asignatario">{tarea.nombreAsignatario}</td>
+      <td>
         <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
-      </TableCell>
-      <TableCell>
+      </td>
+      <td>
         {cumplirButton}
         {asignarButton}
-      </TableCell>
-      <Snackbar
-        open={!!errorMessage}
-        message={errorMessage}
-        autoHideDuration={4}
-      />
-    </TableRow>
+      </td>
+    </tr>
+    <div id="toast-container">
+      <Toast toast={toast} />
+    </div>
+  </>
   )
 }
 

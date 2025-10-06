@@ -1,15 +1,18 @@
-const INTERNAL_SERVER_ERROR = 500
+import { AxiosError } from 'axios'
 
 // TODO: hacer tests
 
-export const mostrarMensajeError = (error: ErrorResponse, setearMensaje: (mensaje: string) => void) => {
-  const status = error.response?.status
-  const mensajeError = status >= INTERNAL_SERVER_ERROR ? 'Ocurrió un error. Consulte al administrador del sistema' :
-    !status ? 'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema' : error.response.data.message
-  if (status >= INTERNAL_SERVER_ERROR) {
+export const getMensajeError = (error: unknown) => {
+  let errorMessage = 'Ocurrió un error. Consulte al administrador del sistema'
+  if (error instanceof Error) {
+    errorMessage = error.message
+  }
+  if (error instanceof AxiosError) {
+    const status = error.response?.status ?? error.response
+    errorMessage = !status ? 'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema' : error.response?.data.message
     console.error(error)
   }
-  setearMensaje(mensajeError)
+  return errorMessage
 }
 
 export type ErrorResponse = {

@@ -1,17 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+* {
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Colores primarios */
+  --color-primary: #1976D2;
+  --color-primary-light: #42A5F5;
+  --color-primary-dark: #1565C0;
+  
+  /* Colores secundarios */
+  --color-secondary: #cae9ff;
+  --color-secondary-light: #cae9ff;
+  --color-secondary-dark: #cae9ff;
+  
+  /* Fondos y superficies */
+  --color-background: #FFFFFF;
+  --color-surface: #F5F5F5;
+  --color-surface-variant: #E0E0E0;
+  
+  /* Textos */
+  --color-text-primary: black;
+  --color-text-secondary: black;
+  --color-text-disabled: #BDBDBD;
+
+  /* Textos para botones */
+  --color-text-button-primary: white;
+  --color-text-button-secondary: black;
+  --color-text-button-disabled: #BDBDBD;
+  
+  /* Estados especiales */
+  --background-color-error: #5fa8d3;
+  --background-color-success: #cae9ff;
+  --background-color-warning: #62b6cb;
+
+  --color-text-error: white;
+  --color-text-success: black;
+  --color-text-warning: black;
+
+  /* Sombras y bordes (opcional, pero útil para paleta completa) */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-border: #E0E0E0;
+}
 
 .MuiTableContainer-root {
   width: 100vw !important;
 }
 
-h1 {
-  background: linear-gradient(-20deg, #97e0cf, #93fae2);
-  background-size: 100% 100%;
-  animation: gradient 15s ease infinite;
-  padding: 1rem;
-  margin: 1rem;
+.title {
+  font-size: 2rem;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
   font-weight: bold;
+  padding-bottom: 12px;
+  position: relative;
 }
+
+.title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-bottom: 2px solid var(--color-primary);
+}
+
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
@@ -42,3 +95,48 @@ input {
   width: 40rem;
 }
 
+.icon {
+  height: 30px;
+  width: auto;
+  padding: 5px;
+}
+
+.icon:hover {
+  cursor: pointer;
+}
+
+input, select {
+  height: 2rem;
+  padding: 0.2rem;
+  line-height: 1.2rem;
+}
+
+.fieldLabel {
+  margin-top: 1rem;
+}
+
+.botonera {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-button-primary);
+}
+
+.secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-button-secondary);
+}
+
+.container {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  padding: 0 1rem;
+}

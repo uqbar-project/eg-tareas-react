@@ -1,0 +1,93 @@
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 350px;
+}
+
+.toast {
+  min-height: 50px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: var(--color-text-primary, #000000);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid transparent;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.fade-out {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-success {
+  background-color: var(--color-success, #4CAF50);
+  color: white;
+  border-color: var(--color-success, #4CAF50);
+}
+
+.toast-error {
+  background-color: var(--color-error, #D32F2F);
+  color: white;
+  border-color: var(--color-error, #D32F2F);
+}
+
+.toast-warning {
+  background-color: var(--color-warning, #FF9800);
+  color: white;
+  border-color: var(--color-warning, #FF9800);
+}
+
+.toast-info {
+  background-color: var(--color-primary, #1976D2);
+  color: white;
+  border-color: var(--color-primary, #1976D2);
+}
+
+.toast::before {
+  content: '';
+  margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  #toast-container {
+    left: 10px;
+    right: 10px;
+    top: auto;
+    bottom: 10px;
+  }
+
+  .toast {
+    max-width: none;
+  }
+}

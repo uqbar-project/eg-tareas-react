@@ -188,7 +188,7 @@ Además de los usuarios, agregamos en el combo la opción "Sin Asignar", para po
 >
     >
         <MenuItem value=" ">
-        <em>Sin Asignar</em>
+        Sin Asignar
     </MenuItem>
     {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
 </Select>

@@ -1,54 +1,47 @@
 import './tareas.css'
 
-import { TableContainer } from '@mui/material'
-import Paper from '@mui/material/Paper'
-import Snackbar from '@mui/material/Snackbar'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import { useState } from 'react'
-
 import { useOnInit } from 'src/customHooks/hooks'
-import { ErrorResponse, mostrarMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, getMensajeError } from 'src/utils/error-handling'
 import { tareaService } from 'src/services/tareaService'
 import TareaRow from './tareaRow/tareaRow'
 import { Tarea } from 'src/domain/tarea'
+import { useToast } from 'src/customHooks/useToast'
+import { Toast } from 'src/components/common/toast'
 
 export const TareasComponent = () => {
 
   const [tareas, setTareas] = useState<Tarea[]>([])
-  const [errorMessage, setErrorMessage] = useState('')
-  
+
+  const { toast, showToast } = useToast()
+
   const traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
       setTareas(tareas)
     } catch (error: unknown) {
-      mostrarMensajeError(error as ErrorResponse, setErrorMessage)
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
     }
   }
 
   useOnInit(traerTareas)
 
-  const snackbarOpen = !!errorMessage
-
   return (
-    <TableContainer component={Paper}>
+    <div className='container'>
       <br />
-      <h1>Tareas a realizar</h1>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Tarea</TableCell>
-            <TableCell id="fecha">Fecha</TableCell>
-            <TableCell id="asignatario">Asignatario</TableCell>
-            <TableCell>%</TableCell>
-            <TableCell>Acciones</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody data-testid="resultados">
+      <div className="title">Tareas a realizar</div>
+      <table aria-label="simple table">
+        <thead>
+          <tr>
+            <th>Tarea</th>
+            <th id="fecha">Fecha</th>
+            <th id="asignatario">Asignatario</th>
+            <th>%</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody data-testid="resultados">
           {
             tareas.map((tarea) =>
               <TareaRow
@@ -56,13 +49,11 @@ export const TareasComponent = () => {
                 key={tarea.id}
                 actualizar={traerTareas} />)
           }
-        </TableBody>
-      </Table>
-      <Snackbar
-        open={snackbarOpen}
-        message={errorMessage}
-        autoHideDuration={4}
-      />
-    </TableContainer>
+        </tbody>
+      </table>
+      <div id="toast-container">
+        <Toast toast={toast} />
+      </div>
+    </div>
   )
 }

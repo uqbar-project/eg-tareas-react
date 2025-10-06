@@ -1,8 +1,4 @@
 .form {
-  width: calc(100vw - 80px) !important;
-}
- 
-.form {
   margin: 2rem;
   display: flex;
   flex-direction: row;
@@ -15,11 +11,6 @@
   flex-direction: row;
   justify-content: center;
   margin: 2em;
-}
-
-.linea {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
 }
 
 .formControl {

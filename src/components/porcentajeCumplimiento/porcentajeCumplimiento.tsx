@@ -1,5 +1,3 @@
-import Avatar from '@mui/material/Avatar'
-
 const limiteSuperior = 80
 const limiteInferior = 50
 
@@ -10,23 +8,27 @@ const getBackgroundTestId = (porcentaje: number) => {
 }
 
 const getBackgroundColor = (porcentaje: number) => {
-  if (porcentaje > limiteSuperior) return '#0BDA51'
-  if (porcentaje < limiteInferior) return 'coral'
-  return '#FBEC5D'
+  if (porcentaje > limiteSuperior) return 'var(--background-color-success)'
+  if (porcentaje < limiteInferior) return 'var(--background-color-error)'
+  return 'var(--background-color-warning)'
 }
 
-const getColor = () => 'black'
+const getColor = (porcentaje: number) => {
+  if (porcentaje > limiteSuperior) return 'var(--color-text-success)'
+  if (porcentaje < limiteInferior) return 'var(--color-text-error)'
+  return 'var(--color-text-warning)'
+}
 
 export const PorcentajeCumplimiento = ({ porcentaje }: { porcentaje: number }) => {
   if (!porcentaje) return null // se puede comentar para ver como se muestra el avatar en 0%
   const backgroundColor = getBackgroundColor(porcentaje)
   const backgroundTestId = getBackgroundTestId(porcentaje)
-  const color = getColor()
+  const color = getColor(porcentaje)
   return (
-    <Avatar
+    <div
       data-testid={backgroundTestId}
-      style={{ backgroundColor, color, fontSize: '0.7rem' }}>
+      style={{ backgroundColor, color, fontSize: '0.7rem', padding: '0.5em 1em', borderRadius: '1em' }}>
       {porcentaje || 0}%
-    </Avatar>
+    </div>
   )
 }
