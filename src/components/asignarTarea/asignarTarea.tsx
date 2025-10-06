@@ -81,7 +81,7 @@ export const AsignarTareaComponent = () => {
           className="formControl"
           title="asignatario"
           name="asignatario"
-          id="asignatario"
+          data-testid="asignatario"
         >
           <option value=" ">
             Sin Asignar

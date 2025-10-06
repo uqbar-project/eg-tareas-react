@@ -1,10 +1,8 @@
 import { render, screen, waitFor, } from '@testing-library/react'
 import axios from 'axios'
 import { MemoryRouter } from 'react-router-dom'
-import { Usuario } from 'src/domain/usuario'
 import { TareasRoutes } from 'src/routes'
 import { REST_SERVER_URL } from 'src/services/constants'
-import { crearTarea } from 'src/testsUtils/crearTarea'
 import { vi, expect, test, beforeEach, describe, afterEach, type MockInstance } from 'vitest'
 
 describe('tests de asignar tarea', () => {
@@ -17,10 +15,21 @@ describe('tests de asignar tarea', () => {
 
     spyGetAxios
       .mockResolvedValueOnce({
-        data: [ new Usuario('Carlos Rojo') ]
+        data: [ 
+          {
+            id: 1,
+            nombre: 'Carlos Rojo',
+          },
+        ],
       })
       .mockResolvedValueOnce({
-        data: crearTarea(idTareaAsignada, 'Ejemplo', 0, 'Carlos Rojo')
+        data: {
+          id: idTareaAsignada,
+          descripcion: 'Ejemplo',
+          iteracion: '',
+          asignadoA: 'Carlos Rojo',
+          porcentajeCumplimiento: 0,
+        }
       })
   })
 
@@ -44,8 +53,13 @@ describe('tests de asignar tarea', () => {
       const textDescripcion = (screen.getByTestId('descripcion') as HTMLInputElement).value
       expect(textDescripcion).toBe('Ejemplo')
     })
+    await waitFor(() => {
+      const asignatario = (screen.getByTestId('asignatario') as HTMLSelectElement).value
+      expect(asignatario).toBe('Carlos Rojo')
+    })
+  })
 
-    // lamentablemente no funciona el test del select de material, no refresca correctamente los usuarios
-    // pese a intentarlo todo: within, envolverlo en un waitFor...
+  test('al cambiar el asignatario se asigna a una nueva persona', () => {
+
   })
 })
