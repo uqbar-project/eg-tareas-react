@@ -2,14 +2,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { AsignarTareaComponent } from './components/asignarTarea/asignarTarea'
 import { TareasComponent } from './components/tareas/tareas'
 
-export const TareasRoutes = () => 
+export const TareasRoutes = () =>
     <Routes>
-        <Route path="/" element={<TareasComponent/>} />
-        <Route path="/asignarTarea/:id" element={<AsignarTareaComponent/>} />
+        <Route path="/" element={<TareasComponent />} />
+        <Route path="/asignarTarea/:id" element={<AsignarTareaComponent />} />
     </Routes>
 
-export const TareasRouter = () => 
+export const TareasRouter = () =>
     <Router>
-        <TareasRoutes/>
+        <TareasRoutes />
     </Router>
 

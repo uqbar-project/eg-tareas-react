@@ -3,16 +3,17 @@
 
 [![Build React App](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-tareas-react/graph/badge.svg?token=hVIcjudvLa)](https://codecov.io/gh/uqbar-project/eg-tareas-react)
 
-![video](video/demo2024.gif)
+![video](video/demo2025.gif)
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 
 # Conceptos
 
 - Componentes de React
-- Uso de componentes visuales de Material: select (combo), text field, snack bar (message box), tablas, entre otras
+- Uso y definición de componentes visuales
+- Definición de un toast para mostrar mensajes de error y una función genérica para obtener un mensaje de error
 - React router que define un master / detail
-- Uso de fetch para disparar pedidos asincrónicos tratados con promises
+- Uso de axios para disparar pedidos asincrónicos tratados con promises
 - Manejo del estado
 
 # Arquitectura general
@@ -29,13 +30,14 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
 
-```js
+```ts
   const traerTareas = async () => {
     try {
       const tareas = await tareaService.allInstances()
       setTareas(tareas)
-    } catch (error) {
-      mostrarMensajeError(error, setErrorMessage)
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
     }
   }
 
@@ -46,7 +48,7 @@ Definimos la función aparte para poder usarla como prop a nuestro componente hi
 
 El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea y ordenándolas por descripción:
 
-```js
+```ts
 class TareaService {
   async allInstances() {
     const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
@@ -59,14 +61,15 @@ Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente 
 
 También podríamos utilizar la sintaxis de promises común `then().catch()`.
 
-```js
+```ts
 traerTareas() {
   tareaService.allInstances()
     .then((tareas) => {
       setTareas(tareas)
     })
-    .catch ((error) => {
-      mostrarMensajeError(error, setErrorMessage)
+    .catch ((error: unknown) => {
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
     })
 }
 ```
@@ -76,24 +79,25 @@ traerTareas() {
 El componente `TareaRow` captura el evento del botón:
 
 ```js
-export const TareaRowexport const TareaRow = ({ tarea, actualizar }) => {
+export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
 
-  <IconButton ... onClick={cumplirTarea}>
-      <CheckCircleIcon />
-  </IconButton>
+  const cumplirButton = tarea.sePuedeCumplir() &&
+    <img className="icon" src="/finish.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
+
 ```
 
 En el método del componente delegamos el cumplimiento al objeto de dominio Tarea y pedimos al service que actualice el backend. Cuando la promise se cumple, disparamos la función que nos pasaron por props para buscar nuevamente las tareas al backend, así traemos la última información:
 
-```js
+```ts
 // en el componente funcional TareaRow
   const cumplirTarea = async () => {
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
       tarea.cumplir()
       await tareaService.actualizarTarea(tarea)
-    } catch (error) {
-      mostrarMensajeError(error, setErrorMessage)
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
     } finally {
       // viene como props
       await actualizar()
@@ -116,10 +120,10 @@ El método traerTareas ya lo hemos visto, es el que se dispara inicialmente en e
 
 Por su parte, el método actualizarTarea del service dispara el pedido PUT al backend, pasando como body la conversión de nuestro objeto de dominio Tarea a JSON:
 
-```js
-actualizarTarea(tarea) {
-  return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
-}
+```ts
+  actualizarTarea(tarea: Tarea) {
+    return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+  }
 ```
 
 ## Asignación de tareas
@@ -128,7 +132,7 @@ actualizarTarea(tarea) {
 
 El botón de asignación dispara la navegación de la ruta '/asignarTarea' (en TareaRow):
 
-```js
+```ts
 const goToAsignarTarea = () => {
     navigate(`/asignarTarea/${tarea.id}`)
 }
@@ -136,19 +140,22 @@ const goToAsignarTarea = () => {
 
 `navigate` es una función que obtenemos mediante el hook _useNavigate_:
 
-```js
+```ts
 const navigate = useNavigate()
 ```
 
 A su vez, en el archivo `routes.js` definimos que el path `/asignarTarea/:id` se mapea con el componente de React que permite asignar la tarea:
 
-```js
-export const TareasRoutes = () => 
+```ts
+export const TareasRoutes = () =>
+    <Routes>
+        <Route path="/" element={<TareasComponent />} />
+        <Route path="/asignarTarea/:id" element={<AsignarTareaComponent />} />
+    </Routes>
+
+export const TareasRouter = () =>
     <Router>
-        <Routes>
-            <Route exact={true} path="/" element={<TareasComponent/>} />
-            <Route path="/asignarTarea/:id" element={<AsignarTareaComponent/>} />
-        </Routes>
+        <TareasRoutes />
     </Router>
 ```
 
@@ -160,7 +167,7 @@ Para más información pueden ver [esta página del Router de React](https://rea
 
 En la asignación de tareas el combo de usuarios se llena con una llamada al servicio REST que trae los usuarios:
 
-```js
+```ts
 class UsuarioService {
 
   async allInstances() {
@@ -175,54 +182,41 @@ class UsuarioService {
 Además de los usuarios, agregamos en el combo la opción "Sin Asignar", para poder desasignar una tarea (lo tenemos que asociar a un valor en blanco):
 
 ```js
-<Select
+<select
   /* Acá podemos ver cómo esta declarado nombreAsignatario */
   value={tarea.nombreAsignatario ?? ' '}
   onChange={(event) => asignar(event.target.value)}
   className="formControl"
   title="asignatario"
-  inputProps={{
-    name: 'asignatario',
-    id: 'asignatario',
-  }}
+  name="asignatario"
+  data-testid="asignatario"
 >
-    >
-        <MenuItem value=" ">
-        Sin Asignar
-    </MenuItem>
-    {usuarios.map(usuario => <MenuItem value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</MenuItem>)}
-</Select>
-```
-
-La clase formControl especifica un width más grande (el default es muy chico), en el archivo `index.css`:
-
-```css
-.formControl {
-  width: 35rem;
-  min-width: 35rem;
-}
+  <option value=" ">
+    Sin Asignar
+  </option>
+  {usuarios.map(usuario => <option value={usuario.nombre} key={usuario.nombre}>{usuario.nombre}</option>)}
+</select>
 ```
 
 Para entender cómo funciona la asignación, el combo dispara el evento de cambio al componente AsignarTareas:
 
-```js
-... onChange={(event) => this.asignar(event.target.value)}
+```ts
+... onChange={(event) => asignar(event.target.value)}
 ```
 
 El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el identificador, pero lamentablemente el servicio REST solo nos da el nombre), entonces delegamos a un método más general que actualiza el estado de la tarea. En el componente AsignarTareaComponent:
 
-```js
-const asignar = (asignatario) => {
-  const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
-  tarea.asignarA(asignatarioNuevo)
-  generarNuevaTarea(tarea)
-}
+```ts
+  const asignar = (asignatario: string) => {
+    const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
+    tarea.asignarA(asignatarioNuevo!)
+    generarNuevaTarea(tarea)
+  }
 
-const generarNuevaTarea = (tarea) => {
-  const nuevaTarea = Object.assign(new Tarea(), tarea)
-  setTarea(nuevaTarea)
-  setErrorMessage('')
-}
+  const generarNuevaTarea = (tarea: Tarea) => {
+    const nuevaTarea = Object.assign(new Tarea(), tarea)
+    setTarea(nuevaTarea)
+  }
 ```
 
 Un detalle importante es que no podemos hacer la copia de la tarea utilizando el _spread operator_ (`{...tarea}`) porque solo copia los atributos del objeto y no sus métodos. Pueden investigar más en [este link](https://www.javascripttutorial.net/object/3-ways-to-copy-objects-in-javascript/).
@@ -233,16 +227,17 @@ Al actualizar el estado se dispara el render que refleja el nuevo valor para el 
 
 Cuando el usuario presiona el botón Aceptar, se dispara el evento asociado que delega la actualización al service y regresa a la página principal.
 
-```js
-const aceptarCambios = async () => {
-  try {
-    tarea.validarAsignacion()
-    await tareaService.actualizarTarea(tarea)
-    volver()
-  } catch (error) {
-    mostrarMensajeError(error, setErrorMessage)
+```ts
+  const aceptarCambios = async () => {
+    try {
+      tarea.validarAsignacion()
+      await tareaService.actualizarTarea(tarea)
+      volver()
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error)
+      showToast(errorMessage, 'error')
+    }
   }
-}
 ```
 
 Se delega la validación en la tarea directamente. Pueden ver la implementación en el código.
@@ -251,24 +246,24 @@ Se delega la validación en la tarea directamente. Pueden ver la implementación
 
 Veamos el código que muestra la lista de tareas:
 
-```js
-  <TableBody data-testid="resultados">
-    {
-      tareas.map((tarea) =>
-        <TareaRow
-          tarea={tarea}
-          key={tarea.id}
-          actualizar={traerTareas} />)
-    }
-  </TableBody>
+```tsx
+<tbody data-testid="resultados">
+  {
+    tareas.map((tarea) =>
+      <TareaRow
+        tarea={tarea}
+        key={tarea.id}
+        actualizar={traerTareas} />)
+  }
+</tbody>
 ```
 
 Como lo cuenta [la documentación de React](https://es.react.dev/learn/rendering-lists), es importante dar a cada uno de nuestros componentes custom (`TareaRow` en este caso) una **key** para identificar rápidamente qué componentes están asociados a un cambio de estado (el Virtual DOM interno que maneja React). La restricción que deben cumplir los componentes hermanos es que a) sus **key** sean únicas, b) que no cambien durante el flujo de trabajo, ya que es lo que React utiliza para poder ubicar un componente en el DOM de HTML. Si trabajamos con el índice o con un valor al azar (`Math.random`) eso hace que cada vez que se dispare el render haya que redibujar toda la tabla. [Este artículo](https://kuldipem.medium.com/say-no-to-array-index-as-key-in-react-my-approaches-to-tackle-it-that-you-can-use-51153bfa8901) cuenta alternativas, entre los que se incluye un hook propio de React: `useId()`.
 
 Si eliminamos la línea que genera la key, el Linter de React nos muestra un mensaje de error: `Missing "key" prop for element in iterator`. Pero qué ocurre si definimos una clave constante, como por ejemplo `1`:
 
-```js
-<TableBody data-testid="resultados">
+```tsx
+<tbody data-testid="resultados">
   {
     tareas.map((tarea) =>
       <TareaRow
@@ -276,7 +271,7 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
         key={1}
         actualizar={traerTareas} />)
   }
-</TableBody>
+</tbody>
 ```
 
 - por un lado en la consola nos aparece un error en runtime, donde nos alerta que definir la misma clave puede producir inconsistencias en las actualizaciones de la página
@@ -299,12 +294,12 @@ A este componente le pasamos una tarea por `props` y basándonos en los diferent
 - cuando tocamos el botón asignar nos redirige hacia otra página
 - si no está asignada no aparece dicho botón
 
-El lector puede ver la implementación en el archivo [tareaRow.spec.js](./src/components/tareas/tareaRow/tareaRow.spec.js), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId` del objeto `screen`:
+El lector puede ver la implementación en el archivo [tareaRow.test.tsx](./src/components/tareas/tareaRow/tareaRow.test.tsx), vamos a detenernos en dos detalles de implementación nuevos. El primero es que la función `getByTestId` tira error si el elemento que buscamos no existe, por ese motivo usamos `queryByTestId` del objeto `screen`:
 
-```js
+```ts
 test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
   tareaAsignada.cumplir()
-  render(<BrowserRouter><TareaRow tarea={tareaAsignada} /></BrowserRouter>)
+  render(<BrowserRouter><TareaRow tarea={tareaAsignada} actualizar={() => { }} /></BrowserRouter>)
   expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
 })
 ```
@@ -315,7 +310,7 @@ Y el segundo es que usamos un **spy** para escuchar a qué ruta nos dirigimos cu
 ...
 const mockedNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
-  const mockedRouter = await vi.importActua('react-router-dom')
+  const mockedRouter = await vi.importActual('react-router-dom')
 
   return {
     ...mockedRouter,
@@ -343,31 +338,48 @@ Para el testeo de la página de Asignación, en lugar de `BrowserRouter` elegimo
 
 ## Tareas
 
-### Mockear el servicio
+### Mockear la llamada a Axios
 
-La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a nuestros **services**, lo primero es crear nuestros datos de mock (pueden ver la implementación en el archivo [crearTarea.js](./src/testsUtils/crearTarea.js)). Y ahora sí podemos construir una _promise mockeada_, dentro de nuestros tests. Como nuestro servicio de tareas es un singleton, podríamos pisar el método en el contexto de los tests haciendo que devuelva una promesa con lo que nosotros queramos directamente, de la siguiente manera:
+La parte más interesante de los tests es cómo hacemos para interceptar las llamadas a Axios (en lugar de hacerlo a nuestros **services**). De esa manera incluimos a los servicios dentro del test de frontend.
 
-```js
-tareaService.allInstances = () => Promise.resolve(mockTareas)
-```
+```tsx
+const mockTareas =
+  [
+    {
+      id: 68, 
+      descripcion: 'Desarrollar TODO List en React', 
+      porcentajeCumplimiento: 75, 
+      asignadoA: 'Paula Paretto'
+    },
+    ...
+  ]
 
-De todas maneras este approach nos deja el comportamiento de tareaService fijo para que siempre devuelva `mockTareas`. **Si queremos que luego del test vuelva a su comportamiento original deberíamos utilizar el mock que nos proporciona `vi`**:
-
-```js
 describe('TareasComponent', () => {
 
   beforeEach(() => {
-    vi.spyOn(tareaService, 'allInstances').mockResolvedValue(Promise.resolve(mockTareas))
-  })
+    vi.mock('axios')
+    const spyGetAxios = vi.spyOn(axios, 'get')
 
+    // se mockea cada respuesta del server
+    spyGetAxios.mockResolvedValueOnce({
+      data: mockTareas
+    })
+  })
+```
+
+De todas maneras este approach nos deja el comportamiento de Axios fijo para que siempre devuelva `mockTareas`. **Si queremos que luego del test vuelva a su comportamiento original deberíamos utilizar el mock que nos proporciona `vi`**:
+
+```ts
   describe('cuando el servicio responde correctamente', () => {
     test('se muestran las tareas en la tabla', async () => {
       render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-      expect(await screen.findByTestId('tarea_159')).toBeTruthy()
-      expect(await screen.findByTestId('tarea_68')).toBeTruthy()
+      await waitFor(() => {
+        expect(screen.getByTestId('tarea_159')).toBeTruthy()
+        expect(screen.getByTestId('tarea_68')).toBeTruthy()
+      })
     })
   })
-
+  
   afterEach(() => {
     vi.restoreAllMocks()
   })
