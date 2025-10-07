@@ -16,7 +16,7 @@ export const Toast: React.FC<ToastProps> = ({ toast }) => {
     return `${base} ${types[type] || base}`
   }
   return (
-    <div className={getToastClass(toast.type)}>
+    <div data-testid='toast'className={getToastClass(toast.type)}>
       {toast.message}
     </div>
   )

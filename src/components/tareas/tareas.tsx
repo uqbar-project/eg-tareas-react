@@ -2,7 +2,7 @@ import './tareas.css'
 
 import { useState } from 'react'
 import { useOnInit } from 'src/customHooks/hooks'
-import { ErrorResponse, getMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
 import { tareaService } from 'src/services/tareaService'
 import TareaRow from './tareaRow/tareaRow'
 import { Tarea } from 'src/domain/tarea'

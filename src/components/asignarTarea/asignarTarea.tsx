@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from 'react'
 
 import { useNavigate, useParams } from 'react-router-dom'
 import { Tarea } from 'src/domain/tarea'
-import { getMensajeError } from 'src/utils/error-handling'
+import { getMensajeError } from 'src/utils/errorHandling'
 import { tareaService } from 'src/services/tareaService'
 import { usuarioService } from 'src/services/usuarioService'
 import { useOnInit } from 'src/customHooks/hooks'
@@ -90,10 +90,10 @@ export const AsignarTareaComponent = () => {
         </select>
       </div>
       <div className="botonera">
-        <button className="secondary" onClick={volver}>
+        <button className="secondary" data-testid="cancelar" onClick={volver}>
           Cancelar
         </button>
-        <button className="primary" onClick={aceptarCambios}>
+        <button className="primary" data-testid="aceptar" onClick={aceptarCambios}>
           Aceptar
         </button>
       </div>

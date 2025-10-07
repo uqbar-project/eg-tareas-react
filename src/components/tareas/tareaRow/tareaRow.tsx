@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-import { ErrorResponse, getMensajeError } from 'src/utils/error-handling'
+import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
 import { tareaService } from 'src/services/tareaService'
 import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { Tarea } from 'src/domain/tarea'
