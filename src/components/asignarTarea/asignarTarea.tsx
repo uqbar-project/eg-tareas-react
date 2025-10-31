@@ -56,7 +56,7 @@ export const AsignarTareaComponent = () => {
   }
 
   const volver = () => {
-    navigate('/')
+    navigate(-1)
   }
 
   return (
