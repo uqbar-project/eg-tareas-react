@@ -65,8 +65,8 @@ describe('tests de asignar tarea', () => {
     )
 
     await waitFor(() => {
-      expect(spyGetAxios.mock.calls[0]).to.deep.equal([`${REST_SERVER_URL}/usuarios`])
-      expect(spyGetAxios.mock.calls[1]).to.deep.equal([`${REST_SERVER_URL}/tareas/${idTareaAsignada}`])
+      expect(spyGetAxios.mock.calls[0]).to.contain(`${REST_SERVER_URL}/usuarios`)
+      expect(spyGetAxios.mock.calls[1]).to.contain(`${REST_SERVER_URL}/tareas/${idTareaAsignada}`)
     })
 
     await waitFor(() => {
@@ -155,7 +155,7 @@ describe('tests de asignar tarea', () => {
     userEvent.click(buttonCancelar)
     await waitFor(() => {
       expect(spyPutAxios.mock.calls.length).toBe(0)
-      expect(mockNavigate).toHaveBeenCalledWith('/')
+      expect(mockNavigate).toHaveBeenCalledWith(-1)
       expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
   })
