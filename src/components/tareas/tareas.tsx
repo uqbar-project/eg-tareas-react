@@ -1,13 +1,14 @@
 import './tareas.css'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useOnInit } from 'src/customHooks/hooks'
 import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
 import { tareaService } from 'src/services/tareaService'
-import TareaRow from './tareaRow/tareaRow'
 import { Tarea } from 'src/domain/tarea'
 import { useToast } from 'src/customHooks/useToast'
 import { Toast } from 'src/components/common/toast'
+
+const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 
 const pageSize = 10
 
@@ -58,19 +59,24 @@ export const TareasComponent = () => {
             <th>Tarea</th>
             <th id="fecha">Fecha</th>
             <th id="asignatario">Asignatario</th>
-            <th>%</th>
+            <th className="center">%</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody data-testid="resultados">
-          {
-            tareas.map((tarea) =>
-              <TareaRow
-                tarea={tarea}
-                key={tarea.id}
-                actualizar={actualizarTarea} />)
-          }
-        </tbody>
+        <React.Suspense fallback={
+          <tr>
+            <td colSpan={5}>Cargando filas...</td>
+          </tr>}>
+          <tbody data-testid="resultados">
+            {
+              tareas.map((tarea) =>
+                <TareaRow
+                  tarea={tarea}
+                  key={tarea.id}
+                  actualizar={actualizarTarea} />)
+            }
+          </tbody>
+        </React.Suspense>
       </table>
       {hasMore && <div>
         <button className='buttonRow secondary' onClick={traerMasTareas}>Ver más tareas</button>

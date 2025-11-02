@@ -34,3 +34,7 @@ td {
     display: none;
   }
 }
+
+.center {
+  text-align: center;
+}

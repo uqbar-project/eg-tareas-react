@@ -27,7 +27,7 @@ export const PorcentajeCumplimiento = ({ porcentaje }: { porcentaje: number }) =
   return (
     <div
       data-testid={backgroundTestId}
-      style={{ backgroundColor, color, fontSize: '0.8rem', padding: '0.5em 1em', borderRadius: '1em' }}>
+      style={{ backgroundColor, color, fontSize: '0.8rem', padding: '0.5em 1em', borderRadius: '1em', width: '4em', margin: 'auto'}}>
       {porcentaje || 0}%
     </div>
   )

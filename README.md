@@ -664,7 +664,6 @@ Y ahora desde el componente principal vamos a pasarle a cada TareaRow una funci�
   }
 
   ...
-
             {
             tareas.map((tarea) =>
               <TareaRow
@@ -675,7 +674,13 @@ Y ahora desde el componente principal vamos a pasarle a cada TareaRow una funci�
 
 De esa manera reemplazamos la lista original con una nueva lista que tiene la tarea cumplida en el mismo lugar.
 
-## Una última mejora
+## Una última mejora: Suspense + Lazy loading
 
-TODO 2: definir tests de integración en node y tests de dominio
-TODO 3: metemos React.Suspense y lazy loading a ver si mejora
+Desde la versión 16, React trae el componente [Suspense](https://es.react.dev/reference/react/Suspense), que permite mostrar una interfaz alternativa hasta que sus hijos hayan terminado de cargar.
+
+Además vamos a cargar el componente TareaRow de forma [lazy](https://react.dev/reference/react/lazy), lo que implica que solo la primera vez que se necesite se va a importar. En este caso no hay mayores diferencias porque al iniciar la página buscamos las primeras 10 tareas, pero si estuviéramos esperando a que el usuario dispare una búsqueda, eso permitiría diferir la carga y por consiguiente mejoraría nuestro FCP (First Content Paint).
+
+Para ver el _fallback_ de nuestro nuevo componente Suspense, vamos a la solapa Network y seleccionamos la opción `Slow 4G`, que simula una red con una conexión 4G lenta. Allí vemos que inicialmente aparece una fila que dice "Cargando filas..." y cuando terminan de traerse las tareas del backend se reemplaza el _fallback_ por la lista de TareaRow.
+
+![React suspense en acción](./images/React.suspense.gif)
+
