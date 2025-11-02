@@ -5,24 +5,24 @@ import { tareaService } from 'src/services/tareaService'
 import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { Tarea } from 'src/domain/tarea'
 import { useToast } from 'src/customHooks/useToast'
-import { Toast } from 'src/components/common/toast'
 
-export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
+export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: (tarea: Tarea) => void }) => {
   const navigate = useNavigate()
 
-  const { toast, showToast } = useToast()
+  const { showToast } = useToast()
 
   const cumplirTarea = async () => {
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
       tarea.cumplir()
-      await tareaService.actualizarTarea(tarea)
+      const tareaCumplida = await tareaService.actualizarTarea(tarea)
+      console.info('tarea cumplida', tareaCumplida)
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)
       showToast(errorMessage, 'error')
     } finally {
       // viene como props
-      await actualizar()
+      await actualizar(tarea)
     }
   }
 
@@ -31,10 +31,10 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
   }
 
   const cumplirButton = tarea.sePuedeCumplir() &&
-    <img className="icon" src="/finish.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
+    <img height="36" width="36" className="icon" src="/finishOk.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
 
   const asignarButton = tarea.sePuedeAsignar() &&
-    <img className="icon" src="/assign.png" title="Asignar tarea" data-testid={`asignar_${tarea.id}`} aria-label="Asignar" onClick={goToAsignarTarea} />
+    <img height="36" width="36" className="icon" src="/assignOk.png" title="Asignar tarea" data-testid={`asignar_${tarea.id}`} aria-label="Asignar" onClick={goToAsignarTarea} />
 
   return (<>
     <tr key={tarea.id} data-testid={'tarea_' + tarea.id}>
@@ -51,9 +51,6 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
         {asignarButton}
       </td>
     </tr>
-    <div id="toast-container">
-      <Toast toast={toast} />
-    </div>
   </>
   )
 }

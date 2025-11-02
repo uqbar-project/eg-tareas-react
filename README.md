@@ -388,3 +388,294 @@ De todas maneras este approach nos deja el comportamiento de Axios fijo para que
 Al final de la ejecución de los tests llamamos a la función que nos permite recuperar el estado original de nuestro service, en caso de que tengamos más tests que necesiten la implementación verdadera.
 
 Por último, es necesario envolver TareasComponent en el **BrowserRouter** para recibir la navegación y que funcione correctamente.
+
+___
+
+## Qué pasa cuando tenemos mucha información
+
+En esta rama vamos a analizar cómo trabajar cuando tenemos que manipular mucha información del lado del frontend.
+
+Cambiamos nuestro backend a [este ejemplo que está hecho en Node](https://github.com/uqbar-project/eg-tareas-node) pero que además
+
+- crea más de 450 tareas
+- y ofrece "paginar" la información: esto significa que podemos pasar como parámetro **page** y **limit**, de manera de traer las primeras 10 tareas, o la página 3 tomando de a 25 tareas como límite, lo que nos daría las tareas que se ubiquen en el orden 51 al 75
+
+Si no le pasamos el valor para el parámetro límite, nos devuelve la lista completa de 450 tareas. Bastante, no?
+
+## Analizando la performance
+
+### Lighthouse - Navigation
+
+Para poder medir el rendimiento, vamos a activar las herramientas de desarrollo (F12) en el navegador. Verifiquemos que en la solapa Network tengamos desactivado el cache:
+
+<img src="./images/01-performance-test-network.png" height="auto" width="500px">
+
+Luego vamos a la solapa Lighthouse, que es la herramienta que trae Chrome para medir la performance. Si tu navegador por defecto es otro, hay cosas similares para Firefox (solapa Performance), Safari (paneles Timelines/Performance) y Edge (Performance/Memory). Desde allí seleccionamos "Navigation", solo el check "Performance", la opción "Desktop" y luego "Analyze page load"
+
+<img src="./images/02-performance-test-lighthouse-previous.png" height="auto" width="800px">
+
+Como resultado tendremos un % de 0 a 100, que variará entre 70 y 85 aproximadamente:
+
+<img src="./images/03-performance-test-lighthouse-report.png" height="auto" width="750px">
+
+- TODO: contar FCP y LCP
+
+### Lighthouse - Snapshot
+
+Si seleccionamos la opción "Snapshot", veremos el siguiente reporte
+
+<img src="./images/04-performance-test-lighthouse-snapshot.png" height="auto" width="750px">
+
+lo que nos está diciendo
+
+- las imágenes son más grandes que el tamaño en el que se renderizan, esto tiene un costo para adaptar el ancho y alto
+- "Avoid an excessive DOM size" -> estamos dibujando 4.058 elementos porque son 450 tareas lo que involucra un TR, varios TDs, las imágenes tienen divs, etc.
+
+```html
+<tr data-testid="tarea_7835554726608137">
+  <td>Acer acquiro nesciunt appello corona.</td>
+  <td id="fecha">31/10/2025</td>
+  <td id="asignatario"></td>
+  <td><div data-testid="alto" style="...">81%</div></td>
+  <td><img class="icon" title="Asignar tarea" data-testid="asignar_7835554726608137" aria-label="Asignar" src="/assign.png"></td>
+</tr>
+```
+
+## Primer avance con la paginación
+
+Pasaremos el **número de página** y **el tamaño de la página** o límite, dentro de los query params de la lista de tareas. Originalmente será 1 el número de página y 10 el tamaño de la lista.
+
+```ts
+// tareaService.ts
+  async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
+    const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`)
+    const tareasResult = tareasJson.data
+    const tareas = tareasResult.data.map((tareaJson: TareaJSON) => Tarea.fromJson(tareaJson))
+    return { tareas: tareas.sort((a: Tarea, b: Tarea) => a.descripcion < b.descripcion ? -1 : 1), hasMore: tareasResult.hasMore }
+  }
+```
+
+Definimos paginationData como
+
+```ts
+export interface PaginationData {
+  page: number,
+  limit: number,
+}
+```
+
+y el tipo de retorno como
+
+```ts
+export interface TareasPaginadas {
+  hasMore: boolean // si hay más tareas para buscar
+  tareas: Tarea[]
+}
+```
+
+Ahora vemos que solo recibimos del back 10 tareas:
+
+<img src="./images/10-network-pagination.png" height="auto" width="800px">
+
+## Segundo avance: scroll dinámico
+
+Lo que sigue es que podamos mostrar un botón para cargar dinámicamente más tareas. Veamos qué cambios son necesarios.
+
+### Agregados en el estado
+
+Necesitamos tener el número de la página como estado y además un booleano que nos indique si hay más elementos.
+
+```tsx
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+```
+
+### Búsqueda inicial de tareas y búsqueda adicional
+
+Inicialmente traeremos la primera página
+
+```tsx
+  const getTareas = async (newPage: number, init = false) => {
+    try {
+      const { tareas, hasMore} = await tareaService.getTareas({ page: newPage, limit: pageSize })
+      setHasMore(hasMore)
+      setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
+    }
+  }
+
+  const traerTareas = async () => {
+    getTareas(page, true)
+  }
+
+  useOnInit(traerTareas)
+```
+
+Eso asigna la **primera lista** de tareas en el setTareas, por eso el condicional va por la lista vacía.
+
+Cuando necesitemos buscar **más** tareas, avanzaremos una página, pero manteniendo la lista de tareas que teníamos actualmente, por eso el condicional por la rama falsa agrega las nuevas tareas a la lista anterior, para no perderlas.
+
+```tsx
+  const traerMasTareas = async () => {
+    const newPage = page + 1
+    getTareas(newPage)
+    setPage(newPage)
+  }
+```
+
+Un detalle: la asignación `setPage` **no modifica el estado inmediatamente**, por eso es necesario pasar una referencia a `newPage` con el valor incrementado, de lo contrario no va a funcionar correctamente.
+
+### Cambios en la vista
+
+Al buscar en el backend, recibimos la confirmación o no de que hay más tareas para traer:
+
+```ts
+const { tareas, hasMore} = await tareaService.getTareas({ page: newPage, limit: pageSize })
+setHasMore(hasMore)
+```
+
+Ese estado `hasMore` lo utilizamos para el render condicional del botón que nos permite buscar más tareas:
+
+```tsx
+  ...
+
+      {hasMore && <div>
+        <button className='buttonRow secondary' onClick={traerMasTareas}>Ver más tareas</button>
+      </div>}
+```
+
+## Nuevo reporte de Lighthouse
+
+Todavía se sigue quejando de que
+
+- hay [recursos críticos que bloquean el thread de UI](https://web.dev/learn/performance/understanding-the-critical-path?utm_source=lighthouse&utm_medium=devtools#render-blocking_resources)
+- las imágenes utilizadas son grandes, y podríamos evitar el resize
+
+<img src="./images/20-performance-blocking-resources.png" height="auto" width="600px">
+
+<img src="./images/21-performance-image-resizing.png" height="auto" width="600px">
+
+### Resize de las imágenes
+
+Dado que ambas imágenes se muestran a 36 x 36, utilizamos algún programa (como [Gimp](https://www.gimp.org/)) para aplicar el resize por fuera del trabajo del navegador. Las grabamos con otro nombre (assignOk.png y finishOk.png) y renombramos los archivos referenciados en nuestros componentes React.
+
+### Evitar recursos bloqueantes
+
+El mensaje `Requests are blocking the page's initial render, which may delay LCP. Deferring or inlining can move these network requests out of the critical path.` nos habla de dos métricas importantes:
+
+- **FCP** o First Content Paint, que mide el momento en que el usuario ve algo útil en la pantalla. Este contenido puede ser cualquier texto, imagen (incluyendo imágenes de fondo no definidas por CSS), o un elemento <svg> que se renderiza. Le indica al usuario que la página está comenzando a cargar. Un valor por debajo de los 1.8 segundos es considerado bueno (por Google) 
+- **LCP** o Largest Content Paint, que mide la percepción de la velocidad de carga principal. Este elemento más grande suele ser el titular, la imagen principal, o el bloque de texto más destacado que capta la atención del usuario. Responde a la pregunta: "¿Qué tan rápido se cargó el contenido principal de la página?". Un valor por debajo de 2.5 segundos es considerado bueno (por Google)
+
+Por lo que vemos, estamos en el umbral de lo "bueno", sin embargo fíjense que la medición de la performance ya no tiene que ver con nuestros componentes de React, sino con decisiones de cómo cargar el css y los fonts. Veamos el index.html:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tareas React</title>
+  </head>
+```
+
+Pasamos a esta versión donde
+
+- la opción `preconnect` ya la estamos usando y le da prioridad a la conexión con los fonts de Google. Si tenemos latencia en la red (demoras) o bien si queremos asegurarnos de tener mayor rapidez, podemos [descargar las fuentes localmente](https://fonts.google.com/knowledge/using_type/self_hosting_web_fonts), lo que le va a dar un mejor rendimiento
+- después hacemos un truco: evitamos el bloqueo del thread del navegador utilizando el media=print, luego una vez que carga descargamos el font para todo tipo de uso. También evitamos descargar las variantes de Nunito para los grosores de 500, 600, 800, 900 y 1000 que no estamos usando
+
+```html
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tareas React</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link 
+      rel="preload" 
+      as="style" 
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@400;1,700&display=swap"
+    >
+    <link 
+      rel="stylesheet" 
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@400;1,700&display=swap"
+      media="print" 
+      onload="this.media='all'"
+    >
+  </head>
+  </html>
+```
+
+Volvemos a correr el análisis de performance y vemos **que no se movió la aguja significativamente** (es más, puede que te de un poco peor inclusive). 
+
+> Una conclusión que podemos extraer es que a la hora de atacar la performance lo importante es encontrar los cuellos de botella. Tratar de solucionar un problema que no tenemos puede hacer que empecemos a tener inconvenientes.
+
+## Otros cambios importantes
+
+### Cumplimiento de una tarea
+
+Originalmente, marcar una tarea como cumplida tenía este comportamiento
+
+```tsx
+tareas.map((tarea) =>
+  <TareaRow
+    tarea={tarea}
+    key={tarea.id}
+    actualizar={traerTareas} />)
+```
+
+con lo que una vez cumplida, lo que hacíamos era refrescar la lista de tareas en base al backend:
+
+```tsx
+export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
+
+  const cumplirTarea = async () => {
+    try {
+      ...
+    } finally {
+      // viene como props
+      await actualizar()
+    }
+  }
+```
+
+**Este comportamiento ya no nos sirve** porque traerTareas nos devuelve la lista de tareas pero únicamente con la página actual. En lugar de eso vamos a pedirle al backend que nos devuelva la tarea actualizada:
+
+```ts
+// tareaService
+actualizarTarea(tarea: Tarea) {
+  return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+}
+```
+
+Y ahora desde el componente principal vamos a pasarle a cada TareaRow una función que toma únicamente la tarea cumplida y regenera la lista que tiene en el estado actual:
+
+```tsx
+  const actualizarTarea = async (tareaActualizada: Tarea) => {
+    const nuevasTareas = [...tareas]
+    const indexTarea = nuevasTareas.findIndex((tareaSearch: Tarea) => tareaSearch.id == tareaActualizada.id)
+    nuevasTareas[indexTarea] = tareaActualizada
+    setTareas(nuevasTareas)
+  }
+
+  ...
+
+            {
+            tareas.map((tarea) =>
+              <TareaRow
+                tarea={tarea}
+                key={tarea.id}
+                actualizar={actualizarTarea} />)
+```
+
+De esa manera reemplazamos la lista original con una nueva lista que tiene la tarea cumplida en el mismo lugar.
+
+## Una última mejora
+
+TODO 2: definir tests de integración en node y tests de dominio
+TODO 3: metemos React.Suspense y lazy loading a ver si mejora

@@ -24,6 +24,11 @@ td {
   text-align: center;
 }
 
+.buttonRow {
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
 @media (max-width: 414px) {
   #fecha, #asignatario {
     display: none;

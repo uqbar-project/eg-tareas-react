@@ -1,16 +1,21 @@
 import axios from 'axios'
 
-import { REST_SERVER_URL } from './constants'
+import { PaginationData, REST_SERVER_URL } from './constants'
 import { Tarea, TareaJSON } from 'src/domain/tarea'
 
 const tareaAsJson = (tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON)
 
+export interface TareasPaginadas {
+  hasMore: boolean
+  tareas: Tarea[]
+}
 class TareaService {
 
-  async allInstances() {
-    const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
-    const tareas = tareasJson.data.map((tareaJson: TareaJSON) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
-    return tareas.sort((a: Tarea, b: Tarea) => a.descripcion < b.descripcion ? -1 : 1)
+  async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
+    const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`)
+    const tareasResult = tareasJson.data
+    const tareas = tareasResult.data.map((tareaJson: TareaJSON) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    return { tareas: tareas.sort((a: Tarea, b: Tarea) => a.descripcion < b.descripcion ? -1 : 1), hasMore: tareasResult.hasMore }
   }
 
   async getTareaById(id: number) {
