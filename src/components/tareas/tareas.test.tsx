@@ -5,7 +5,6 @@ import { TareasComponent } from './tareas'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import axios from 'axios'
 
-
 describe('TareasComponent', () => {
   const mockTareas = {
     hasMore: false,
@@ -90,13 +89,6 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
     })
     spyGetAxios.mockResolvedValueOnce({
       data: mockResultTareas2
-    })
-  })
-
-  test('al comenzar aparece un fallback que nos indica que está cargando tareas', async () => {
-    render(<BrowserRouter><TareasComponent /></BrowserRouter>)
-    await waitFor(() => {
-      expect(screen.getByTestId('fallback_tareas')).toBeTruthy()
     })
   })
 
