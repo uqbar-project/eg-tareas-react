@@ -15,8 +15,7 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: (tar
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
       tarea.cumplir()
-      const tareaCumplida = await tareaService.actualizarTarea(tarea)
-      console.info('tarea cumplida', tareaCumplida)
+      await tareaService.actualizarTarea(tarea)
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)
       showToast(errorMessage, 'error')
