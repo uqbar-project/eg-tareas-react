@@ -69,6 +69,17 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
       },
     ]
   }
+  const mockResultTareas2 = {
+    hasMore: false,
+    data: [
+      {
+        id: 91, 
+        descripcion: 'Resolver tests e2e', 
+        porcentajeCumplimiento: 80, 
+        asignadoA: 'Jeremías Ocaño'
+      },
+    ]
+  }
 
   beforeEach(() => {
     vi.mock('axios')
@@ -77,13 +88,27 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
     spyGetAxios.mockResolvedValueOnce({
       data: mockResultTareas
     })
+    spyGetAxios.mockResolvedValueOnce({
+      data: mockResultTareas2
+    })
   })
 
-  test('si hay más tareas aparece el botón correspondiente', async () => {
+  test('al comenzar aparece un fallback que nos indica que está cargando tareas', async () => {
     render(<BrowserRouter><TareasComponent /></BrowserRouter>)
     await waitFor(() => {
-      expect(screen.getByTestId('mas_tareas')).toBeTruthy()
+      expect(screen.getByTestId('fallback_tareas')).toBeTruthy()
     })
+  })
+
+  test('al traer más tareas se visualizan las de la página actual y la anterior', async () => {
+    render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+    await screen.findByTestId('tarea_68')
+    await waitFor(() => {
+      screen.getByTestId('mas_tareas').click()
+    })
+    await screen.findByTestId('tarea_91')
+    expect(screen.getByTestId('tarea_68')).toBeTruthy()
+    expect(screen.getByTestId('tarea_91')).toBeTruthy()
   })
 
   afterEach(() => {

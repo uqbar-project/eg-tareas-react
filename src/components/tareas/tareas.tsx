@@ -66,7 +66,7 @@ export const TareasComponent = () => {
         <React.Suspense fallback={
           <tbody>
             <tr>
-              <td colSpan={5}>Cargando filas...</td>
+              <td colSpan={5} data-testid='fallback_tareas'>Cargando filas...</td>
             </tr>
           </tbody>
           }>
