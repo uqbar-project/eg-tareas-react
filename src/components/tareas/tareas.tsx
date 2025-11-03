@@ -21,7 +21,7 @@ export const TareasComponent = () => {
 
   const getTareas = async (newPage: number, init = false) => {
     try {
-      const { tareas, hasMore} = await tareaService.getTareas({ page: newPage, limit: pageSize })
+      const { tareas, hasMore } = await tareaService.getTareas({ page: newPage, limit: pageSize })
       setHasMore(hasMore)
       setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
     } catch (error: unknown) {
@@ -64,9 +64,12 @@ export const TareasComponent = () => {
           </tr>
         </thead>
         <React.Suspense fallback={
-          <tr>
-            <td colSpan={5}>Cargando filas...</td>
-          </tr>}>
+          <tbody>
+            <tr>
+              <td colSpan={5}>Cargando filas...</td>
+            </tr>
+          </tbody>
+          }>
           <tbody data-testid="resultados">
             {
               tareas.map((tarea) =>
@@ -79,7 +82,7 @@ export const TareasComponent = () => {
         </React.Suspense>
       </table>
       {hasMore && <div>
-        <button className='buttonRow secondary' onClick={traerMasTareas}>Ver más tareas</button>
+        <button className='buttonRow secondary' data-testid="mas_tareas" onClick={traerMasTareas}>Ver más tareas</button>
       </div>}
       <div id="toast-container">
         <Toast toast={toast} />
