@@ -1,53 +1,13 @@
 import './tareas.css'
 
-import React, { useState } from 'react'
-import { useOnInit } from 'src/customHooks/hooks'
-import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
-import { tareaService } from 'src/services/tareaService'
-import { Tarea } from 'src/domain/tarea'
-import { useToast } from 'src/customHooks/useToast'
-import { Toast } from 'src/components/common/toast'
+import React from 'react'
+import { useOutletContext } from 'react-router-dom'
+import { PaginadorContextType } from 'src/routes'
 
 const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 
-const pageSize = 10
-
 export const TareasComponent = () => {
-
-  const [tareas, setTareas] = useState<Tarea[]>([])
-  const [hasMore, setHasMore] = useState(false)
-  const [page, setPage] = useState(1)
-  const {toast, showToast} = useToast()
-
-  const getTareas = async (newPage: number, init = false) => {
-    try {
-      const { tareas, hasMore } = await tareaService.getTareas({ page: newPage, limit: pageSize })
-      setHasMore(hasMore)
-      setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
-    } catch (error: unknown) {
-      const errorMessage = getMensajeError(error as ErrorResponse)
-      showToast(errorMessage, 'error')
-    }
-  }
-
-  const traerMasTareas = async () => {
-    const newPage = page + 1
-    getTareas(newPage)
-    setPage(newPage)
-  }
-
-  const traerTareas = async () => {
-    getTareas(page, true)
-  }
-
-  const actualizarTarea = async (tareaActualizada: Tarea) => {
-    const nuevasTareas = [...tareas]
-    const indexTarea = nuevasTareas.findIndex((tareaSearch: Tarea) => tareaSearch.id == tareaActualizada.id)
-    nuevasTareas[indexTarea] = tareaActualizada
-    setTareas(nuevasTareas)
-  }
-
-  useOnInit(traerTareas)
+  const { tareas, hasMore, traerMasTareas, actualizarTarea } = useOutletContext<PaginadorContextType>()
 
   return (
     <div className='container'>
@@ -84,9 +44,6 @@ export const TareasComponent = () => {
       {hasMore && <div>
         <button className='buttonRow secondary' data-testid="mas_tareas" onClick={traerMasTareas}>Ver más tareas</button>
       </div>}
-      <div id="toast-container">
-        <Toast toast={toast} />
-      </div>
     </div>
   )
 }
