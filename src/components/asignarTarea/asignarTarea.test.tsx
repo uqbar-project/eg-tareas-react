@@ -1,9 +1,19 @@
-import { render, screen, waitFor, } from '@testing-library/react'
+
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+
+vi.mock('axios', () => {
+  return {
+    default: {
+      get: vi.fn(),
+      put: vi.fn(),
+    },
+  }
+})
 import axios from 'axios'
-import { TareasRoutes } from 'src/routes'
-import { REST_SERVER_URL } from 'src/services/constants'
+
 import { vi, expect, test, beforeEach, describe, afterEach, type MockInstance, MockedFunction } from 'vitest'
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
   return {
@@ -21,25 +31,23 @@ describe('tests de asignar tarea', () => {
   let spyGetAxios: MockInstance<typeof axios['get']>
   let spyPutAxios: MockInstance<typeof axios['put']>
   let mockNavigate: ReturnType<typeof vi.fn>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let TareasRoutes: any
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    vi.clearAllMocks()
+  
     mockNavigate = vi.fn()
     useNavigate.mockReturnValue(mockNavigate)
-    vi.mock('axios')
+  
     spyGetAxios = vi.spyOn(axios, 'get')
     spyPutAxios = vi.spyOn(axios, 'put')
-
+  
     spyGetAxios
       .mockResolvedValueOnce({
-        data: [ 
-          {
-            id: 1,
-            nombre: 'Margarito Tereré',
-          },
-          {
-            id: 2,
-            nombre: 'Misia Pataca',
-          },
+        data: [
+          { id: 1, nombre: 'Margarito Tereré' },
+          { id: 2, nombre: 'Misia Pataca' },
         ],
       })
       .mockResolvedValueOnce({
@@ -49,24 +57,36 @@ describe('tests de asignar tarea', () => {
           iteracion: '',
           asignadoA: 'Margarito Tereré',
           porcentajeCumplimiento: 0,
-        }
+        },
       })
+      .mockResolvedValueOnce({
+        data: {
+          id: idTareaAsignada,
+          descripcion: 'Ejemplo',
+          iteracion: '',
+          asignadoA: 'Margarito Tereré',
+          porcentajeCumplimiento: 0,
+        },
+      })
+  
+    const routesModule = await import('src/routes')
+    TareasRoutes = routesModule.TareasRoutes
   })
 
   afterEach(() => {
-     vi.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('al inicio muestra la información de la tarea', async () => {
     render(
       <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
-        <TareasRoutes/>
+        <TareasRoutes />
       </MemoryRouter>
     )
 
     await waitFor(() => {
-      expect(spyGetAxios.mock.calls[0]).to.contain(`${REST_SERVER_URL}/usuarios`)
-      expect(spyGetAxios.mock.calls[1]).to.contain(`${REST_SERVER_URL}/tareas/${idTareaAsignada}`)
+      expect(spyGetAxios.mock.calls[0]).to.contain('http://localhost:9000/usuarios')
+      expect(spyGetAxios.mock.calls[2]).to.contain(`http://localhost:9000/tareas/${idTareaAsignada}`)
     })
 
     await waitFor(() => {
@@ -82,7 +102,7 @@ describe('tests de asignar tarea', () => {
   test('al cambiar el asignatario se asigna a una nueva persona', async () => {
     render(
       <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
-        <TareasRoutes/>
+        <TareasRoutes />
       </MemoryRouter>
     )
     await waitFor(() => {
@@ -99,7 +119,7 @@ describe('tests de asignar tarea', () => {
   test('al cambiar la descripción se actualiza la tarea', async () => {
     render(
       <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
-        <TareasRoutes/>
+        <TareasRoutes />
       </MemoryRouter>
     )
     await waitFor(() => {
@@ -116,7 +136,7 @@ describe('tests de asignar tarea', () => {
   test('al aceptar los cambios se actualiza la tarea', async () => {
     render(
       <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
-        <TareasRoutes/>
+        <TareasRoutes />
       </MemoryRouter>
     )
     const selectAsignatario = screen.getByTestId('asignatario') as HTMLSelectElement
@@ -148,7 +168,7 @@ describe('tests de asignar tarea', () => {
   test('al cancelar los cambios se vuelve a la lista de tareas', async () => {
     render(
       <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
-        <TareasRoutes/>
+        <TareasRoutes />
       </MemoryRouter>
     )
     const buttonCancelar = screen.getByTestId('cancelar')

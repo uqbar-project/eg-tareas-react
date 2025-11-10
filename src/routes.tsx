@@ -19,7 +19,7 @@ export type PaginadorContextType = {
 
 const pageSize = 10
 
-const PaginadorLayout = () => {
+export const PaginadorLayout = () => {
     const [tareas, setTareas] = useState<Tarea[]>([])
     const [hasMore, setHasMore] = useState(false)
     const [page, setPage] = useState(1)

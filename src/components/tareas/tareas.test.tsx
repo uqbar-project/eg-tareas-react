@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 
-import { TareasComponent } from './tareas'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import axios from 'axios'
+import { TareasRoutes } from 'src/routes'
 
 describe('TareasComponent', () => {
   const mockTareas = {
@@ -35,7 +35,7 @@ describe('TareasComponent', () => {
 
   describe('cuando el servicio responde correctamente', () => {
     test('se muestran las tareas en la tabla', async () => {
-      render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+      render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
       await waitFor(() => {
         expect(screen.getByTestId('tarea_159')).toBeTruthy()
         expect(screen.getByTestId('tarea_68')).toBeTruthy()
@@ -43,7 +43,7 @@ describe('TareasComponent', () => {
     })
 
     test('si no hay más tareas no aparece el botón correspondiente', async () => {
-      render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+      render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
       await waitFor(() => {
         expect(screen.getAllByRole('row')).not.toHaveLength(0)
       })
@@ -93,7 +93,7 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
   })
 
   test('al traer más tareas se visualizan las de la página actual y la anterior', async () => {
-    render(<BrowserRouter><TareasComponent /></BrowserRouter>)
+    render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
     await screen.findByTestId('tarea_68')
     await waitFor(() => {
       screen.getByTestId('mas_tareas').click()
