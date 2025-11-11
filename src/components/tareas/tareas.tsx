@@ -1,31 +1,13 @@
 import './tareas.css'
 
-import { useState } from 'react'
-import { useOnInit } from 'src/customHooks/hooks'
-import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
-import { tareaService } from 'src/services/tareaService'
-import TareaRow from './tareaRow/tareaRow'
-import { Tarea } from 'src/domain/tarea'
-import { useToast } from 'src/customHooks/useToast'
-import { Toast } from 'src/components/common/toast'
+import React from 'react'
+import { useOutletContext } from 'react-router-dom'
+import { PaginadorContextType } from 'src/routes'
+
+const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 
 export const TareasComponent = () => {
-
-  const [tareas, setTareas] = useState<Tarea[]>([])
-
-  const { toast, showToast } = useToast()
-
-  const traerTareas = async () => {
-    try {
-      const tareas = await tareaService.allInstances()
-      setTareas(tareas)
-    } catch (error: unknown) {
-      const errorMessage = getMensajeError(error as ErrorResponse)
-      showToast(errorMessage, 'error')
-    }
-  }
-
-  useOnInit(traerTareas)
+  const { tareas, hasMore, traerMasTareas, actualizarTarea } = useOutletContext<PaginadorContextType>()
 
   return (
     <div className='container'>
@@ -37,23 +19,31 @@ export const TareasComponent = () => {
             <th>Tarea</th>
             <th id="fecha">Fecha</th>
             <th id="asignatario">Asignatario</th>
-            <th>%</th>
+            <th className="center">%</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody data-testid="resultados">
-          {
-            tareas.map((tarea) =>
-              <TareaRow
-                tarea={tarea}
-                key={tarea.id}
-                actualizar={traerTareas} />)
-          }
-        </tbody>
+        <React.Suspense fallback={
+          <tbody>
+            <tr>
+              <td colSpan={5} data-testid='fallback_tareas'>Cargando filas...</td>
+            </tr>
+          </tbody>
+          }>
+          <tbody data-testid="resultados">
+            {
+              tareas.map((tarea) =>
+                <TareaRow
+                  tarea={tarea}
+                  key={tarea.id}
+                  actualizar={actualizarTarea} />)
+            }
+          </tbody>
+        </React.Suspense>
       </table>
-      <div id="toast-container">
-        <Toast toast={toast} />
-      </div>
+      {hasMore && <div>
+        <button className='buttonRow secondary' data-testid="mas_tareas" onClick={traerMasTareas}>Ver más tareas</button>
+      </div>}
     </div>
   )
 }

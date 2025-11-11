@@ -15,4 +15,6 @@
 
 .formControl {
   width: 100%;
+  font-size: 1.1em;
+  color: rgb(76, 72, 76);
 }

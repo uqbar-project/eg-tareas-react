@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react'
 
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { Tarea } from 'src/domain/tarea'
 import { getMensajeError } from 'src/utils/errorHandling'
 import { tareaService } from 'src/services/tareaService'
@@ -11,10 +11,11 @@ import { Usuario } from 'src/domain/usuario'
 import './asignarTarea.css'
 import { Toast } from '../common/toast'
 import { useToast } from 'src/customHooks/useToast'
+import { PaginadorContextType } from 'src/routes'
 
 export const AsignarTareaComponent = () => {
+  const { actualizarTarea } = useOutletContext<PaginadorContextType>()
   const { toast, showToast } = useToast()
-
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
   const navigate = useNavigate()
@@ -48,6 +49,7 @@ export const AsignarTareaComponent = () => {
     try {
       tarea.validarAsignacion()
       await tareaService.actualizarTarea(tarea)
+      actualizarTarea(tarea)
       volver()
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error)
