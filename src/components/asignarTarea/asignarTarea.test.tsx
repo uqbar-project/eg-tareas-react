@@ -8,6 +8,7 @@ vi.mock('axios', () => {
       get: vi.fn(),
       put: vi.fn(),
     },
+    AxiosError: vi.fn(),
   }
 })
 import axios from 'axios'
