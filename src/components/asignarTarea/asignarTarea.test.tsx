@@ -1,4 +1,3 @@
-
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -11,9 +10,19 @@ vi.mock('axios', () => {
     AxiosError: vi.fn(),
   }
 })
+
 import axios from 'axios'
 
-import { vi, expect, test, beforeEach, describe, afterEach, type MockInstance, MockedFunction } from 'vitest'
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  type MockedFunction,
+  type MockInstance,
+  test,
+  vi,
+} from 'vitest'
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
@@ -24,26 +33,27 @@ vi.mock('react-router-dom', async () => {
 })
 const { useNavigate: useNavigateRaw } = await import('react-router-dom')
 // Es bastante tricky pero así tipamos el useNavigate que queremos mockear
-const useNavigate = useNavigateRaw as unknown as MockedFunction<() => ReturnType<typeof vi.fn>>
+const useNavigate = useNavigateRaw as unknown as MockedFunction<
+  () => ReturnType<typeof vi.fn>
+>
 const { MemoryRouter } = await import('react-router-dom')
 
 describe('tests de asignar tarea', () => {
   const idTareaAsignada = 159
-  let spyGetAxios: MockInstance<typeof axios['get']>
-  let spyPutAxios: MockInstance<typeof axios['put']>
+  let spyGetAxios: MockInstance<(typeof axios)['get']>
+  let spyPutAxios: MockInstance<(typeof axios)['put']>
   let mockNavigate: ReturnType<typeof vi.fn>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let TareasRoutes: any
+  let TareasRoutes: React.ComponentType
 
   beforeEach(async () => {
     vi.clearAllMocks()
-  
+
     mockNavigate = vi.fn()
     useNavigate.mockReturnValue(mockNavigate)
-  
+
     spyGetAxios = vi.spyOn(axios, 'get')
     spyPutAxios = vi.spyOn(axios, 'put')
-  
+
     spyGetAxios
       .mockResolvedValueOnce({
         data: [
@@ -69,7 +79,7 @@ describe('tests de asignar tarea', () => {
           porcentajeCumplimiento: 0,
         },
       })
-  
+
     const routesModule = await import('src/routes')
     TareasRoutes = routesModule.TareasRoutes
   })
@@ -80,37 +90,55 @@ describe('tests de asignar tarea', () => {
 
   test('al inicio muestra la información de la tarea', async () => {
     render(
-      <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
         <TareasRoutes />
       </MemoryRouter>
     )
 
     await waitFor(() => {
-      expect(spyGetAxios.mock.calls[0]).to.contain('http://localhost:9000/usuarios')
-      expect(spyGetAxios.mock.calls[2]).to.contain(`http://localhost:9000/tareas/${idTareaAsignada}`)
+      expect(spyGetAxios.mock.calls[0]).to.contain(
+        'http://localhost:9000/usuarios'
+      )
+      expect(spyGetAxios.mock.calls[2]).to.contain(
+        `http://localhost:9000/tareas/${idTareaAsignada}`
+      )
     })
 
     await waitFor(() => {
-      const textDescripcion = (screen.getByTestId('descripcion') as HTMLInputElement).value
+      const textDescripcion = (
+        screen.getByTestId('descripcion') as HTMLInputElement
+      ).value
       expect(textDescripcion).toBe('Ejemplo')
     })
     await waitFor(() => {
-      const asignatario = (screen.getByTestId('asignatario') as HTMLSelectElement).value
+      const asignatario = (
+        screen.getByTestId('asignatario') as HTMLSelectElement
+      ).value
       expect(asignatario).toBe('Margarito Tereré')
     })
   })
 
   test('al cambiar el asignatario se asigna a una nueva persona', async () => {
     render(
-      <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
         <TareasRoutes />
       </MemoryRouter>
     )
     await waitFor(() => {
-      const asignatario = (screen.getByTestId('asignatario') as HTMLSelectElement).value
+      const asignatario = (
+        screen.getByTestId('asignatario') as HTMLSelectElement
+      ).value
       expect(asignatario).toBe('Margarito Tereré')
     })
-    const selectAsignatario = screen.getByTestId('asignatario') as HTMLSelectElement
+    const selectAsignatario = screen.getByTestId(
+      'asignatario'
+    ) as HTMLSelectElement
     userEvent.selectOptions(selectAsignatario, 'Misia Pataca')
     await waitFor(() => {
       expect(selectAsignatario.value).toBe('Misia Pataca')
@@ -119,15 +147,22 @@ describe('tests de asignar tarea', () => {
 
   test('al cambiar la descripción se actualiza la tarea', async () => {
     render(
-      <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
         <TareasRoutes />
       </MemoryRouter>
     )
     await waitFor(() => {
-      const textDescripcion = (screen.getByTestId('descripcion') as HTMLInputElement).value
+      const textDescripcion = (
+        screen.getByTestId('descripcion') as HTMLInputElement
+      ).value
       expect(textDescripcion).toBe('Ejemplo')
     })
-    const inputDescripcion = screen.getByTestId('descripcion') as HTMLInputElement
+    const inputDescripcion = screen.getByTestId(
+      'descripcion'
+    ) as HTMLInputElement
     userEvent.type(inputDescripcion, ' 2')
     await waitFor(() => {
       expect(inputDescripcion.value).toBe('Ejemplo 2')
@@ -136,11 +171,16 @@ describe('tests de asignar tarea', () => {
 
   test('al aceptar los cambios se actualiza la tarea', async () => {
     render(
-      <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
         <TareasRoutes />
       </MemoryRouter>
     )
-    const selectAsignatario = screen.getByTestId('asignatario') as HTMLSelectElement
+    const selectAsignatario = screen.getByTestId(
+      'asignatario'
+    ) as HTMLSelectElement
     await waitFor(() => {
       expect(selectAsignatario.value).toBe('Margarito Tereré')
     })
@@ -153,7 +193,8 @@ describe('tests de asignar tarea', () => {
     await waitFor(() => {
       expect(spyPutAxios.mock.calls.length).toBe(1)
       expect(spyPutAxios.mock.calls[0]).to.deep.equal([
-        'http://localhost:9000/tareas/159', {
+        'http://localhost:9000/tareas/159',
+        {
           asignadoA: 'Misia Pataca',
           asignatario: null,
           descripcion: 'Ejemplo',
@@ -168,7 +209,10 @@ describe('tests de asignar tarea', () => {
 
   test('al cancelar los cambios se vuelve a la lista de tareas', async () => {
     render(
-      <MemoryRouter initialEntries={[`/asignarTarea/${idTareaAsignada}`]} initialIndex={0}>
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
         <TareasRoutes />
       </MemoryRouter>
     )

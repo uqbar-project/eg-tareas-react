@@ -1,12 +1,17 @@
 import { useNavigate } from 'react-router-dom'
-
-import { ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
-import { tareaService } from 'src/services/tareaService'
 import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
-import { Tarea } from 'src/domain/tarea'
 import { useToast } from 'src/customHooks/useToast'
+import type { Tarea } from 'src/domain/tarea'
+import { tareaService } from 'src/services/tareaService'
+import { type ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
 
-export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: (tarea: Tarea) => void }) => {
+export const TareaRow = ({
+  tarea,
+  actualizar,
+}: {
+  tarea: Tarea
+  actualizar: (tarea: Tarea) => void
+}) => {
   const navigate = useNavigate()
 
   const { showToast } = useToast()
@@ -29,28 +34,47 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: (tar
     navigate(`/asignarTarea/${tarea.id}`)
   }
 
-  const cumplirButton = tarea.sePuedeCumplir() &&
-    <img height="36" width="36" className="icon" src="/finishOk.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
+  const cumplirButton = tarea.sePuedeCumplir() && (
+    <button
+      type="button"
+      onClick={cumplirTarea}
+      data-testid={`cumplir_${tarea.id}`}
+      aria-label={`Cumplir tarea: ${tarea.descripcion}`}
+      title="Cumplir tarea"
+      className="icon-button"
+    >
+      <img height="36" width="36" className="icon" src="/finishOk.png" alt="" />
+    </button>
+  )
 
-  const asignarButton = tarea.sePuedeAsignar() &&
-    <img height="36" width="36" className="icon" src="/assignOk.png" title="Asignar tarea" data-testid={`asignar_${tarea.id}`} aria-label="Asignar" onClick={goToAsignarTarea} />
+  const asignarButton = tarea.sePuedeAsignar() && (
+    <button
+      type="button"
+      onClick={goToAsignarTarea}
+      data-testid={`asignar_${tarea.id}`}
+      aria-label={`Asignar tarea: ${tarea.descripcion}`}
+      title="Asignar tarea"
+      className="icon-button"
+    >
+      <img height="36" width="36" className="icon" src="/assignOk.png" alt="" />
+    </button>
+  )
 
-  return (<>
-    <tr key={tarea.id} data-testid={'tarea_' + tarea.id}>
-      <td>
-        {tarea.descripcion}
-      </td>
-      <td id="fecha">{tarea.fecha}</td>
-      <td id="asignatario">{tarea.nombreAsignatario}</td>
-      <td>
+  return (
+    <tr key={tarea.id} data-testid={`tarea_${tarea.id}`}>
+      <td>{tarea.descripcion}</td>
+      <td>{tarea.fecha}</td>
+      <td>{tarea.nombreAsignatario}</td>
+      <td
+        aria-label={`Porcentaje de cumplimiento: ${tarea.porcentajeCumplimiento}%`}
+      >
         <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
       </td>
-      <td>
+      <td aria-label="Acciones disponibles">
         {cumplirButton}
         {asignarButton}
       </td>
     </tr>
-  </>
   )
 }
 

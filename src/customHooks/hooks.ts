@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 
-export const useOnInit = (initialCallBack: () => void) => {
-    useEffect(() => {
-      initialCallBack()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])}
+export const useOnInit = (initialCallback: () => void) => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: It's only meant to run once
+  useEffect(() => {
+    initialCallback()
+  }, [])
+}

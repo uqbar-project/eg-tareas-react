@@ -1,41 +1,44 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import axios from 'axios'
+import { BrowserRouter } from 'react-router-dom'
 import { TareasRoutes } from 'src/routes'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 describe('TareasComponent', () => {
   const mockTareas = {
     hasMore: false,
     data: [
       {
-        id: 68, 
-        descripcion: 'Desarrollar TODO List en React', 
-        porcentajeCumplimiento: 75, 
-        asignadoA: 'Paula Paretto'
+        id: 68,
+        descripcion: 'Desarrollar TODO List en React',
+        porcentajeCumplimiento: 75,
+        asignadoA: 'Paula Paretto',
       },
       {
-        id: 159, 
-        descripcion: 'Construir test TODO List', 
-        porcentajeCumplimiento: 0, 
-        asignadoA: 'Eliana Mendia'
-      }
-    ]
+        id: 159,
+        descripcion: 'Construir test TODO List',
+        porcentajeCumplimiento: 0,
+        asignadoA: 'Eliana Mendia',
+      },
+    ],
   }
-  
+
   beforeEach(() => {
     vi.mock('axios')
     const spyGetAxios = vi.spyOn(axios, 'get')
 
     spyGetAxios.mockResolvedValueOnce({
-      data: mockTareas
+      data: mockTareas,
     })
   })
 
   describe('cuando el servicio responde correctamente', () => {
     test('se muestran las tareas en la tabla', async () => {
-      render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
+      render(
+        <BrowserRouter>
+          <TareasRoutes />
+        </BrowserRouter>
+      )
       await waitFor(() => {
         expect(screen.getByTestId('tarea_159')).toBeTruthy()
         expect(screen.getByTestId('tarea_68')).toBeTruthy()
@@ -43,7 +46,11 @@ describe('TareasComponent', () => {
     })
 
     test('si no hay más tareas no aparece el botón correspondiente', async () => {
-      render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
+      render(
+        <BrowserRouter>
+          <TareasRoutes />
+        </BrowserRouter>
+      )
       await waitFor(() => {
         expect(screen.getAllByRole('row')).not.toHaveLength(0)
       })
@@ -61,23 +68,23 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
     hasMore: true,
     data: [
       {
-        id: 68, 
-        descripcion: 'Desarrollar TODO List en React', 
-        porcentajeCumplimiento: 75, 
-        asignadoA: 'Paula Paretto'
+        id: 68,
+        descripcion: 'Desarrollar TODO List en React',
+        porcentajeCumplimiento: 75,
+        asignadoA: 'Paula Paretto',
       },
-    ]
+    ],
   }
   const mockResultTareas2 = {
     hasMore: false,
     data: [
       {
-        id: 91, 
-        descripcion: 'Resolver tests e2e', 
-        porcentajeCumplimiento: 80, 
-        asignadoA: 'Jeremías Ocaño'
+        id: 91,
+        descripcion: 'Resolver tests e2e',
+        porcentajeCumplimiento: 80,
+        asignadoA: 'Jeremías Ocaño',
       },
-    ]
+    ],
   }
 
   beforeEach(() => {
@@ -85,15 +92,19 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
     const spyGetAxios = vi.spyOn(axios, 'get')
 
     spyGetAxios.mockResolvedValueOnce({
-      data: mockResultTareas
+      data: mockResultTareas,
     })
     spyGetAxios.mockResolvedValueOnce({
-      data: mockResultTareas2
+      data: mockResultTareas2,
     })
   })
 
   test('al traer más tareas se visualizan las de la página actual y la anterior', async () => {
-    render(<BrowserRouter><TareasRoutes /></BrowserRouter>)
+    render(
+      <BrowserRouter>
+        <TareasRoutes />
+      </BrowserRouter>
+    )
     await screen.findByTestId('tarea_68')
     await waitFor(() => {
       screen.getByTestId('mas_tareas').click()

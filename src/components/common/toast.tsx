@@ -1,10 +1,13 @@
-import React from 'react'
-import { ToastMessage } from 'src/customHooks/useToast'
+import type React from 'react'
+import type { ToastMessage } from 'src/customHooks/useToast'
+
 interface ToastProps {
   toast: ToastMessage | null
 }
 export const Toast: React.FC<ToastProps> = ({ toast }) => {
-  if (!toast) return null
+  if (!toast) {
+    return null
+  }
   const getToastClass = (type: ToastMessage['type']) => {
     const base = 'toast'
     const types = {
@@ -16,7 +19,7 @@ export const Toast: React.FC<ToastProps> = ({ toast }) => {
     return `${base} ${types[type] || base}`
   }
   return (
-    <div data-testid='toast'className={getToastClass(toast.type)}>
+    <div data-testid="toast" className={getToastClass(toast.type)}>
       {toast.message}
     </div>
   )

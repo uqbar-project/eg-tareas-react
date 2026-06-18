@@ -111,7 +111,7 @@ describe('tests de tarea', () => {
       fecha: '10/07/2024',
       porcentajeCumplimiento: 20,
       asignadoA: persona.nombre,
-      iteracion: 'Sprint 3'
+      iteracion: 'Sprint 3',
     })
     expect(tarea.nombreAsignatario).toBe(persona.nombre)
     expect(tarea.porcentajeCumplimiento).toBe(20)
@@ -119,7 +119,9 @@ describe('tests de tarea', () => {
   })
   test('una tarea sin asignatario no es válida', () => {
     const tarea = new Tarea()
-    expect(() => { tarea.validarAsignacion() }).toThrowError()
+    expect(() => {
+      tarea.validarAsignacion()
+    }).toThrow()
   })
 
   test('una tarea con asignatario es válida', () => {
@@ -131,6 +133,8 @@ describe('tests de tarea', () => {
       asignadoA: persona.nombre,
       iteracion: 'Sprint 3',
     })
-    expect(() => { tarea.validarAsignacion() }).not.toThrowError()
+    expect(() => {
+      tarea.validarAsignacion()
+    }).not.toThrow()
   })
 })

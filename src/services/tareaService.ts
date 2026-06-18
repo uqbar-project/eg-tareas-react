@@ -1,7 +1,6 @@
 import axios from 'axios'
-
-import { PaginationData, REST_SERVER_URL } from './constants'
-import { Tarea, TareaJSON } from 'src/domain/tarea'
+import { Tarea, type TareaJSON } from 'src/domain/tarea'
+import { type PaginationData, REST_SERVER_URL } from './constants'
 
 const tareaAsJson = (tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON)
 
@@ -11,11 +10,14 @@ export interface TareasPaginadas {
 }
 
 class TareaService {
-
   async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
-    const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`)
+    const tareasJson = await axios.get(
+      `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
+    )
     const tareasResult = tareasJson.data
-    const tareas = tareasResult.data.map((tareaJson: TareaJSON) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
+    const tareas = tareasResult.data.map((tareaJson: TareaJSON) =>
+      Tarea.fromJson(tareaJson)
+    ) // o ... this.tareaAsJson
     return { tareas, hasMore: tareasResult.hasMore }
   }
 
@@ -27,7 +29,6 @@ class TareaService {
   actualizarTarea(tarea: Tarea) {
     return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
   }
-
 }
 
 export const tareaService = new TareaService()

@@ -1,8 +1,7 @@
-import { Usuario } from './usuario'
 import { describe, expect, test } from 'vitest'
+import { Usuario } from './usuario'
 
 describe('tests de usuario', () => {
-
   test('dos usuarios con el mismo nombre son iguales', () => {
     const usuario1 = new Usuario('pepe')
     const usuario2 = new Usuario('pepe')
@@ -13,5 +12,4 @@ describe('tests de usuario', () => {
     const usuario = Usuario.fromJSON('pepe')
     expect(usuario).toEqual(new Usuario('pepe'))
   })
-
 })

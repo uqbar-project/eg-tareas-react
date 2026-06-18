@@ -1,7 +1,7 @@
+import { render, screen } from '@testing-library/react'
+import type { ToastMessage } from 'src/customHooks/useToast'
 import { describe, expect, test } from 'vitest'
 import { Toast } from './toast'
-import { ToastMessage } from 'src/customHooks/useToast'
-import { render, screen } from '@testing-library/react'
 
 describe('toast tests', () => {
   test('should render toast', () => {
