@@ -1,7 +1,5 @@
 import { AxiosError } from 'axios'
 
-// TODO: hacer tests
-
 export const getMensajeError = (error: unknown) => {
   console.error(error)
   let errorMessage = 'Ocurrió un error. Consulte al administrador del sistema'
@@ -10,9 +8,13 @@ export const getMensajeError = (error: unknown) => {
   }
   if (error instanceof AxiosError) {
     const status = error.response?.status ?? error.status ?? 0
+    const backendMessage = (
+      error.response?.data as { message?: string } | null | undefined
+    )?.message
+
     errorMessage =
       status >= 400 && status < 500
-        ? error.response?.data.message
+        ? (backendMessage ?? errorMessage)
         : 'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema'
   }
   return errorMessage

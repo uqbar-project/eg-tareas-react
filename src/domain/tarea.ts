@@ -13,10 +13,10 @@ export class Tarea {
     public porcentajeCumplimiento = 0
   ) {}
 
-  contiene(palabra: string) {
+  contiene(palabra: string): boolean {
     return (
       this.descripcion.includes(palabra) ||
-      this.asignatario?.nombre?.includes(palabra)
+      (this.asignatario?.nombre?.includes(palabra) ?? false)
     )
   }
 

@@ -9,12 +9,29 @@ export interface TareasPaginadas {
   tareas: Tarea[]
 }
 
+let pagination = false
+
 class TareaService {
+  configurePagination(enabled: boolean) {
+    pagination = enabled
+  }
+  
+  private async getInternalTareas(paginationData: PaginationData) {
+    if (pagination) {
+      const tareasJson = await axios.get(
+        `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
+      )
+      const tareasResult = tareasJson.data
+      return tareasResult
+    } else {
+      return {
+        hasMore: false,
+        data: (await axios.get(`${REST_SERVER_URL}/tareas`)).data,
+      }
+    }
+  }
   async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
-    const tareasJson = await axios.get(
-      `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
-    )
-    const tareasResult = tareasJson.data
+    const tareasResult = await this.getInternalTareas(paginationData)
     const tareas = tareasResult.data.map((tareaJson: TareaJSON) =>
       Tarea.fromJson(tareaJson)
     ) // o ... this.tareaAsJson

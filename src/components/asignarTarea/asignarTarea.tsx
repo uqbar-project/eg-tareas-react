@@ -22,13 +22,18 @@ export const AsignarTareaComponent = () => {
   const { id } = useParams()
 
   useOnInit(async () => {
-    const nuevosUsuarios = await usuarioService.allInstances()
-    setUsuarios(nuevosUsuarios)
-    if (!id) {
-      return
+    try {
+      const nuevosUsuarios = await usuarioService.allInstances()
+      setUsuarios(nuevosUsuarios)
+      if (!id) {
+        return
+      }
+      const nuevaTarea = await tareaService.getTareaById(Number(id))
+      setTarea(nuevaTarea)
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error)
+      showToast(errorMessage, 'error')
     }
-    const nuevaTarea = await tareaService.getTareaById(Number(id))
-    setTarea(nuevaTarea)
   })
 
   const asignar = (asignatario: string) => {

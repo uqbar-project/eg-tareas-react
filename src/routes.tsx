@@ -67,6 +67,9 @@ export const PaginadorLayout = () => {
     const indexTarea = nuevasTareas.findIndex(
       (tareaSearch: Tarea) => tareaSearch.id === tareaActualizada.id
     )
+    if (indexTarea < 0) {
+      return
+    }
     nuevasTareas[indexTarea] = tareaActualizada
     setTareas(nuevasTareas)
   }

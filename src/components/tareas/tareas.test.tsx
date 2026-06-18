@@ -2,7 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react'
 import axios from 'axios'
 import { BrowserRouter } from 'react-router-dom'
 import { TareasRoutes } from 'src/routes'
+import { tareaService } from 'src/services/tareaService'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
+vi.mock('axios')
 
 describe('TareasComponent', () => {
   const mockTareas = {
@@ -24,11 +27,10 @@ describe('TareasComponent', () => {
   }
 
   beforeEach(() => {
-    vi.mock('axios')
     const spyGetAxios = vi.spyOn(axios, 'get')
 
     spyGetAxios.mockResolvedValueOnce({
-      data: mockTareas,
+      data: mockTareas.data,
     })
   })
 
@@ -88,14 +90,20 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
   }
 
   beforeEach(() => {
-    vi.mock('axios')
+    tareaService.configurePagination(true)
     const spyGetAxios = vi.spyOn(axios, 'get')
 
     spyGetAxios.mockResolvedValueOnce({
-      data: mockResultTareas,
+      data: {
+        hasMore: mockResultTareas.hasMore,
+        data: mockResultTareas.data,
+      },
     })
     spyGetAxios.mockResolvedValueOnce({
-      data: mockResultTareas2,
+      data: {
+        hasMore: mockResultTareas2.hasMore,
+        data: mockResultTareas2.data,
+      },
     })
   })
 
@@ -116,5 +124,6 @@ describe('cuando el servicio responde correctamente y dice que tiene más tareas
 
   afterEach(() => {
     vi.restoreAllMocks()
+    tareaService.configurePagination(false)
   })
 })
