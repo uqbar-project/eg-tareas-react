@@ -58,7 +58,7 @@ describe('TareaRow', () => {
     })
     test('si falla al cumplir, igualmente actualiza la tarea', async () => {
       const { tareaService } = await import('@/services/tareaService')
-      tareaService.actualizarTarea.mockRejectedValue(
+      vi.mocked(tareaService.actualizarTarea).mockRejectedValue(
         new Error('Error al cumplir')
       )
 
