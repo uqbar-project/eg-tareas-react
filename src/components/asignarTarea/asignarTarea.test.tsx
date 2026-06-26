@@ -289,7 +289,7 @@ function runTests() {
 
     fireEvent.change(select, { target: { value: ' ' } })
     await waitFor(() => {
-      expect(select.value).toBe('Misia Pataca')
+      expect(select.value).toBe(' ')
     })
   })
 

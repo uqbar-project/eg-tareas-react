@@ -37,6 +37,11 @@ export const AsignarTareaComponent = () => {
   })
 
   const asignar = (asignatario: string) => {
+    if (asignatario === ' ') {
+      tarea.desasignar()
+      generarNuevaTarea(tarea)
+      return
+    }
     const asignatarioNuevo = usuarios.find(
       (usuario) => usuario.nombre === asignatario
     )
