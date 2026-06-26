@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { ToastMessage } from 'src/customHooks/useToast'
+import type { ToastMessage } from '@/customHooks/useToast'
 
 interface ToastProps {
   toast: ToastMessage | null

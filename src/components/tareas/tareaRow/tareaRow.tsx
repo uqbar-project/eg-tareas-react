@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { PorcentajeCumplimiento } from 'src/components/porcentajeCumplimiento/porcentajeCumplimiento'
-import { useToast } from 'src/customHooks/useToast'
-import type { Tarea } from 'src/domain/tarea'
-import { tareaService } from 'src/services/tareaService'
-import { type ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
+import { PorcentajeCumplimiento } from '@/components/porcentajeCumplimiento/porcentajeCumplimiento'
+import { useToast } from '@/customHooks/useToast'
+import type { Tarea } from '@/domain/tarea'
+import { tareaService } from '@/services/tareaService'
+import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
 
 export const TareaRow = ({
   tarea,

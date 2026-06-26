@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
-import type { Tarea } from 'src/domain/tarea'
-import { crearTarea } from 'src/testsUtils/crearTarea'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import type { Tarea } from '@/domain/tarea'
+import { crearTarea } from '@/testsUtils/crearTarea'
 import { TareaRow } from './tareaRow'
 
 const mockedNavigate = vi.fn()
@@ -16,7 +16,7 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-vi.mock('src/services/tareaService', () => ({
+vi.mock('@/services/tareaService', () => ({
   tareaService: {
     actualizarTarea: vi.fn(() => Promise.resolve()),
   },

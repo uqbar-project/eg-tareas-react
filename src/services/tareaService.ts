@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { Tarea, type TareaJSON } from 'src/domain/tarea'
+import { Tarea, type TareaJSON } from '@/domain/tarea'
 import {
-  PAGINATION_ENABLED,
+  PAGINATION_CONFIG,
   type PaginationData,
   REST_SERVER_URL,
 } from './constants'
@@ -15,7 +15,7 @@ export interface TareasPaginadas {
 
 class TareaService {
   private async getInternalTareas(paginationData: PaginationData) {
-    if (PAGINATION_ENABLED) {
+    if (PAGINATION_CONFIG.enabled) {
       const tareasJson = await axios.get(
         `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
       )

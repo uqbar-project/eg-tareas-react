@@ -1,4 +1,4 @@
-import type { TareaJSON } from 'src/domain/tarea'
+import type { TareaJSON } from '@/domain/tarea'
 
 export const mockTareaJSON: TareaJSON = {
   id: 159,

@@ -10,8 +10,8 @@ import {
   BrowserRouter as Router,
   Routes,
 } from 'react-router-dom'
-import { tareaService } from 'src/services/tareaService'
-import { type ErrorResponse, getMensajeError } from 'src/utils/errorHandling'
+import { tareaService } from '@/services/tareaService'
+import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
 import { AsignarTareaComponent } from './components/asignarTarea/asignarTarea'
 import { Toast } from './components/common/toast'
 import { TareasComponent } from './components/tareas/tareas'

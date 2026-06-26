@@ -2,7 +2,7 @@ import './tareas.css'
 
 import React from 'react'
 import { useOutletContext } from 'react-router-dom'
-import type { PaginadorContextType } from 'src/routes'
+import type { PaginadorContextType } from '@/routes'
 
 const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 

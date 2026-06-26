@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { mockTareaJSON, mockUsuarios } from 'src/test-utils/mockData'
+import { mockTareaJSON, mockUsuarios } from '@/test-utils/mockData'
 
 vi.mock('axios', () => {
   return {
@@ -16,6 +16,7 @@ import axios from 'axios'
 
 import {
   afterEach,
+  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -38,7 +39,9 @@ const useNavigate = useNavigateRaw as unknown as MockedFunction<
 >
 const { MemoryRouter } = await import('react-router-dom')
 
-describe('tests de asignar tarea', () => {
+import { PAGINATION_CONFIG } from '@/services/constants'
+
+function runTests() {
   const idTareaAsignada = 159
   let spyGetAxios: MockInstance<(typeof axios)['get']>
   let spyPutAxios: MockInstance<(typeof axios)['put']>
@@ -54,18 +57,24 @@ describe('tests de asignar tarea', () => {
     spyGetAxios = vi.spyOn(axios, 'get')
     spyPutAxios = vi.spyOn(axios, 'put')
 
-    spyGetAxios
-      .mockResolvedValueOnce({
-        data: mockUsuarios,
-      })
-      .mockResolvedValueOnce({
-        data: mockTareaJSON,
-      })
-      .mockResolvedValueOnce({
-        data: mockTareaJSON,
-      })
+    spyGetAxios.mockImplementation((url: string) => {
+      if (url.includes('/usuarios')) {
+        return Promise.resolve({ data: mockUsuarios })
+      }
+      if (url.includes('/tareas/')) {
+        return Promise.resolve({ data: mockTareaJSON })
+      }
+      if (url.includes('/tareas')) {
+        return Promise.resolve({
+          data: PAGINATION_CONFIG.enabled
+            ? { hasMore: false, data: [mockTareaJSON] }
+            : [mockTareaJSON],
+        })
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+    })
 
-    const routesModule = await import('src/routes')
+    const routesModule = await import('@/routes')
     TareasRoutes = routesModule.TareasRoutes
   })
 
@@ -209,4 +218,20 @@ describe('tests de asignar tarea', () => {
       expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
   })
+}
+
+describe('tests de asignar tarea con paginador activado', () => {
+  beforeAll(() => {
+    PAGINATION_CONFIG.enabled = true
+  })
+
+  runTests()
+})
+
+describe('tests de asignar tarea con paginador desactivado', () => {
+  beforeAll(() => {
+    PAGINATION_CONFIG.enabled = false
+  })
+
+  runTests()
 })

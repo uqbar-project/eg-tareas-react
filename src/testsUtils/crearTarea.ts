@@ -1,5 +1,5 @@
-import { Tarea } from 'src/domain/tarea'
-import { Usuario } from 'src/domain/usuario'
+import { Tarea } from '@/domain/tarea'
+import { Usuario } from '@/domain/usuario'
 
 export function crearTarea(
   id: number,
