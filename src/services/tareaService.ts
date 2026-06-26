@@ -1,6 +1,10 @@
 import axios from 'axios'
 import { Tarea, type TareaJSON } from 'src/domain/tarea'
-import { type PaginationData, REST_SERVER_URL } from './constants'
+import {
+  PAGINATION_ENABLED,
+  type PaginationData,
+  REST_SERVER_URL,
+} from './constants'
 
 const tareaAsJson = (tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON)
 
@@ -9,15 +13,9 @@ export interface TareasPaginadas {
   tareas: Tarea[]
 }
 
-let pagination = false
-
 class TareaService {
-  configurePagination(enabled: boolean) {
-    pagination = enabled
-  }
-  
   private async getInternalTareas(paginationData: PaginationData) {
-    if (pagination) {
+    if (PAGINATION_ENABLED) {
       const tareasJson = await axios.get(
         `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
       )

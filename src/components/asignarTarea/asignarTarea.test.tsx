@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { mockTareaJSON, mockUsuarios } from 'src/test-utils/mockData'
 
 vi.mock('axios', () => {
   return {
@@ -32,7 +33,6 @@ vi.mock('react-router-dom', async () => {
   }
 })
 const { useNavigate: useNavigateRaw } = await import('react-router-dom')
-// Es bastante tricky pero así tipamos el useNavigate que queremos mockear
 const useNavigate = useNavigateRaw as unknown as MockedFunction<
   () => ReturnType<typeof vi.fn>
 >
@@ -56,28 +56,13 @@ describe('tests de asignar tarea', () => {
 
     spyGetAxios
       .mockResolvedValueOnce({
-        data: [
-          { id: 1, nombre: 'Margarito Tereré' },
-          { id: 2, nombre: 'Misia Pataca' },
-        ],
+        data: mockUsuarios,
       })
       .mockResolvedValueOnce({
-        data: {
-          id: idTareaAsignada,
-          descripcion: 'Ejemplo',
-          iteracion: '',
-          asignadoA: 'Margarito Tereré',
-          porcentajeCumplimiento: 0,
-        },
+        data: mockTareaJSON,
       })
       .mockResolvedValueOnce({
-        data: {
-          id: idTareaAsignada,
-          descripcion: 'Ejemplo',
-          iteracion: '',
-          asignadoA: 'Margarito Tereré',
-          porcentajeCumplimiento: 0,
-        },
+        data: mockTareaJSON,
       })
 
     const routesModule = await import('src/routes')
