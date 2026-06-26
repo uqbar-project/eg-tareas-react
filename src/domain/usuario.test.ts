@@ -8,6 +8,23 @@ describe('tests de usuario', () => {
     expect(usuario1).toEqual(usuario2)
   })
 
+  test('equals con null devuelve false', () => {
+    const usuario = new Usuario('pepe')
+    expect(usuario.equals(null as unknown as Usuario)).toBeFalsy()
+  })
+
+  test('equals con nombres diferentes devuelve false', () => {
+    const usuario = new Usuario('pepe')
+    const otro = new Usuario('juan')
+    expect(usuario.equals(otro)).toBeFalsy()
+  })
+
+  test('equals con el mismo nombre devuelve true', () => {
+    const usuario = new Usuario('pepe')
+    const otro = new Usuario('pepe')
+    expect(usuario.equals(otro)).toBeTruthy()
+  })
+
   test('al convertir de JSON se obtiene un usuario con dicho nombre', () => {
     const usuario = Usuario.fromJSON('pepe')
     expect(usuario).toEqual(new Usuario('pepe'))

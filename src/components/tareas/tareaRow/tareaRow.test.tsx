@@ -56,6 +56,23 @@ describe('TareaRow', () => {
       })
       expect(mockActualizar).toHaveBeenCalled()
     })
+    test('si falla al cumplir, igualmente actualiza la tarea', async () => {
+      const { tareaService } = await import('@/services/tareaService')
+      tareaService.actualizarTarea.mockRejectedValue(
+        new Error('Error al cumplir')
+      )
+
+      const mockActualizar = vi.fn()
+      render(
+        <BrowserRouter>
+          <TareaRow tarea={tareaAsignada} actualizar={mockActualizar} />
+        </BrowserRouter>
+      )
+      await waitFor(() => {
+        screen.getByTestId('cumplir_159').click()
+      })
+      expect(mockActualizar).toHaveBeenCalled()
+    })
     test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
       tareaAsignada.cumplir()
       render(

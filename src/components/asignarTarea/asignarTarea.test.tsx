@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockTareaJSON, mockUsuarios } from '@/test-utils/mockData'
 
@@ -37,9 +37,13 @@ const { useNavigate: useNavigateRaw } = await import('react-router-dom')
 const useNavigate = useNavigateRaw as unknown as MockedFunction<
   () => ReturnType<typeof vi.fn>
 >
-const { MemoryRouter } = await import('react-router-dom')
+const { MemoryRouter, Routes, Route } = await import('react-router-dom')
 
 import { PAGINATION_CONFIG } from '@/services/constants'
+
+const { AsignarTareaComponent } = await import(
+  '@/components/asignarTarea/asignarTarea'
+)
 
 function runTests() {
   const idTareaAsignada = 159
@@ -47,6 +51,7 @@ function runTests() {
   let spyPutAxios: MockInstance<(typeof axios)['put']>
   let mockNavigate: ReturnType<typeof vi.fn>
   let TareasRoutes: React.ComponentType
+  let PaginadorLayout: React.ComponentType
 
   beforeEach(async () => {
     vi.clearAllMocks()
@@ -76,6 +81,7 @@ function runTests() {
 
     const routesModule = await import('@/routes')
     TareasRoutes = routesModule.TareasRoutes
+    PaginadorLayout = routesModule.PaginadorLayout
   })
 
   afterEach(() => {
@@ -216,6 +222,141 @@ function runTests() {
       expect(spyPutAxios.mock.calls.length).toBe(0)
       expect(mockNavigate).toHaveBeenCalledWith(-1)
       expect(mockNavigate).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  test('cuando no hay id en la url, solo carga usuarios', async () => {
+    render(
+      <MemoryRouter initialEntries={['/asignarTarea']}>
+        <Routes>
+          <Route path="/" element={<PaginadorLayout />}>
+            <Route path="/asignarTarea" element={<AsignarTareaComponent />} />
+            <Route
+              path="/asignarTarea/:id"
+              element={<AsignarTareaComponent />}
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(spyGetAxios.mock.calls[0][0]).toContain('/usuarios')
+    })
+    expect(spyGetAxios).toHaveBeenCalledTimes(2)
+  })
+
+  test('al fallar la carga inicial se muestra toast de error', async () => {
+    spyGetAxios.mockReset()
+    spyGetAxios.mockRejectedValue(new Error('Error de red'))
+
+    render(
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
+        <TareasRoutes />
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Error de red').length).toBeGreaterThanOrEqual(
+        1
+      )
+    })
+  })
+
+  test('al seleccionar Sin Asignar, no se encuentra asignatario', async () => {
+    render(
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
+        <TareasRoutes />
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      const select = screen.getByTestId('asignatario') as HTMLSelectElement
+      expect(select.value).toBe('Margarito Tereré')
+    })
+
+    const select = screen.getByTestId('asignatario') as HTMLSelectElement
+    userEvent.selectOptions(select, 'Misia Pataca')
+    await waitFor(() => {
+      expect(select.value).toBe('Misia Pataca')
+    })
+
+    fireEvent.change(select, { target: { value: ' ' } })
+    await waitFor(() => {
+      expect(select.value).toBe('Misia Pataca')
+    })
+  })
+
+  test('al fallar la actualizacion se muestra toast de error', async () => {
+    spyPutAxios.mockRejectedValue(new Error('Error al actualizar'))
+
+    render(
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
+        <TareasRoutes />
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(spyGetAxios.mock.calls.length).toBeGreaterThanOrEqual(1)
+    })
+
+    const buttonAceptar = screen.getByTestId('aceptar')
+    userEvent.click(buttonAceptar)
+
+    await waitFor(() => {
+      expect(screen.getByText('Error al actualizar')).toBeTruthy()
+    })
+  })
+
+  test('cuando la tarea no está en la lista local se muestra toast', async () => {
+    spyPutAxios.mockReset()
+    spyGetAxios.mockReset()
+    spyGetAxios.mockImplementation((url: string) => {
+      if (url.includes('/usuarios')) {
+        return Promise.resolve({ data: mockUsuarios })
+      }
+      if (url.includes('/tareas/')) {
+        return Promise.resolve({ data: mockTareaJSON })
+      }
+      if (url.includes('/tareas')) {
+        return Promise.resolve({
+          data: PAGINATION_CONFIG.enabled
+            ? { hasMore: false, data: [{ ...mockTareaJSON, id: 68 }] }
+            : [{ ...mockTareaJSON, id: 68 }],
+        })
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+    })
+
+    render(
+      <MemoryRouter
+        initialEntries={[`/asignarTarea/${idTareaAsignada}`]}
+        initialIndex={0}
+      >
+        <TareasRoutes />
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(spyGetAxios.mock.calls.length).toBeGreaterThanOrEqual(1)
+    })
+
+    const buttonAceptar = screen.getByTestId('aceptar')
+    userEvent.click(buttonAceptar)
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Tarea no encontrada. Recargue la página.')
+      ).toBeTruthy()
     })
   })
 }

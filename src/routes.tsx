@@ -68,6 +68,7 @@ export const PaginadorLayout = () => {
       (tareaSearch: Tarea) => tareaSearch.id === tareaActualizada.id
     )
     if (indexTarea < 0) {
+      showToast('Tarea no encontrada. Recargue la página.', 'error')
       return
     }
     nuevasTareas[indexTarea] = tareaActualizada

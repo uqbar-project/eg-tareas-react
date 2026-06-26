@@ -10,7 +10,7 @@ import {
   test,
   vi,
 } from 'vitest'
-import { TareasRoutes } from '@/routes'
+import { TareasRouter, TareasRoutes } from '@/routes'
 import { PAGINATION_CONFIG } from '@/services/constants'
 
 vi.mock('axios')
@@ -78,6 +78,13 @@ describe('TareasComponent con paginador activado', () => {
       await waitFor(() => {
         expect(screen.getByTestId('tarea_159')).toBeTruthy()
         expect(screen.getByTestId('tarea_68')).toBeTruthy()
+      })
+    })
+
+    test('TareasRouter renderiza sin errores', async () => {
+      render(<TareasRouter />)
+      await waitFor(() => {
+        expect(screen.getByTestId('tarea_159')).toBeTruthy()
       })
     })
 

@@ -47,7 +47,7 @@ export const PorcentajeCumplimiento = ({
       data-testid={backgroundTestId}
       role="progressbar"
       aria-label={`Porcentaje de cumplimiento: ${porcentaje}%`}
-      aria-valuenow={porcentaje || 0}
+      aria-valuenow={porcentaje}
       aria-valuemin={0}
       aria-valuemax={100}
       style={{
@@ -60,7 +60,7 @@ export const PorcentajeCumplimiento = ({
         margin: 'auto',
       }}
     >
-      {porcentaje || 0}%
+      {porcentaje}%
     </div>
   )
 }

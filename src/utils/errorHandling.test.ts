@@ -46,4 +46,32 @@ describe('error handling tests', () => {
       'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema'
     )
   })
+
+  test('should handle non-Error objects', () => {
+    const errorMessage = getMensajeError('some string error')
+    expect(errorMessage).toBe(
+      'Ocurrió un error. Consulte al administrador del sistema'
+    )
+  })
+
+  test('should return default message for AxiosError without response', () => {
+    const error = new AxiosError('Error', 'ERR_BAD_REQUEST')
+    const errorMessage = getMensajeError(error)
+    expect(errorMessage).toBe(
+      'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema'
+    )
+  })
+
+  test('should return error message for 4xx without backend message', () => {
+    const error = new AxiosError(
+      'Custom error message',
+      'ERR_BAD_REQUEST',
+      undefined,
+      undefined,
+      { status: 400, data: {} } as unknown as AxiosResponse
+    )
+    error.status = 400
+    const errorMessage = getMensajeError(error)
+    expect(errorMessage).toBe('Custom error message')
+  })
 })
