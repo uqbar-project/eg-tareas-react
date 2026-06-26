@@ -20,7 +20,13 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       provider: 'v8',
-      exclude: ['./src/main.tsx', '**/*.cjs', '**/*.d.ts', '**/*.css', 'vite.config.ts'],
+      exclude: [
+        './src/main.tsx',
+        '**/*.cjs',
+        '**/*.d.ts',
+        '**/*.css',
+        'vite.config.ts',
+      ],
       reporter: ['lcov', 'json', 'html', 'json-summary', 'text'],
     },
   },
