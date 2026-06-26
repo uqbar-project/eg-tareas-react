@@ -1,7 +1,5 @@
 export class Usuario {
-
-  constructor(public nombre = '') {
-  }
+  constructor(public nombre = '') {}
 
   // Lo necesitamos para mostrar el valor seleccionado en el combo
   equals(otroUsuario: Usuario) {
@@ -11,5 +9,4 @@ export class Usuario {
   static fromJSON(nombre: string) {
     return new Usuario(nombre)
   }
-
 }

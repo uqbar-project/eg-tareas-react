@@ -1,14 +1,16 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import path from 'node:path'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, 'src'),
       src: '/src',
       components: '/src/components',
     },
@@ -17,8 +19,15 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     coverage: {
-      reporter: ['lcov', 'json', 'html', 'text', 'json-summary'],
-      exclude: [ './src/App.tsx', 'eslint.config.js', './src/main.tsx', '**/*.cjs', '**/*.d.ts', 'vite.config.ts' ],      
+      provider: 'v8',
+      exclude: [
+        './src/main.tsx',
+        '**/*.cjs',
+        '**/*.d.ts',
+        '**/*.css',
+        'vite.config.ts',
+      ],
+      reporter: ['lcov', 'json', 'html', 'json-summary', 'text'],
     },
-  }
+  },
 })

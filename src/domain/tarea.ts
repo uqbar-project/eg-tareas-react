@@ -5,11 +5,19 @@ const PORCENTAJE_CUMPLIDA = 100
 export class Tarea {
   id = 0
 
-  constructor(public descripcion = '', public iteracion = '', public asignatario: Usuario | null = null, public fecha = '10/10/2015', public porcentajeCumplimiento = 0) {
-  }
+  constructor(
+    public descripcion = '',
+    public iteracion = '',
+    public asignatario: Usuario | null = null,
+    public fecha = '10/10/2015',
+    public porcentajeCumplimiento = 0
+  ) {}
 
-  contiene(palabra: string) {
-    return this.descripcion.includes(palabra) || this.asignatario?.nombre?.includes(palabra)
+  contiene(palabra: string): boolean {
+    return (
+      this.descripcion.includes(palabra) ||
+      (this.asignatario?.nombre?.includes(palabra) ?? false)
+    )
   }
 
   cumplio(porcentaje: number) {
@@ -53,10 +61,11 @@ export class Tarea {
   }
 
   static fromJson(tareaJSON: TareaJSON): Tarea {
-    const result = Object.assign(new Tarea(),
-      tareaJSON,
-      { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : null }
-    )
+    const result = Object.assign(new Tarea(), tareaJSON, {
+      asignatario: tareaJSON.asignadoA
+        ? Usuario.fromJSON(tareaJSON.asignadoA)
+        : null,
+    })
     // eliminamos el dato de JSON
     delete result.asignadoA
     return result

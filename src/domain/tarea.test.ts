@@ -104,6 +104,13 @@ describe('tests de tarea', () => {
     expect(tareaJson.fecha).toBe('10/10/2015')
   })
 
+  test('contiene palabra sin asignatario', () => {
+    const tarea = new Tarea()
+    tarea.descripcion = 'Hacer la tarea'
+    expect(tarea.contiene('Hacer')).toBeTruthy()
+    expect(tarea.contiene('otra')).toBeFalsy()
+  })
+
   test('conversión desde JSON trae el nombre del asignatario', () => {
     const tarea = Tarea.fromJson({
       id: 1,
@@ -111,15 +118,29 @@ describe('tests de tarea', () => {
       fecha: '10/07/2024',
       porcentajeCumplimiento: 20,
       asignadoA: persona.nombre,
-      iteracion: 'Sprint 3'
+      iteracion: 'Sprint 3',
     })
     expect(tarea.nombreAsignatario).toBe(persona.nombre)
     expect(tarea.porcentajeCumplimiento).toBe(20)
     expect(tarea.iteracion).toBe('Sprint 3')
   })
+
+  test('conversión desde JSON sin asignatario', () => {
+    const tarea = Tarea.fromJson({
+      id: 2,
+      descripcion: 'Sin asignar',
+      fecha: '10/07/2024',
+      porcentajeCumplimiento: 0,
+      iteracion: '',
+    })
+    expect(tarea.nombreAsignatario).toBeUndefined()
+    expect(tarea.asignatario).toBeNull()
+  })
   test('una tarea sin asignatario no es válida', () => {
     const tarea = new Tarea()
-    expect(() => { tarea.validarAsignacion() }).toThrowError()
+    expect(() => {
+      tarea.validarAsignacion()
+    }).toThrow()
   })
 
   test('una tarea con asignatario es válida', () => {
@@ -131,6 +152,8 @@ describe('tests de tarea', () => {
       asignadoA: persona.nombre,
       iteracion: 'Sprint 3',
     })
-    expect(() => { tarea.validarAsignacion() }).not.toThrowError()
+    expect(() => {
+      tarea.validarAsignacion()
+    }).not.toThrow()
   })
 })

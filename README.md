@@ -78,7 +78,7 @@ traerTareas() {
 
 El componente `TareaRow` captura el evento del botón:
 
-```js
+```ts
 export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
 
   const cumplirButton = tarea.sePuedeCumplir() &&
@@ -113,10 +113,10 @@ tareas.map((tarea) =>
   <TareaRow
     tarea={tarea}
     key={tarea.id}
-    actualizar={traerTareas} />)
+    actualizar={actualizarTarea} />)
 ```
 
-El método traerTareas ya lo hemos visto, es el que se dispara inicialmente en el componente principal.
+El método actualizarTarea ya lo hemos visto, es el que se dispara inicialmente en el componente principal.
 
 Por su parte, el método actualizarTarea del service dispara el pedido PUT al backend, pasando como body la conversión de nuestro objeto de dominio Tarea a JSON:
 
@@ -300,7 +300,7 @@ El lector puede ver la implementación en el archivo [tareaRow.test.tsx](./src/c
 test('si su porcentaje de cumplimiento está completo NO se puede asignar', () => {
   tareaAsignada.cumplir()
   render(<BrowserRouter><TareaRow tarea={tareaAsignada} actualizar={() => { }} /></BrowserRouter>)
-  expect(screen.queryByTestId('cumplir_' + tareaAsignada.id)).toBeNull()
+  expect(screen.queryByTestId(`cumplir_${tareaAsignada.id}`)).toBeNull()
 })
 ```
 
@@ -329,7 +329,7 @@ test('y se clickea el boton de asignacion, nos redirige a la ruta de asignacion 
     </BrowserRouter>
   )
 
-  await userEvent.click(screen.getByTestId('asignar_' + tareaAsignada.id))
+  await userEvent.click(screen.getByTestId(`asignar_${tareaAsignada.id}`))
   expect(mockedNavigate).toBeCalledWith(`/asignarTarea/${tareaAsignada.id}`)
 })
 ```
@@ -402,6 +402,13 @@ Cambiamos nuestro backend a [este ejemplo que está hecho en Node](https://githu
 
 Si no le pasamos el valor para el parámetro límite, nos devuelve la lista completa de 450 tareas. Bastante, no?
 
+Cambiamos también nuestra configuración en el archivo `.env` para aceptar paginación:
+
+```bash
+VITE_API_URL=http://localhost:9000
+VITE_PAGINATION_ENABLED=true         # cambiamos de false a true
+```
+
 ## Analizando la performance
 
 ### Lighthouse - Navigation
@@ -434,10 +441,14 @@ lo que nos está diciendo
 ```html
 <tr data-testid="tarea_7835554726608137">
   <td>Acer acquiro nesciunt appello corona.</td>
-  <td id="fecha">31/10/2025</td>
-  <td id="asignatario"></td>
+  <td>31/10/2025</td>
+  <td></td>
   <td><div data-testid="alto" style="...">81%</div></td>
-  <td><img class="icon" title="Asignar tarea" data-testid="asignar_7835554726608137" aria-label="Asignar" src="/assign.png"></td>
+  <td>
+    <button type="button" title="Asignar tarea" data-testid="asignar_7835554726608137" aria-label="Asignar tarea: Acer acquiro nesciunt appello corona." class="icon-button">
+      <img class="icon" src="/assignOk.png" alt="">
+    </button>
+  </td>
 </tr>
 ```
 
@@ -512,6 +523,31 @@ Inicialmente traeremos la primera página
 
   useOnInit(traerTareas)
 ```
+
+### Optimización con useCallback
+
+Para evitar que las funciones se recreen en cada render y causen múltiples llamadas al backend, utilizamos `useCallback` para memoizarlas:
+
+```tsx
+import { useCallback } from 'react'
+
+const getTareas = useCallback(async (newPage: number, init = false) => {
+  try {
+    const { tareas, hasMore } = await tareaService.getTareas({ page: newPage, limit: pageSize })
+    setHasMore(hasMore)
+    setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
+  } catch (error: unknown) {
+    const errorMessage = getMensajeError(error as ErrorResponse)
+    showToast(errorMessage, 'error')
+  }
+}, [showToast])
+
+const traerTareas = useCallback(async () => {
+  getTareas(page, true)
+}, [page, getTareas])
+```
+
+Esto asegura que `getTareas` solo se recrete cuando `showToast` cambia, y `traerTareas` solo cuando `page` o `getTareas` cambian, evitando llamadas innecesarias al backend.
 
 Eso asigna la **primera lista** de tareas en el setTareas, por eso el condicional va por la lista vacía.
 
@@ -658,7 +694,7 @@ Y ahora desde el componente principal vamos a pasarle a cada TareaRow una funci�
 ```tsx
   const actualizarTarea = async (tareaActualizada: Tarea) => {
     const nuevasTareas = [...tareas]
-    const indexTarea = nuevasTareas.findIndex((tareaSearch: Tarea) => tareaSearch.id == tareaActualizada.id)
+    const indexTarea = nuevasTareas.findIndex((tareaSearch: Tarea) => tareaSearch.id === tareaActualizada.id)
     nuevasTareas[indexTarea] = tareaActualizada
     setTareas(nuevasTareas)
   }

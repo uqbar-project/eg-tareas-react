@@ -4,9 +4,9 @@ import { TareasRouter } from './routes'
 
 const App = () => {
   return (
-      <div className="App">
-        <TareasRouter />
-      </div>
+    <div className="App">
+      <TareasRouter />
+    </div>
   )
 }
 
