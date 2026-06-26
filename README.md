@@ -402,6 +402,13 @@ Cambiamos nuestro backend a [este ejemplo que está hecho en Node](https://githu
 
 Si no le pasamos el valor para el parámetro límite, nos devuelve la lista completa de 450 tareas. Bastante, no?
 
+Cambiamos también nuestra configuración en el archivo `.env` para aceptar paginación:
+
+```bash
+VITE_API_URL=http://localhost:9000
+VITE_PAGINATION_ENABLED=true         # cambiamos de false a true
+```
+
 ## Analizando la performance
 
 ### Lighthouse - Navigation
