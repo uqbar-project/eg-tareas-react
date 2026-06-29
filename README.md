@@ -3,7 +3,7 @@
 
 [![Build React App](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-react/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-tareas-react/graph/badge.svg?token=hVIcjudvLa)](https://codecov.io/gh/uqbar-project/eg-tareas-react)
 
-![video](video/demo2025-1.gif)
+![video](video/demo2026.gif)
 
 El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, cumplir o modificar la descripción de una tarea.
 
