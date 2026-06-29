@@ -33,7 +33,7 @@ A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
 ```ts
   const traerTareas = async () => {
     try {
-      const tareas = await tareaService.allInstances()
+      const { tareas } = await tareaService.getTareas({ page: 1, limit: 10 })
       setTareas(tareas)
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)
@@ -46,14 +46,16 @@ A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
 
 Definimos la función aparte para poder usarla como prop a nuestro componente hijo.
 
-El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea y ordenándolas por descripción:
+El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea:
 
 ```ts
 class TareaService {
-  async allInstances() {
-    const tareasJson = await axios.get(`${REST_SERVER_URL}/tareas`)
-    const tareas = tareasJson.data.map((tareaJson) => Tarea.fromJson(tareaJson)) // o ... this.tareaAsJson
-    return tareas.sort((a, b) => a.descripcion < b.descripcion ? -1 : 1)
+  async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
+    const tareasResult = await this.getInternalTareas(paginationData)
+    const tareas = tareasResult.data.map((tareaJson: TareaJSON) =>
+      Tarea.fromJson(tareaJson)
+    )
+    return { tareas, hasMore: tareasResult.hasMore }
   }
 ```
 
@@ -79,10 +81,13 @@ traerTareas() {
 El componente `TareaRow` captura el evento del botón:
 
 ```ts
-export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () => void }) => {
+export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: (tarea: Tarea) => void }) => {
 
-  const cumplirButton = tarea.sePuedeCumplir() &&
-    <img className="icon" src="/finish.png" title="Cumplir tarea" data-testid={`cumplir_${tarea.id}`} aria-label="Cumplir" onClick={cumplirTarea} />
+  const cumplirButton = tarea.sePuedeCumplir() && (
+    <button type="button" onClick={cumplirTarea} className="icon-button">
+      <img height="36" width="36" className="icon" src="/finishOk.png" alt="" />
+    </button>
+  )
 
 ```
 
@@ -100,7 +105,7 @@ En el método del componente delegamos el cumplimiento al objeto de dominio Tare
       showToast(errorMessage, 'error')
     } finally {
       // viene como props
-      await actualizar()
+      await actualizar(tarea)
     }
   }
 ```
@@ -149,8 +154,12 @@ A su vez, en el archivo `routes.js` definimos que el path `/asignarTarea/:id` se
 ```ts
 export const TareasRoutes = () =>
     <Routes>
+      <Route path="/" element={<PaginadorLayout />}>
         <Route path="/" element={<TareasComponent />} />
         <Route path="/asignarTarea/:id" element={<AsignarTareaComponent />} />
+        <Route path="/crearTarea" element={<CrearTareaComponent />} />
+        <Route path="/eliminarTarea/:id" element={<EliminarTareaComponent />} />
+      </Route>
     </Routes>
 
 export const TareasRouter = () =>
@@ -208,8 +217,16 @@ El método asignar recibe el nombre del nuevo asignatario (podríamos recibir el
 
 ```ts
   const asignar = (asignatario: string) => {
+    if (asignatario === ' ') {
+      tarea.desasignar()
+      generarNuevaTarea(tarea)
+      return
+    }
     const asignatarioNuevo = usuarios.find((usuario) => usuario.nombre === asignatario)
-    tarea.asignarA(asignatarioNuevo!)
+    if (!asignatarioNuevo) {
+      return
+    }
+    tarea.asignarA(asignatarioNuevo)
     generarNuevaTarea(tarea)
   }
 
@@ -253,7 +270,7 @@ Veamos el código que muestra la lista de tareas:
       <TareaRow
         tarea={tarea}
         key={tarea.id}
-        actualizar={traerTareas} />)
+        actualizar={actualizarTarea} />)
   }
 </tbody>
 ```
@@ -269,7 +286,7 @@ Si eliminamos la línea que genera la key, el Linter de React nos muestra un men
       <TareaRow
         tarea={tarea}
         key={1}
-        actualizar={traerTareas} />)
+        actualizar={actualizarTarea} />)
   }
 </tbody>
 ```
@@ -613,7 +630,7 @@ Por lo que vemos, estamos en el umbral de lo "bueno", sin embargo fíjense que l
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tareas React</title>
   </head>
@@ -635,11 +652,11 @@ Pasamos a esta versión donde
     <link 
       rel="preload" 
       as="style" 
-      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@400;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
     >
     <link 
       rel="stylesheet" 
-      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@400;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       media="print" 
       onload="this.media='all'"
     >
