@@ -44,6 +44,14 @@ class TareaService {
   actualizarTarea(tarea: Tarea) {
     return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
   }
+
+  crearTarea(tarea: Tarea) {
+    return axios.post(`${REST_SERVER_URL}/tareas`, tarea.toJSON())
+  }
+
+  eliminarTarea(id: number) {
+    return axios.delete(`${REST_SERVER_URL}/tareas/${id}`)
+  }
 }
 
 export const tareaService = new TareaService()

@@ -196,7 +196,6 @@ function runTests() {
         'http://localhost:9000/tareas/159',
         {
           asignadoA: 'Misia Pataca',
-          asignatario: null,
           descripcion: 'Ejemplo',
           fecha: '10/10/2015',
           id: 159,

@@ -34,6 +34,10 @@ export const TareaRow = ({
     navigate(`/asignarTarea/${tarea.id}`)
   }
 
+  const goToEliminarTarea = () => {
+    navigate(`/eliminarTarea/${tarea.id}`)
+  }
+
   const cumplirButton = tarea.sePuedeCumplir() && (
     <button
       type="button"
@@ -60,10 +64,23 @@ export const TareaRow = ({
     </button>
   )
 
+  const deleteButton = (
+    <button
+      type="button"
+      onClick={goToEliminarTarea}
+      data-testid={`eliminar_${tarea.id}`}
+      aria-label={`Eliminar tarea: ${tarea.descripcion}`}
+      title="Eliminar tarea"
+      className="icon-button"
+    >
+      <img height="36" width="36" className="icon" src="/delete.png" alt="" />
+    </button>
+  )
+
   return (
     <tr key={tarea.id} data-testid={`tarea_${tarea.id}`}>
       <td>{tarea.descripcion}</td>
-      <td>{tarea.fecha}</td>
+      <td>{tarea.fechaFormateada}</td>
       <td>{tarea.nombreAsignatario}</td>
       <td
         aria-label={`Porcentaje de cumplimiento: ${tarea.porcentajeCumplimiento}%`}
@@ -73,6 +90,7 @@ export const TareaRow = ({
       <td aria-label="Acciones disponibles">
         {cumplirButton}
         {asignarButton}
+        {deleteButton}
       </td>
     </tr>
   )

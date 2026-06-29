@@ -1,24 +1,36 @@
 import './tareas.css'
 
 import React from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import type { PaginadorContextType } from '@/routes'
 
 const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 
 export const TareasComponent = () => {
+  const navigate = useNavigate()
   const { tareas, hasMore, traerMasTareas, actualizarTarea } =
     useOutletContext<PaginadorContextType>()
+
+  const goToCrearTarea = () => {
+    navigate('/crearTarea')
+  }
 
   return (
     <div className="container">
       <br />
       <h2 className="title">Tareas a realizar</h2>
+      <div className="nuevaTareaWrapper">
+        <button
+          type="button"
+          className="primary"
+          data-testid="nueva_tarea"
+          onClick={goToCrearTarea}
+          aria-label="Crear nueva tarea"
+        >
+          Nueva tarea
+        </button>
+      </div>
       <table aria-label="Lista de tareas a realizar">
-        <caption>
-          Tabla de tareas con descripción, fecha, asignatario, porcentaje de
-          cumplimiento y acciones disponibles
-        </caption>
         <thead>
           <tr>
             <th scope="col">Tarea</th>
@@ -52,13 +64,28 @@ export const TareasComponent = () => {
           }
         >
           <tbody data-testid="resultados">
-            {tareas.map((tarea) => (
-              <TareaRow
-                tarea={tarea}
-                key={tarea.id}
-                actualizar={actualizarTarea}
-              />
-            ))}
+            {tareas.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    textAlign: 'center',
+                    padding: '3rem 1rem',
+                    color: 'var(--color-text-disabled)',
+                  }}
+                >
+                  No hay tareas. Creá una nueva para empezar.
+                </td>
+              </tr>
+            ) : (
+              tareas.map((tarea) => (
+                <TareaRow
+                  tarea={tarea}
+                  key={tarea.id}
+                  actualizar={actualizarTarea}
+                />
+              ))
+            )}
           </tbody>
         </React.Suspense>
       </table>

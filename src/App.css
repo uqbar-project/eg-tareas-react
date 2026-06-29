@@ -1,5 +1,5 @@
 * {
-  font-family: Nunito, sans-serif;
+  font-family: Inter, sans-serif;
   box-sizing: border-box;
 }
 
@@ -10,41 +10,64 @@
   --color-primary-dark: #1565c0;
 
   /* Colores secundarios */
-  --color-secondary: #cae9ff;
-  --color-secondary-light: #cae9ff;
-  --color-secondary-dark: #cae9ff;
+  --color-secondary: #e3f2fd;
+  --color-secondary-light: #bbdefb;
+  --color-secondary-dark: #90caf9;
 
   /* Fondos y superficies */
   --color-background: #ffffff;
-  --color-surface: #f5f5f5;
-  --color-surface-variant: #e0e0e0;
+  --color-surface: #f8f9fa;
+  --color-surface-variant: #e9ecef;
 
   /* Textos */
-  --color-text-primary: black;
-  --color-text-secondary: black;
-  --color-text-disabled: #bdbdbd;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #495057;
+  --color-text-disabled: #adb5bd;
 
   /* Textos para botones */
   --color-text-button-primary: white;
-  --color-text-button-secondary: black;
-  --color-text-button-disabled: #bdbdbd;
+  --color-text-button-secondary: #1a1a1a;
+  --color-text-button-disabled: #adb5bd;
 
   /* Estados especiales */
-  --background-color-error: #5fa8d3;
-  --background-color-success: #cae9ff;
-  --background-color-warning: #62b6cb;
+  --background-color-error: #ef5350;
+  --background-color-success: #4caf50;
+  --background-color-warning: #ff8f00;
 
   --color-text-error: white;
-  --color-text-success: black;
-  --color-text-warning: black;
+  --color-text-success: white;
+  --color-text-warning: #1a1a1a;
 
-  /* Sombras y bordes (opcional, pero útil para paleta completa) */
-  --color-shadow: rgba(0, 0, 0, 0.1);
-  --color-border: #e0e0e0;
+  /* Sombras y bordes */
+  --color-shadow: rgba(0, 0, 0, 0.08);
+  --color-border: #dee2e6;
 }
 
-.MuiTableContainer-root {
-  width: 100vw;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #42a5f5;
+    --color-primary-light: #64b5f6;
+    --color-primary-dark: #1e88e5;
+
+    --color-secondary: #1a2a3a;
+    --color-secondary-light: #1e3a4a;
+    --color-secondary-dark: #1565c0;
+
+    --color-background: #1a1a1a;
+    --color-surface: #2d2d2d;
+    --color-surface-variant: #3d3d3d;
+
+    --color-text-primary: #e0e0e0;
+    --color-text-secondary: #a0a0a0;
+    --color-text-disabled: #666666;
+
+    --color-text-button-primary: #ffffff;
+    --color-text-button-secondary: #e0e0e0;
+    --color-text-button-disabled: #555555;
+
+    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-border: #404040;
+  }
 }
 
 .title {
@@ -94,8 +117,29 @@
   }
 }
 
-input {
-  width: 40rem;
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 .icon {
@@ -127,32 +171,38 @@ input {
   transform: scale(0.95);
 }
 
-input,
-select {
-  height: 2rem;
-  padding: 0.2rem;
-  line-height: 1.2rem;
-}
-
 .fieldLabel {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .botonera {
-  width: 100%;
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 2rem 0;
 }
 
 .primary {
   background-color: var(--color-primary);
   color: var(--color-text-button-primary);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 8px;
 }
 
 .secondary {
-  background-color: var(--color-secondary);
-  color: var(--color-text-button-secondary);
+  background-color: var(--color-surface-variant);
+  color: var(--color-text-primary);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-radius: 8px;
 }
 
 .container {
@@ -160,6 +210,50 @@ select {
   color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  padding: 0 1rem;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: var(--color-text-button-primary);
+  box-shadow: 0 2px 8px var(--color-shadow);
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.headerLink {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.375rem 0;
+  transition: box-shadow 0.2s;
+  box-shadow: inset 0 0 0 transparent;
+}
+
+.headerLink:hover {
+  color: #ffffff;
+  box-shadow: inset 0 -2px 0 #ffffff;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 0;
 }

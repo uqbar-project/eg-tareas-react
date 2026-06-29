@@ -9,7 +9,7 @@ export class Tarea {
     public descripcion = '',
     public iteracion = '',
     public asignatario: Usuario | null = null,
-    public fecha = '10/10/2015',
+    public fecha = new Date().toLocaleDateString('en-CA'),
     public porcentajeCumplimiento = 0
   ) {}
 
@@ -60,13 +60,29 @@ export class Tarea {
     return !!this.asignatario
   }
 
+  private static formatearFechaAInput(fecha: string): string {
+    if (!fecha) {
+      return fecha
+    }
+    const [dia, mes, anio] = fecha.split('/')
+    return `${anio}-${mes}-${dia}`
+  }
+
+  private static formatearFechaABackend(fecha: string): string {
+    if (!fecha) {
+      return fecha
+    }
+    const [anio, mes, dia] = fecha.split('-')
+    return `${dia}/${mes}/${anio}`
+  }
+
   static fromJson(tareaJSON: TareaJSON): Tarea {
     const result = Object.assign(new Tarea(), tareaJSON, {
       asignatario: tareaJSON.asignadoA
         ? Usuario.fromJSON(tareaJSON.asignadoA)
         : null,
     })
-    // eliminamos el dato de JSON
+    result.fecha = Tarea.formatearFechaAInput(result.fecha)
     delete result.asignadoA
     return result
   }
@@ -75,10 +91,17 @@ export class Tarea {
     return this.asignatario?.nombre
   }
 
+  get fechaFormateada() {
+    return this.fecha.split('-').reverse().join('/')
+  }
+
   toJSON(): TareaJSON {
     return {
-      ...this,
-      asignatario: null, // o podríamos pisarlo
+      ...(this.id ? { id: this.id } : {}),
+      descripcion: this.descripcion,
+      iteracion: this.iteracion,
+      porcentajeCumplimiento: this.porcentajeCumplimiento,
+      fecha: Tarea.formatearFechaABackend(this.fecha),
       asignadoA: this.nombreAsignatario,
     }
   }
@@ -97,7 +120,7 @@ class UserException extends Error {
 }
 
 export type TareaJSON = {
-  id: number
+  id?: number
   descripcion: string
   iteracion: string
   porcentajeCumplimiento: number

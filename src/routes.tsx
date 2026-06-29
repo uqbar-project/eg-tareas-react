@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react'
 import {
+  Link,
   Outlet,
   Route,
   BrowserRouter as Router,
@@ -14,6 +15,8 @@ import { tareaService } from '@/services/tareaService'
 import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
 import { AsignarTareaComponent } from './components/asignarTarea/asignarTarea'
 import { Toast } from './components/common/toast'
+import { CrearTareaComponent } from './components/crearTarea/crearTarea'
+import { EliminarTareaComponent } from './components/eliminarTarea/eliminarTarea'
 import { TareasComponent } from './components/tareas/tareas'
 import { useOnInit } from './customHooks/hooks'
 import { useToast } from './customHooks/useToast'
@@ -25,6 +28,8 @@ export type PaginadorContextType = {
   hasMore: boolean
   traerMasTareas: () => Promise<Tarea[]>
   actualizarTarea: (tarea: Tarea) => Promise<Tarea[]>
+  agregarTarea: (tarea: Tarea) => Promise<Tarea[]>
+  eliminarTarea: (id: number) => Promise<Tarea[]>
 }
 
 const pageSize = 10
@@ -75,23 +80,43 @@ export const PaginadorLayout = () => {
     setTareas(nuevasTareas)
   }
 
+  const agregarTarea = async (nuevaTarea: Tarea) => {
+    setTareas((oldTareas) => [nuevaTarea, ...oldTareas])
+  }
+
+  const eliminarTarea = async (id: number) => {
+    setTareas((oldTareas) => oldTareas.filter((t) => t.id !== id))
+  }
+
   useOnInit(traerTareas)
 
   return (
-    <>
-      <Outlet
-        context={{
-          tareas,
-          setTareas,
-          hasMore,
-          traerMasTareas,
-          actualizarTarea,
-        }}
-      />
+    <div className="layout">
+      <header className="header">
+        <Link to="/" className="headerLink" style={{ fontWeight: 700 }}>
+          Tareas
+        </Link>
+        <Link to="/" className="headerLink">
+          Inicio
+        </Link>
+      </header>
+      <div className="main">
+        <Outlet
+          context={{
+            tareas,
+            setTareas,
+            hasMore,
+            traerMasTareas,
+            actualizarTarea,
+            agregarTarea,
+            eliminarTarea,
+          }}
+        />
+      </div>
       <div id="toast-container">
         <Toast toast={toast} />
       </div>
-    </>
+    </div>
   )
 }
 
@@ -100,6 +125,8 @@ export const TareasRoutes = () => (
     <Route path="/" element={<PaginadorLayout />}>
       <Route path="/" element={<TareasComponent />} />
       <Route path="/asignarTarea/:id" element={<AsignarTareaComponent />} />
+      <Route path="/crearTarea" element={<CrearTareaComponent />} />
+      <Route path="/eliminarTarea/:id" element={<EliminarTareaComponent />} />
     </Route>
   </Routes>
 )

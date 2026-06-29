@@ -96,6 +96,7 @@ describe('tests de tarea', () => {
     const tarea = new Tarea()
     tarea.porcentajeCumplimiento = 20
     tarea.iteracion = 'Sprint 3'
+    tarea.fecha = '2015-10-10'
     tarea.asignarA(persona)
     const tareaJson = tarea.toJSON()
     expect(tareaJson.asignadoA).toBe(persona.nombre)
