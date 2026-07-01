@@ -510,6 +510,14 @@ Si en algún momento el test falla, o queremos tener la chance de mirar cómo ej
 1. primero `pnpm run start-backend` para tener el backend listo
 2. luego `pnpm test:e2e:ui` para acceder a la app de Playwright
 
+![Playwright E2E](./images/playwright-e2e.png)
+
+Allí podemos 
+
+- ejecutar todos los tests (F5)
+- o correr en modo debug (`npx playwright test --debug`) frenando en los breakpoints en nuestro código (`await page.pause()`)
+- luego de la ejecución nos podemos ubicar en un punto determinado, y avanzar o retroceder un paso a la vez para ver cómo se fue modificando la página, viendo errores en la consola, las llamadas que se hicieron en la red, etc.
+
 ### e2e + CI
 
 Para ejecutar los tests e2e en el CI necesitamos instalar Playwright, ejecutar los tests unitarios para sacar la cobertura, y luego disparar el comando `pnpm test:e2e`. Podés ver la implementación en el archivo [build.yml](./.github/workflows/build.yml).
