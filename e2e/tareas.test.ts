@@ -63,6 +63,15 @@ const editarTarea = async (
   await page.getByTestId(`asignar_${tareaId}`).click()
   await page.waitForURL(`/asignarTarea/${tareaId}`)
 
+  // esperamos a que se carguen los datos asincrónicos (tarea + usuarios)
+  // antes de modificar el formulario
+  await expect(page.getByTestId('descripcion')).not.toHaveValue('')
+  await expect(
+    page.locator(
+      `select[data-testid="asignatario"] option[value="${asignadoA}"]`
+    )
+  ).toBeVisible()
+
   await page.getByTestId('descripcion').fill(descripcion)
   await page.getByTestId('asignatario').selectOption(asignadoA)
 
