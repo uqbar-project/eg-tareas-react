@@ -408,6 +408,120 @@ Por último, es necesario envolver TareasComponent en el **BrowserRouter** para 
 
 ___
 
+## Tests e2e
+
+### Instalación
+
+Los tests e2e necesitan tener levantado tanto el backend como el frontend. El [script start-backend.sh](./scripts/start-backend.sh) se encarga de clonar o traerse los últimos cambios del [repositorio de backend](https://github.com/uqbar-project/eg-tareas-springboot-kotlin) dentro de la carpeta `backend/` y levantar el servidor en el puerto 9000 con gradlew.
+
+El comando `pnpm test:e2e` utiliza la dependencia `start-server-and-test` para:
+
+1. ejecutar nuestro script que levanta el backend
+2. esperar a que el endpoint `/health` nos devuelva un ok (código http 200)
+3. una vez que la señal se recibe, se disparan los tests de Playwright
+
+Para ello necesitamos tener instalado Playwright en nuestro entorno:
+
+```bash
+npx playwright install --with-deps
+```
+
+### Configuración
+
+Hay un solo archivo necesario para configurar Playwright: [playwright.config.ts](./playwright.config.ts), donde definimos el `webServer` para construir y servir el frontend con `vite preview`, y la carpeta donde están nuestros tests end-to-end.
+
+Al ejecutar los tests e2e desactivamos la paginación (`VITE_PAGINATION_ENABLED=false`) para que todas las tareas se muestren en una sola página.
+
+### Flujo de un test end-to-end
+
+Al contrario de lo que pasa cuando diseñamos un test unitario, el test end-to-end prueba todo un flujo, por lo que vamos a
+
+- iniciar la app
+- crear una tarea
+- luego, al volver, la seleccionamos y modificamos algunos datos
+- luego, la marcamos como cumplida
+- y por último la eliminamos
+
+En este único test cubrimos prácticamente toda la aplicación.
+
+Como no queremos depender de los datos que tiene el backend a la hora de inicializar (el bootstrap), el test e2e comienza creando un usuario nuevo que es el que usaremos para asignar a la tarea en el paso de edición.
+
+Un último detalle: para poder conocer el id de la tarea interceptamos la llamada a la API en la creación, mediante `page.waitForResponse` en paralelo al click del botón. Eso nos permite filtrar las requests que van a `/tareas` con método POST y capturar el id del objeto que devuelve el backend:
+
+```ts
+const [response] = await Promise.all([
+  page.waitForResponse(
+    (resp) => resp.url().includes('/tareas') && resp.request().method() === 'POST',
+  ),
+  page.getByTestId('crear').click(),
+])
+const tareaId = (await response.json()).id
+```
+
+Cada paso del flujo se encapsula en una función separada, lo que hace que el test se lea de forma casi declarativa:
+
+```ts
+test('creamos una tarea, la editamos, la cumplimos y la eliminamos', async ({ page }) => {
+  await navegarAlInicio(page)
+
+  const tareaId = await crearTarea(page, {
+    descripcion: 'Agregar tests e2e',
+    iteracion: 'Kepler',
+    fecha: '2025-11-25',
+  })
+
+  await verificarTarea(page, tareaId, { title: 'Agregar tests e2e' })
+
+  await editarTarea(page, tareaId, {
+    descripcion: 'Agregar tests e2e con Playwright',
+    asignadoA: NUEVO_USUARIO,
+  })
+
+  await verificarTarea(page, tareaId, {
+    title: 'Agregar tests e2e con Playwright',
+    asignatario: NUEVO_USUARIO,
+  })
+
+  await cumplirTarea(page, tareaId)
+
+  await eliminarTarea(page, tareaId)
+})
+```
+
+Entre las funciones auxiliares, vale la pena destacar `verificarTarea` que recibe un diccionario de campos a chequear y evita repetir assertions para cada paso:
+
+```ts
+const verificarTarea = async (
+  page: Page, tareaId: number, campos: Record<string, string>,
+) => {
+  await expect(page.getByTestId(`tarea_${tareaId}`)).toBeVisible()
+  for (const [campo, valor] of Object.entries(campos)) {
+    await expect(page.getByTestId(`${campo}_${tareaId}`)).toHaveText(valor)
+  }
+}
+```
+
+El resto de las funciones (`crearTarea`, `editarTarea`, `cumplirTarea`, `eliminarTarea`) siguen el mismo patrón: interactúan con la UI mediante `getByTestId` y esperan respuestas del backend. Podés ver la implementación completa en [e2e/tareas.test.ts](./e2e/tareas.test.ts).
+
+### Debug manual
+
+Si en algún momento el test falla, o queremos tener la chance de mirar cómo ejecutan los tests e2e, podemos ejecutar:
+
+1. primero `pnpm run start-backend` para tener el backend listo
+2. luego `pnpm test:e2e:ui` para acceder a la app de Playwright
+
+![Playwright E2E](./images/playwright-e2e.png)
+
+Allí podemos 
+
+- ejecutar todos los tests (F5)
+- o correr en modo debug (`npx playwright test --debug`) frenando en los breakpoints en nuestro código (`await page.pause()`)
+- luego de la ejecución nos podemos ubicar en un punto determinado, y avanzar o retroceder un paso a la vez para ver cómo se fue modificando la página, viendo errores en la consola, las llamadas que se hicieron en la red, etc.
+
+### e2e + CI
+
+Para ejecutar los tests e2e en el CI necesitamos instalar Playwright, ejecutar los tests unitarios para sacar la cobertura, y luego disparar el comando `pnpm test:e2e`. Podés ver la implementación en el archivo [build.yml](./.github/workflows/build.yml).
+
 ## Qué pasa cuando tenemos mucha información
 
 En esta rama vamos a analizar cómo trabajar cuando tenemos que manipular mucha información del lado del frontend.

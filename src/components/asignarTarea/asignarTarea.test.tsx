@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { mockTareaJSON, mockUsuarios } from '@/test-utils/mockData'
+import { mockTareaJSON, mockUsuarios } from '@/testUtils/mockData'
 
 vi.mock('axios', () => {
   return {

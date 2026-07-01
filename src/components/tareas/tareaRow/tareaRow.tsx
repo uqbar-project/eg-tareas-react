@@ -79,10 +79,11 @@ export const TareaRow = ({
 
   return (
     <tr key={tarea.id} data-testid={`tarea_${tarea.id}`}>
-      <td>{tarea.descripcion}</td>
-      <td>{tarea.fechaFormateada}</td>
-      <td>{tarea.nombreAsignatario}</td>
+      <td data-testid={`title_${tarea.id}`}>{tarea.descripcion}</td>
+      <td data-testid={`fecha_${tarea.id}`}>{tarea.fechaFormateada}</td>
+      <td data-testid={`asignatario_${tarea.id}`}>{tarea.nombreAsignatario}</td>
       <td
+        data-testid={`porcentaje_${tarea.id}`}
         aria-label={`Porcentaje de cumplimiento: ${tarea.porcentajeCumplimiento}%`}
       >
         <PorcentajeCumplimiento porcentaje={tarea.porcentajeCumplimiento} />
