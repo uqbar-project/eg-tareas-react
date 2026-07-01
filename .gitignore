@@ -29,3 +29,6 @@ coverage/
 
 # Backend clonado para tests e2e
 backend/
+
+# Playwright test results
+test-results/

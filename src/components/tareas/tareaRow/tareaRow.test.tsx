@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import type { Tarea } from '@/domain/tarea'
-import { crearTarea } from '@/testsUtils/crearTarea'
+import { crearTarea } from '@/testUtils/crearTarea'
 import { TareaRow } from './tareaRow'
 
 const mockedNavigate = vi.fn()

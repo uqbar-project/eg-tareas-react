@@ -18,6 +18,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    exclude: ['**/e2e/**', '**/node_modules/**'],
     coverage: {
       provider: 'v8',
       exclude: [
@@ -26,6 +27,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.css',
         'vite.config.ts',
+        'e2e',
       ],
       reporter: ['lcov', 'json', 'html', 'json-summary', 'text'],
     },
