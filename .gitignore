@@ -26,3 +26,6 @@ dist-ssr
 
 # Coverage files
 coverage/
+
+# Backend clonado para tests e2e
+backend/

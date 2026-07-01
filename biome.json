@@ -58,7 +58,9 @@
       "!**/node_modules",
       "!**/dist",
       "!**/build",
-      "!**/coverage"
+      "!**/coverage",
+      "!**/backend",
+      "!**/test-results"
     ]
   }
 }
