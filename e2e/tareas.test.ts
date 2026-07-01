@@ -70,7 +70,7 @@ const editarTarea = async (
     page.locator(
       `select[data-testid="asignatario"] option[value="${asignadoA}"]`
     )
-  ).toBeVisible()
+  ).toHaveCount(1)
 
   await page.getByTestId('descripcion').fill(descripcion)
   await page.getByTestId('asignatario').selectOption(asignadoA)
