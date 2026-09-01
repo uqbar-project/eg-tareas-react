@@ -26,7 +26,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+
+    "types": [
+      "vitest",
+      "@testing-library/react",
+      "@testing-library/user-event"
+    ]
   },
   "include": ["src"]
 }

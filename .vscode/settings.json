@@ -1,11 +1,12 @@
 {
   "editor.linkedEditing": true,
-  "editor.formatOnSave": true,
   "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": "always",
-    "source.organizeImports": "always"
+    "source.fixAll.biome": "explicit"
   },
+  "js/ts.preferences.quoteStyle": "single",
+  "js/ts.suggest.autoImports": true,
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -16,6 +17,9 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
   }
 }
