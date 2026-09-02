@@ -28,11 +28,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
 
-    "types": [
-      "vitest",
-      "@testing-library/react",
-      "@testing-library/user-event"
-    ]
+    "types": ["vitest", "@testing-library/react", "@testing-library/user-event"]
   },
   "include": ["src"]
 }

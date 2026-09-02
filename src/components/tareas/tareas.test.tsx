@@ -10,7 +10,7 @@ import {
   test,
   vi,
 } from 'vitest'
-import { TareasRouter, TareasRoutes } from '@/routes'
+import { TareasRoutes } from '@/routes'
 import { PAGINATION_CONFIG } from '@/services/constants'
 
 vi.mock('axios')
