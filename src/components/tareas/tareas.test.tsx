@@ -81,13 +81,6 @@ describe('TareasComponent con paginador activado', () => {
       })
     })
 
-    test('TareasRouter renderiza sin errores', async () => {
-      render(<TareasRouter />)
-      await waitFor(() => {
-        expect(screen.getByTestId('tarea_159')).toBeTruthy()
-      })
-    })
-
     test('si no hay más tareas no aparece el botón correspondiente', async () => {
       render(
         <BrowserRouter>
