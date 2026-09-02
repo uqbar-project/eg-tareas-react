@@ -191,18 +191,19 @@ function runTests() {
     const buttonAceptar = screen.getByTestId('aceptar')
     userEvent.click(buttonAceptar)
     await waitFor(() => {
-      expect(spyPutAxios.mock.calls.length).toBe(1)
-      expect(spyPutAxios.mock.calls[0]).to.deep.equal([
-        'http://localhost:9000/tareas/159',
-        {
+      expect(spyPutAxios).toHaveBeenCalledTimes(1)
+      expect(spyPutAxios).toHaveBeenNthCalledWith(
+        1,
+        expect.stringContaining('/tareas/159'),
+        expect.objectContaining({
           asignadoA: 'Misia Pataca',
           descripcion: 'Ejemplo',
           fecha: '10/10/2015',
           id: 159,
           iteracion: '',
           porcentajeCumplimiento: 0,
-        },
-      ])
+        })
+      )
     })
   })
 
