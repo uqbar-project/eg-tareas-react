@@ -3,27 +3,41 @@
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
+    "domains": {
+      "react": "recommended",
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
+      "a11y": {
+        "useAriaPropsForRole": "warn",
+        "noNoninteractiveElementToInteractiveRole": "warn"
+      },
       "correctness": {
         "noUnusedVariables": "error",
-        "useExhaustiveDependencies": "warn"
+        "useUniqueElementIds": "warn"
       },
       "style": {
         "useBlockStatements": "error",
         "useConst": "error",
-        "useTemplate": "error"
+        "useTemplate": "error",
+        "useSelfClosingElements": "error"
       },
       "suspicious": {
         "noDoubleEquals": "error",
         "noExplicitAny": "error",
         "noImplicitAnyLet": "error",
         "noAssignInExpressions": "error",
-        "noVar": "error"
+        "noVar": "error",
+        "noAsyncPromiseExecutor": "error"
       },
       "complexity": {
         "noForEach": "off",
         "useOptionalChain": "warn"
+      },
+      "nursery": {
+        "noReactStringRefs": "warn",
+        "noIdenticalTestTitle": "warn"
       }
     }
   },

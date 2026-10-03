@@ -1,3 +1,5 @@
+import './porcentajeCumplimiento.css'
+
 const limiteSuperior = 80
 const limiteInferior = 50
 
@@ -11,24 +13,14 @@ const getBackgroundTestId = (porcentaje: number) => {
   return 'medio'
 }
 
-const getBackgroundColor = (porcentaje: number) => {
+const getTonoClass = (porcentaje: number) => {
   if (porcentaje > limiteSuperior) {
-    return 'var(--background-color-success)'
+    return 'chip chipAlto'
   }
   if (porcentaje < limiteInferior) {
-    return 'var(--background-color-error)'
+    return 'chip chipBajo'
   }
-  return 'var(--background-color-warning)'
-}
-
-const getColor = (porcentaje: number) => {
-  if (porcentaje > limiteSuperior) {
-    return 'var(--color-text-success)'
-  }
-  if (porcentaje < limiteInferior) {
-    return 'var(--color-text-error)'
-  }
-  return 'var(--color-text-warning)'
+  return 'chip chipMedio'
 }
 
 export const PorcentajeCumplimiento = ({
@@ -39,26 +31,15 @@ export const PorcentajeCumplimiento = ({
   if (!porcentaje) {
     return null // se puede comentar para ver como se muestra el avatar en 0%
   }
-  const backgroundColor = getBackgroundColor(porcentaje)
-  const backgroundTestId = getBackgroundTestId(porcentaje)
-  const color = getColor(porcentaje)
   return (
     <div
-      data-testid={backgroundTestId}
+      data-testid={getBackgroundTestId(porcentaje)}
       role="progressbar"
       aria-label={`Porcentaje de cumplimiento: ${porcentaje}%`}
       aria-valuenow={porcentaje}
       aria-valuemin={0}
       aria-valuemax={100}
-      style={{
-        backgroundColor,
-        color,
-        fontSize: '0.8rem',
-        padding: '0.5em 1em',
-        borderRadius: '1em',
-        width: '4em',
-        margin: 'auto',
-      }}
+      className={getTonoClass(porcentaje)}
     >
       {porcentaje}%
     </div>

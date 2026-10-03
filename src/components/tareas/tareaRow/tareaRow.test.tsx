@@ -107,6 +107,83 @@ describe('TareaRow', () => {
     })
   })
 
+  describe('la primera columna unifica avatar, descripción, fecha e iteración', () => {
+    const renderizarTarea = (tarea: Tarea) =>
+      render(
+        <BrowserRouter>
+          <TareaRow tarea={tarea} actualizar={() => {}} />
+        </BrowserRouter>
+      )
+
+    test('con la tarea asignada muestra las iniciales de la persona', () => {
+      renderizarTarea(
+        crearTarea(159, 'Construir test TODO List', 0, 'Denis Stracqualursi')
+      )
+      expect(screen.getByTestId('avatar_159').textContent).toBe('DS')
+    })
+
+    test('con la tarea sin asignar muestra un ? en gris', () => {
+      const tarea = crearTarea(
+        159,
+        'Construir test TODO List',
+        0,
+        'Denis Stracqualursi'
+      )
+      tarea.desasignar()
+      renderizarTarea(tarea)
+      expect(screen.getByTestId('avatar_159').textContent).toBe('?')
+      expect(screen.getByTestId('avatar_159').className).toContain(
+        'avatarSinAsignar'
+      )
+    })
+
+    test('el avatar usa un tono pastel estable según el nombre', () => {
+      renderizarTarea(
+        crearTarea(159, 'Construir test TODO List', 0, 'Eliana Mendia')
+      )
+      const tono = screen
+        .getByTestId('avatar_159')
+        .style.getPropertyValue('--tono')
+      expect(tono).toMatch(/^\d+$/)
+    })
+
+    test('distintas personas reciben tonos distintos', () => {
+      const nombres = ['Eliana Mendia', 'Denis Stracqualursi', 'Paula Paretto']
+      const tonos = nombres.map((nombre, index) => {
+        renderizarTarea(crearTarea(index + 1, 'Tarea', 0, nombre))
+        return screen
+          .getByTestId(`avatar_${index + 1}`)
+          .style.getPropertyValue('--tono')
+      })
+      expect(new Set(tonos).size).toBe(nombres.length)
+    })
+
+    test('el nombre completo sigue disponible para lectores de pantalla', () => {
+      renderizarTarea(
+        crearTarea(159, 'Construir test TODO List', 0, 'Eliana Mendia')
+      )
+      expect(screen.getByTestId('asignatario_159').textContent).toBe(
+        'Eliana Mendia'
+      )
+    })
+
+    test('muestra la fecha y la iteración junto a la descripción', () => {
+      const tarea = crearTarea(
+        159,
+        'Construir test TODO List',
+        0,
+        'Eliana Mendia'
+      )
+      tarea.fecha = '2015-10-10'
+      tarea.iteracion = 'Iteración 1'
+      renderizarTarea(tarea)
+      expect(screen.getByTestId('fecha_159').textContent).toBe('10/10/2015')
+      expect(screen.getByTestId('iteracion_159').textContent).toBe(
+        'Iteración 1'
+      )
+    })
+  })
+
   describe('cuando una tarea NO está asignada', () => {
     test('no puede cumplirse', () => {
       const tareaNoAsignada = crearTarea(
@@ -122,6 +199,30 @@ describe('TareaRow', () => {
         </BrowserRouter>
       )
       expect(screen.queryByTestId(`cumplir_${tareaNoAsignada.id}`)).toBeNull()
+    })
+  })
+
+  describe('las acciones de la fila', () => {
+    test('comparten una sola celda, así no se apilan en columna', () => {
+      render(
+        <BrowserRouter>
+          <TareaRow
+            tarea={crearTarea(
+              159,
+              'Construir test TODO List',
+              0,
+              'Eliana Mendia'
+            )}
+            actualizar={() => {}}
+          />
+        </BrowserRouter>
+      )
+
+      const celda = screen.getByTestId('cumplir_159').closest('td')
+
+      expect(celda?.querySelectorAll('button')).toHaveLength(3)
+      expect(screen.getByTestId('asignar_159').closest('td')).toBe(celda)
+      expect(screen.getByTestId('eliminar_159').closest('td')).toBe(celda)
     })
   })
 })

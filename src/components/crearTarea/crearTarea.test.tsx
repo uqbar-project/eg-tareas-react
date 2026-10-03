@@ -97,6 +97,57 @@ function runTests() {
     })
   })
 
+  test('cada campo está asociado a su label', async () => {
+    render(
+      <MemoryRouter initialEntries={['/crearTarea']} initialIndex={0}>
+        <Routes>
+          <Route path="/" element={<PaginadorLayout />}>
+            <Route path="/crearTarea" element={<CrearTareaComponent />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('descripcion')).toBeTruthy()
+    })
+
+    expect(screen.getByLabelText('Descripción')).toBe(
+      screen.getByTestId('descripcion')
+    )
+    expect(screen.getByLabelText('Iteración')).toBe(
+      screen.getByTestId('iteracion')
+    )
+    expect(screen.getByLabelText('Fecha')).toBe(screen.getByTestId('fecha'))
+    expect(screen.getByLabelText('Asignatario')).toBe(
+      screen.getByTestId('asignatario')
+    )
+  })
+
+  test('los ids se generan, no son literales estáticos', async () => {
+    render(
+      <MemoryRouter initialEntries={['/crearTarea']} initialIndex={0}>
+        <Routes>
+          <Route path="/" element={<PaginadorLayout />}>
+            <Route path="/crearTarea" element={<CrearTareaComponent />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('descripcion')).toBeTruthy()
+    })
+
+    const idDescripcion = screen.getByTestId('descripcion').getAttribute('id')
+    expect(idDescripcion).toBeTruthy()
+    expect(idDescripcion).not.toBe('descripcion')
+
+    const idAsignatario = screen.getByTestId('asignatario').getAttribute('id')
+    expect(idAsignatario).toBeTruthy()
+    expect(idAsignatario).not.toBe(idDescripcion)
+  })
+
   test('al crear la tarea se llama al servicio POST y se vuelve atras', async () => {
     spyPostAxios.mockResolvedValue({ data: { id: 999 } })
 

@@ -1,4 +1,4 @@
-#toast-container {
+.toast-container {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -12,7 +12,7 @@
   margin-bottom: 8px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: var(--color-text-primary, #000000);
+  color: var(--color-text-primary);
   font-size: 14px;
   font-weight: 500;
   display: flex;
@@ -51,27 +51,27 @@
 }
 
 .toast-success {
-  background-color: var(--color-success, #4caf50);
-  color: white;
-  border-color: var(--color-success, #4caf50);
+  background-color: var(--color-success);
+  color: var(--color-text-button-primary);
+  border-color: var(--color-success);
 }
 
 .toast-error {
-  background-color: var(--color-error, #d32f2f);
-  color: white;
-  border-color: var(--color-error, #d32f2f);
+  background-color: var(--color-error);
+  color: var(--color-text-button-primary);
+  border-color: var(--color-error);
 }
 
 .toast-warning {
-  background-color: var(--color-warning, #ff9800);
-  color: white;
-  border-color: var(--color-warning, #ff9800);
+  background-color: var(--color-warning);
+  color: var(--color-text-on-warning);
+  border-color: var(--color-warning);
 }
 
 .toast-info {
-  background-color: var(--color-primary, #1976d2);
-  color: white;
-  border-color: var(--color-primary, #1976d2);
+  background-color: var(--color-primary);
+  color: var(--color-text-button-primary);
+  border-color: var(--color-primary);
 }
 
 .toast::before {
@@ -79,8 +79,15 @@
   margin-right: 8px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.fade-out {
+    animation: none;
+  }
+}
+
 @media (max-width: 768px) {
-  #toast-container {
+  .toast-container {
     left: 10px;
     right: 10px;
     top: auto;

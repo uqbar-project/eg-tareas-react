@@ -1,22 +1,25 @@
-import { type ChangeEvent, useState } from 'react'
+import { type ChangeEvent, useId, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
-import { useToast } from '@/customHooks/useToast'
+import { showToast } from '@/customHooks/useToast'
 import { Tarea, type TareaJSON } from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
 import { usuarioService } from '@/services/usuarioService'
 import { getMensajeError } from '@/utils/errorHandling'
-import { Toast } from '../common/toast'
 import './crearTarea.css'
 
 export const CrearTareaComponent = () => {
   const { agregarTarea } = useOutletContext<PaginadorContextType>()
-  const { toast, showToast } = useToast()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
   const navigate = useNavigate()
+
+  const descripcionId = useId()
+  const iteracionId = useId()
+  const fechaId = useId()
+  const asignatarioId = useId()
 
   useOnInit(async () => {
     try {
@@ -89,42 +92,51 @@ export const CrearTareaComponent = () => {
   return (
     <div className="container">
       <div className="title">Crear tarea</div>
-      <div className="fieldLabel">Descripción</div>
+      <label className="fieldLabel" htmlFor={descripcionId}>
+        Descripción
+      </label>
       <div>
         <input
           type="text"
           data-testid="descripcion"
-          id="descripcion"
+          id={descripcionId}
           value={tarea.descripcion}
           onChange={cambiarDescripcion}
           className="formControl"
         />
       </div>
-      <div className="fieldLabel">Iteración</div>
+      <label className="fieldLabel" htmlFor={iteracionId}>
+        Iteración
+      </label>
       <div>
         <input
           type="text"
           data-testid="iteracion"
-          id="iteracion"
+          id={iteracionId}
           value={tarea.iteracion}
           onChange={cambiarIteracion}
           className="formControl"
         />
       </div>
-      <div className="fieldLabel">Fecha</div>
+      <label className="fieldLabel" htmlFor={fechaId}>
+        Fecha
+      </label>
       <div>
         <input
           type="date"
           data-testid="fecha"
-          id="fecha"
+          id={fechaId}
           value={tarea.fecha}
           onChange={cambiarFecha}
           className="formControl"
         />
       </div>
-      <div className="fieldLabel">Asignatario</div>
+      <label className="fieldLabel" htmlFor={asignatarioId}>
+        Asignatario
+      </label>
       <div>
         <select
+          id={asignatarioId}
           value={tarea.nombreAsignatario ?? ' '}
           onChange={(event) => asignar(event.target.value)}
           className="formControl"
@@ -157,9 +169,6 @@ export const CrearTareaComponent = () => {
         >
           Crear
         </button>
-      </div>
-      <div id="toast-container">
-        <Toast toast={toast} />
       </div>
     </div>
   )

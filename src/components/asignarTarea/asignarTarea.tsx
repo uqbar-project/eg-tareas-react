@@ -1,23 +1,24 @@
-import { type ChangeEvent, useState } from 'react'
+import { type ChangeEvent, useId, useState } from 'react'
 
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
-import { useToast } from '@/customHooks/useToast'
+import { showToast } from '@/customHooks/useToast'
 import { Tarea } from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
 import { usuarioService } from '@/services/usuarioService'
 import { getMensajeError } from '@/utils/errorHandling'
-import { Toast } from '../common/toast'
 import './asignarTarea.css'
 
 export const AsignarTareaComponent = () => {
   const { actualizarTarea } = useOutletContext<PaginadorContextType>()
-  const { toast, showToast } = useToast()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
   const navigate = useNavigate()
+
+  const descripcionId = useId()
+  const asignatarioId = useId()
 
   const { id } = useParams()
 
@@ -83,21 +84,26 @@ export const AsignarTareaComponent = () => {
   return (
     <div className="container">
       <div className="title">Asignar tarea</div>
-      <div className="fieldLabel">Descripción</div>
+      <label className="fieldLabel" htmlFor={descripcionId}>
+        Descripción
+      </label>
       <div>
         <input
           type="text"
           data-testid="descripcion"
-          id="descripcion"
+          id={descripcionId}
           value={tarea.descripcion}
           onChange={cambiarDescripcion}
           className="formControl"
         />
       </div>
-      <div className="fieldLabel">Asignatario</div>
+      <label className="fieldLabel" htmlFor={asignatarioId}>
+        Asignatario
+      </label>
       <div>
         <select
           /* Acá podemos ver cómo esta declarado nombreAsignatario */
+          id={asignatarioId}
           value={tarea.nombreAsignatario ?? ' '}
           onChange={(event) => asignar(event.target.value)}
           className="formControl"
@@ -130,9 +136,6 @@ export const AsignarTareaComponent = () => {
         >
           Aceptar
         </button>
-      </div>
-      <div id="toast-container">
-        <Toast toast={toast} />
       </div>
     </div>
   )

@@ -1,81 +1,110 @@
 * {
-  font-family: Inter, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
   box-sizing: border-box;
 }
 
 :root {
-  /* Colores primarios */
-  --color-primary: #1976d2;
-  --color-primary-light: #42a5f5;
-  --color-primary-dark: #1565c0;
+  color-scheme: light;
 
-  /* Colores secundarios */
-  --color-secondary: #e3f2fd;
-  --color-secondary-light: #bbdefb;
-  --color-secondary-dark: #90caf9;
+  --color-nav: #115e59;
+  --color-nav-hover: #0f766e;
+  --color-grid: #ccfbf1;
+  --color-grid-header-text: #115e59;
+  --color-grid-row-hover: #f0fdfa;
+  --color-neutral: #ffffff;
 
-  /* Fondos y superficies */
-  --color-background: #ffffff;
-  --color-surface: #f8f9fa;
-  --color-surface-variant: #e9ecef;
+  --color-primary: var(--color-nav);
 
-  /* Textos */
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #495057;
-  --color-text-disabled: #adb5bd;
+  --color-background: var(--color-neutral);
+  --color-surface: #f8fafc;
+  --color-surface-variant: #f1f5f9;
 
-  /* Textos para botones */
-  --color-text-button-primary: white;
-  --color-text-button-secondary: #1a1a1a;
-  --color-text-button-disabled: #adb5bd;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-disabled: #94a3b8;
 
-  /* Estados especiales */
-  --background-color-error: #ef5350;
-  --background-color-success: #4caf50;
-  --background-color-warning: #ff8f00;
+  --color-text-button-primary: #ffffff;
 
-  --color-text-error: white;
-  --color-text-success: white;
-  --color-text-warning: #1a1a1a;
+  --color-avatar-empty-bg: #e2e8f0;
+  --color-avatar-empty-fg: #64748b;
+
+  --pastel-bg-l: 0.945;
+  --pastel-bg-c: 0.042;
+  --pastel-fg-l: 0.36;
+  --pastel-fg-c: 0.105;
+
+  --color-pastel-alto-bg: #dcfce7;
+  --color-pastel-alto-text: #166534;
+  --color-pastel-medio-bg: #fef3c7;
+  --color-pastel-medio-text: #92400e;
+  --color-pastel-bajo-bg: #fee2e2;
+  --color-pastel-bajo-text: #991b1b;
+  --color-pastel-bajo-hover-bg: #fecaca;
+
+  --color-success: #4caf50;
+  --color-error: #d32f2f;
+  --color-warning: #ff9800;
+  --color-text-on-warning: #1a1a1a;
 
   /* Sombras y bordes */
-  --color-shadow: rgba(0, 0, 0, 0.08);
-  --color-border: #dee2e6;
+  --color-shadow: rgba(15, 23, 42, 0.08);
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #42a5f5;
-    --color-primary-light: #64b5f6;
-    --color-primary-dark: #1e88e5;
+    color-scheme: dark;
 
-    --color-secondary: #1a2a3a;
-    --color-secondary-light: #1e3a4a;
-    --color-secondary-dark: #1565c0;
+    --color-nav: #134e4a;
+    --color-nav-hover: #115e59;
+    --color-grid: #134e4a;
+    --color-grid-header-text: #5eead4;
+    --color-grid-row-hover: #115e59;
+    --color-neutral: #0f172a;
 
-    --color-background: #1a1a1a;
-    --color-surface: #2d2d2d;
-    --color-surface-variant: #3d3d3d;
+    --color-primary: var(--color-nav);
 
-    --color-text-primary: #e0e0e0;
-    --color-text-secondary: #a0a0a0;
-    --color-text-disabled: #666666;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-surface-variant: #334155;
+
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-disabled: #64748b;
 
     --color-text-button-primary: #ffffff;
-    --color-text-button-secondary: #e0e0e0;
-    --color-text-button-disabled: #555555;
 
-    --color-shadow: rgba(0, 0, 0, 0.3);
-    --color-border: #404040;
+    --color-avatar-empty-bg: #334155;
+    --color-avatar-empty-fg: #94a3b8;
+
+    --pastel-bg-l: 0.32;
+    --pastel-bg-c: 0.07;
+    --pastel-fg-l: 0.88;
+    --pastel-fg-c: 0.11;
+
+    --color-pastel-alto-bg: #14532d;
+    --color-pastel-alto-text: #86efac;
+    --color-pastel-medio-bg: #78350f;
+    --color-pastel-medio-text: #fcd34d;
+    --color-pastel-bajo-bg: #7f1d1d;
+    --color-pastel-bajo-text: #fca5a5;
+    --color-pastel-bajo-hover-bg: #991b1b;
+
+    --color-shadow: rgba(0, 0, 0, 0.4);
+    --color-border: #334155;
+    --color-border-strong: #475569;
   }
 }
 
 .title {
   font-size: 2rem;
-  padding: 1rem 0;
-  margin-bottom: 1rem;
-  font-weight: bold;
-  padding-bottom: 12px;
+  margin: 0 0 1rem;
+  padding: 0 0 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   position: relative;
 }
 
@@ -85,36 +114,7 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  border-bottom: 2px solid var(--color-primary);
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  border-bottom: 1px solid var(--color-grid-header-text);
 }
 
 input,
@@ -142,29 +142,49 @@ textarea:focus {
     color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+input:focus-visible {
+  outline: none;
+}
+
+.headerLink:focus-visible {
+  outline-color: var(--color-text-button-primary);
+}
+
 .icon {
-  height: 30px;
-  width: auto;
-  padding: 5px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .icon-button {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
   background: none;
   border: none;
-  padding: 4px;
-  border-radius: 4px;
+  border-radius: 50%;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .icon-button:hover {
   background-color: var(--color-surface-variant);
+  color: var(--color-text-primary);
   transform: scale(1.1);
-}
-
-.icon-button:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
 }
 
 .icon-button:active {
@@ -194,15 +214,44 @@ textarea:focus {
   font-size: 0.9375rem;
   font-weight: 600;
   border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.primary:hover {
+  background-color: var(--color-nav-hover);
 }
 
 .secondary {
   background-color: var(--color-surface-variant);
   color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
   padding: 0.625rem 1.5rem;
   font-size: 0.9375rem;
   font-weight: 500;
   border-radius: 8px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.secondary:hover {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
+}
+
+.danger {
+  background-color: var(--color-pastel-bajo-bg);
+  color: var(--color-pastel-bajo-text);
+  border: 1px solid var(--color-pastel-bajo-text);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.danger:hover {
+  background-color: var(--color-pastel-bajo-hover-bg);
 }
 
 .container {
@@ -232,14 +281,8 @@ textarea:focus {
   box-shadow: 0 2px 8px var(--color-shadow);
 }
 
-.headerTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
 .headerLink {
-  color: #ffffff;
+  color: var(--color-text-button-primary);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -249,11 +292,40 @@ textarea:focus {
 }
 
 .headerLink:hover {
-  color: #ffffff;
-  box-shadow: inset 0 -2px 0 #ffffff;
+  color: var(--color-text-button-primary);
+  box-shadow: inset 0 -2px 0 var(--color-text-button-primary);
 }
 
 .main {
   flex: 1;
   padding: 2rem 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input,
+  select,
+  textarea,
+  .icon-button,
+  .secondary,
+  .danger,
+  .headerLink {
+    transition: none;
+  }
+
+  .icon-button:hover,
+  .icon-button:active {
+    transform: none;
+  }
 }

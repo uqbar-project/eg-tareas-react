@@ -1,0 +1,25 @@
+.chip {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.chipAlto {
+  background-color: var(--color-pastel-alto-bg);
+  color: var(--color-pastel-alto-text);
+}
+
+.chipMedio {
+  background-color: var(--color-pastel-medio-bg);
+  color: var(--color-pastel-medio-text);
+}
+
+.chipBajo {
+  background-color: var(--color-pastel-bajo-bg);
+  color: var(--color-pastel-bajo-text);
+}

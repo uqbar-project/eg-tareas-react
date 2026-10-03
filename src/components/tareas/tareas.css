@@ -1,3 +1,11 @@
+.tablaWrapper {
+  background-color: var(--color-neutral);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px var(--color-shadow);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -5,32 +13,94 @@ table {
 
 th,
 td {
-  border: 1px solid var(--color-border);
-  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.875rem 1rem;
   text-align: left;
-}
-
-td[aria-label="Acciones disponibles"] {
-  white-space: nowrap;
-  min-width: 160px;
+  vertical-align: middle;
 }
 
 th {
-  background-color: var(--color-primary);
-  color: var(--color-text-button-primary);
+  background-color: var(--color-grid);
+  color: var(--color-grid-header-text);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-tbody tr:nth-child(even) td {
-  background-color: var(--color-surface);
+tbody td {
+  background-color: var(--color-neutral);
+  transition: background-color 0.15s ease;
 }
 
 tbody tr:hover td {
-  background-color: var(--color-secondary);
+  background-color: var(--color-grid-row-hover);
 }
 
-.loading {
-  color: var(--color-text-secondary);
-  text-align: center;
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.colAcciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.colTarea {
+  width: 100%;
+}
+
+.tareaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.avatar {
+  --tono: 0;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: oklch(var(--pastel-bg-l) var(--pastel-bg-c) var(--tono));
+  color: oklch(var(--pastel-fg-l) var(--pastel-fg-c) var(--tono));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.avatarSinAsignar {
+  background-color: var(--color-avatar-empty-bg);
+  color: var(--color-avatar-empty-fg);
+  font-size: 1rem;
+}
+
+.tareaDetalle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.tareaDescripcion {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.tareaMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
 }
 
 .nuevaTareaWrapper {
@@ -42,13 +112,33 @@ tbody tr:hover td {
   width: 100%;
 }
 
-@media (max-width: 414px) {
-  #fecha,
-  #asignatario {
-    display: none;
+.center {
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tbody td {
+    transition: none;
   }
 }
 
-.center {
-  text-align: center;
+@media (max-width: 414px) {
+  th,
+  td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .tareaItem {
+    gap: 0.625rem;
+  }
+
+  .avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.6875rem;
+  }
+
+  .colAcciones {
+    min-width: 0;
+  }
 }

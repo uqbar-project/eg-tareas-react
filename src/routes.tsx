@@ -19,7 +19,7 @@ import { CrearTareaComponent } from './components/crearTarea/crearTarea'
 import { EliminarTareaComponent } from './components/eliminarTarea/eliminarTarea'
 import { TareasComponent } from './components/tareas/tareas'
 import { useOnInit } from './customHooks/hooks'
-import { useToast } from './customHooks/useToast'
+import { showToast, useToast } from './customHooks/useToast'
 import type { Tarea } from './domain/tarea'
 
 export type PaginadorContextType = {
@@ -38,24 +38,21 @@ export const PaginadorLayout = () => {
   const [tareas, setTareas] = useState<Tarea[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(1)
-  const { toast, showToast } = useToast()
+  const { toast } = useToast()
 
-  const getTareas = useCallback(
-    async (newPage: number, init = false) => {
-      try {
-        const { tareas, hasMore } = await tareaService.getTareas({
-          page: newPage,
-          limit: pageSize,
-        })
-        setHasMore(hasMore)
-        setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
-      } catch (error: unknown) {
-        const errorMessage = getMensajeError(error as ErrorResponse)
-        showToast(errorMessage, 'error')
-      }
-    },
-    [showToast]
-  )
+  const getTareas = useCallback(async (newPage: number, init = false) => {
+    try {
+      const { tareas, hasMore } = await tareaService.getTareas({
+        page: newPage,
+        limit: pageSize,
+      })
+      setHasMore(hasMore)
+      setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
+    } catch (error: unknown) {
+      const errorMessage = getMensajeError(error as ErrorResponse)
+      showToast(errorMessage, 'error')
+    }
+  }, [])
 
   const traerMasTareas = async () => {
     const newPage = page + 1
@@ -113,7 +110,7 @@ export const PaginadorLayout = () => {
           }}
         />
       </div>
-      <div id="toast-container">
+      <div className="toast-container">
         <Toast toast={toast} />
       </div>
     </div>

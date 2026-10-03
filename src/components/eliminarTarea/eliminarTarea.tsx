@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
-import { useToast } from '@/customHooks/useToast'
+import { showToast } from '@/customHooks/useToast'
 import type { Tarea } from '@/domain/tarea'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
 import { getMensajeError } from '@/utils/errorHandling'
-import { Toast } from '../common/toast'
 import './eliminarTarea.css'
 
 export const EliminarTareaComponent = () => {
   const { eliminarTarea } = useOutletContext<PaginadorContextType>()
-  const { toast, showToast } = useToast()
   const [tarea, setTarea] = useState<Tarea | null>(null)
   const navigate = useNavigate()
 
@@ -68,15 +66,12 @@ export const EliminarTareaComponent = () => {
         </button>
         <button
           type="button"
-          className="primary"
+          className="danger"
           data-testid="eliminar"
           onClick={eliminar}
         >
           Eliminar
         </button>
-      </div>
-      <div id="toast-container">
-        <Toast toast={toast} />
       </div>
     </div>
   )

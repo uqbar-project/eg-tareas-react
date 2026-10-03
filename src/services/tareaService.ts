@@ -30,6 +30,11 @@ class TareaService {
   }
   async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
     const tareasResult = await this.getInternalTareas(paginationData)
+    if (!tareasResult.data) {
+      throw new Error(
+        'La búsqueda de tareas no trajo resultados, revise la configuración de la aplicación (por ejemplo el paginado)'
+      )
+    }
     const tareas = tareasResult.data.map((tareaJson: TareaJSON) =>
       Tarea.fromJson(tareaJson)
     ) // o ... this.tareaAsJson

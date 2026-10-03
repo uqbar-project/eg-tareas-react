@@ -1,5 +1,4 @@
 :root {
-  font-family: Inter, system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,11 +12,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  background-color: var(--color-background);
 }
 
 button {
@@ -31,4 +26,10 @@ button {
   color: var(--color-text-primary);
   cursor: pointer;
   transition: border-color 0.25s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
 }
