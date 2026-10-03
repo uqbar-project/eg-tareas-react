@@ -42,10 +42,7 @@ tbody tr:last-child td {
 }
 
 .colAcciones {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.25rem;
+  white-space: nowrap;
   min-width: 160px;
 }
 

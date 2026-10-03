@@ -224,5 +224,53 @@ describe('TareaRow', () => {
       expect(screen.getByTestId('asignar_159').closest('td')).toBe(celda)
       expect(screen.getByTestId('eliminar_159').closest('td')).toBe(celda)
     })
+
+    test('cada acción muestra su nombre en un title', () => {
+      render(
+        <BrowserRouter>
+          <TareaRow
+            tarea={crearTarea(
+              159,
+              'Construir test TODO List',
+              0,
+              'Eliana Mendia'
+            )}
+            actualizar={() => {}}
+          />
+        </BrowserRouter>
+      )
+
+      expect(screen.getByTestId('cumplir_159').getAttribute('title')).toBe(
+        'Cumplir'
+      )
+      expect(screen.getByTestId('asignar_159').getAttribute('title')).toBe(
+        'Asignar'
+      )
+      expect(screen.getByTestId('eliminar_159').getAttribute('title')).toBe(
+        'Eliminar'
+      )
+      expect(screen.getByTestId('avatar_159').getAttribute('title')).toBe(
+        'Eliana Mendia'
+      )
+    })
+
+    test('el avatar sin asignar también tiene title', () => {
+      const tarea = crearTarea(
+        159,
+        'Construir test TODO List',
+        0,
+        'Eliana Mendia'
+      )
+      tarea.desasignar()
+      render(
+        <BrowserRouter>
+          <TareaRow tarea={tarea} actualizar={() => {}} />
+        </BrowserRouter>
+      )
+
+      expect(screen.getByTestId('avatar_159').getAttribute('title')).toBe(
+        'Sin asignar'
+      )
+    })
   })
 })
