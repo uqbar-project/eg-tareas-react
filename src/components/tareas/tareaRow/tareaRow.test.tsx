@@ -137,27 +137,6 @@ describe('TareaRow', () => {
       )
     })
 
-    test('el avatar usa un tono pastel estable según el nombre', () => {
-      renderizarTarea(
-        crearTarea(159, 'Construir test TODO List', 0, 'Eliana Mendia')
-      )
-      const tono = screen
-        .getByTestId('avatar_159')
-        .style.getPropertyValue('--tono')
-      expect(tono).toMatch(/^\d+$/)
-    })
-
-    test('distintas personas reciben tonos distintos', () => {
-      const nombres = ['Eliana Mendia', 'Denis Stracqualursi', 'Paula Paretto']
-      const tonos = nombres.map((nombre, index) => {
-        renderizarTarea(crearTarea(index + 1, 'Tarea', 0, nombre))
-        return screen
-          .getByTestId(`avatar_${index + 1}`)
-          .style.getPropertyValue('--tono')
-      })
-      expect(new Set(tonos).size).toBe(nombres.length)
-    })
-
     test('el nombre completo sigue disponible para lectores de pantalla', () => {
       renderizarTarea(
         crearTarea(159, 'Construir test TODO List', 0, 'Eliana Mendia')

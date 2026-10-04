@@ -20,13 +20,14 @@ El ejemplo que muestra las tareas de un equipo de desarrollo, permite asignar, c
 
 ## Página principal: ver tareas
 
-![master](images/ComponentesReact.png)
+![master](images/componentes-react.png)
 
 - **TareasComponent**: es el que sabe mostrar la tabla y delega en TareaRow la visualización de cada ítem
 - **TareaRow**: conoce cómo mostrar una tarea dentro de una fila de la tabla
-- **PorcentajeCumplimiento**: es un componente que muestra un avatar con el % de cumplimiento en diferentes colores. En rojo se visualizan las tareas cuyo % de cumplimiento es menor a 50, luego de 50 a 90% exclusive aparecen en amarillo y por último las que tienen 90% ó más se ven en verde.
+- **Asignatario**: componente que muestra un chip con un color random con las iniciales del asignatario o bien un '?' si está sin asignar
+- **PorcentajeCumplimiento**: es un componente que muestra un chip con el % de cumplimiento en diferentes colores. En rojo se visualizan las tareas cuyo % de cumplimiento es menor a 50, luego de 50 a 90% exclusive aparecen en amarillo y por último las que tienen 90% ó más se ven en verde
 
-![image](images/ArquitecturaTareas2.png)
+![image](images/arquitectura-tareas.png)
 
 A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
 
@@ -44,7 +45,7 @@ A través de nuestro _custom hook_ useOnInit disparamos la búsqueda de tareas:
   useOnInit(traerTareas)
 ```
 
-Definimos la función aparte para poder usarla como prop a nuestro componente hijo.
+Los componentes reciben `tareas`, `actualizarTarea`, `agregarTarea`, `eliminarTarea` y `hasMore`/`traerMasTareas` a través de `useOutletContext`. Esto significa que el `PaginadorLayout` (que define el `<Outlet />`) centraliza el estado compartido: allí viven las tareas, el flag `hasMore`, la página actual y las acciones para traer más, actualizar, agregar y eliminar tareas. El contexto se pasa al `Outlet` y cada componente hijo lo consume con `useOutletContext<PaginadorContextType>`, compartiendo así un único origen de verdad entre las rutas sin tener que pasar esas props manualmente.
 
 El service hace la llamada asincrónica al backend utilizando la biblioteca [Axios](https://github.com/axios/axios), transformando la lista de objetos JSON en objetos Tarea:
 
@@ -59,22 +60,9 @@ class TareaService {
   }
 ```
 
-Cuando el pedido vuelve con un estado ok, se actualiza el estado del componente React: `setTareas(tareas)`
+Cuando el pedido vuelve con un estado ok, el layout actualiza el estado (`setTareas`) y los componentes lo reciben vía `useOutletContext`.
 
 También podríamos utilizar la sintaxis de promises común `then().catch()`.
-
-```ts
-traerTareas() {
-  tareaService.allInstances()
-    .then((tareas) => {
-      setTareas(tareas)
-    })
-    .catch ((error: unknown) => {
-      const errorMessage = getMensajeError(error as ErrorResponse)
-      showToast(errorMessage, 'error')
-    })
-}
-```
 
 ## Cumplir una tarea
 

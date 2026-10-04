@@ -56,28 +56,6 @@ tbody tr:last-child td {
   gap: 0.875rem;
 }
 
-.avatar {
-  --tono: 0;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background-color: oklch(var(--pastel-bg-l) var(--pastel-bg-c) var(--tono));
-  color: oklch(var(--pastel-fg-l) var(--pastel-fg-c) var(--tono));
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  user-select: none;
-}
-
-.avatarSinAsignar {
-  background-color: var(--color-avatar-empty-bg);
-  color: var(--color-avatar-empty-fg);
-  font-size: 1rem;
-}
-
 .tareaDetalle {
   display: flex;
   flex-direction: column;

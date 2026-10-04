@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
+import { Asignatario } from '@/components/asignatario/asignatario'
 import { Icono } from '@/components/common/Icono'
 import { PorcentajeCumplimiento } from '@/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { useToast } from '@/customHooks/useToast'
 import type { Tarea } from '@/domain/tarea'
 import { tareaService } from '@/services/tareaService'
 import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
-import { inicialesDe, tonoDeCss } from './tonoAvatar'
 
 export const TareaRow = ({
   tarea,
@@ -80,25 +80,12 @@ export const TareaRow = ({
   )
 
   const nombreAsignatario = tarea.nombreAsignatario
-  const sinAsignar = !nombreAsignatario
-  const claseAvatar = sinAsignar ? 'avatar avatarSinAsignar' : 'avatar'
 
   return (
     <tr data-testid={`tarea_${tarea.id}`}>
       <td className="colTarea">
         <div className="tareaItem">
-          <span
-            className={claseAvatar}
-            style={sinAsignar ? undefined : tonoDeCss(nombreAsignatario)}
-            data-testid={`avatar_${tarea.id}`}
-            title={nombreAsignatario ?? 'Sin asignar'}
-            aria-hidden="true"
-          >
-            {inicialesDe(nombreAsignatario)}
-          </span>
-          <span className="srOnly" data-testid={`asignatario_${tarea.id}`}>
-            {nombreAsignatario ?? 'Sin asignar'}
-          </span>
+          <Asignatario nombre={nombreAsignatario} id={tarea.id} />
           <div className="tareaDetalle">
             <span
               className="tareaDescripcion"
