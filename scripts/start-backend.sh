@@ -14,4 +14,9 @@ else
 fi
 
 cd "$BACKEND_DIR"
-./gradlew bootRun --no-daemon
+# exec: reemplaza el proceso bash por gradle para que las señales
+# (SIGINT/SIGTERM que envía start-server-and-test al terminar los tests)
+# lleguen directo a Gradle/JVM y el apagado sea limpio.
+# Sin exec, el bash intermediario muere con 128+SIGINT=130 y ese código
+# es el que veías aunque el test hubiera pasado (1 passed).
+exec ./gradlew bootRun --no-daemon

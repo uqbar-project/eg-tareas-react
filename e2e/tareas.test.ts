@@ -1,6 +1,10 @@
 import { expect, type Page, test } from '@playwright/test'
+import { addDays, format } from 'date-fns'
 
 const NUEVO_USUARIO = 'Eva Dida'
+
+const fechaFutura = (diasEnFuturo = 30): string =>
+  format(addDays(new Date(), diasEnFuturo), 'yyyy-MM-dd')
 
 const navegarAlInicio = async (page: Page) => {
   await page.goto('/')
@@ -126,7 +130,7 @@ test.describe('flujo principal', () => {
     const tareaId = await crearTarea(page, {
       descripcion: 'Agregar tests e2e',
       iteracion: 'Kepler',
-      fecha: '2025-11-25',
+      fecha: fechaFutura(),
     })
 
     await verificarTarea(page, tareaId, {

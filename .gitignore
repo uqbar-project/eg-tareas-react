@@ -31,5 +31,6 @@ coverage/
 backend/
 
 # Playwright test results
+test-results/
 test-results/plans/
 plans/

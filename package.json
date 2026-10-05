@@ -17,7 +17,7 @@
     "coverage": "vitest run --coverage",
     "clean": "rm -rf dist node_modules coverage",
     "start-backend": "bash ./scripts/start-backend.sh",
-    "test:e2e": "start-server-and-test 'pnpm run start-backend' http://localhost:9000/health 'pnpm exec playwright test'",
+    "test:e2e": "start-server-and-test 'bash ./scripts/start-backend.sh' http://localhost:9000/health 'pnpm exec playwright test'",
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
