@@ -1,3 +1,14 @@
+export type ValidationError = {
+  field: string
+  message: string
+}
+
+export const obtenerErrorPorCampo = (
+  errores: ValidationError[],
+  campo: string
+): string | undefined => errores.find((error) => error.field === campo)?.message
+
+import { parse, isBefore, startOfDay } from 'date-fns'
 import { Usuario } from './usuario'
 
 const PORCENTAJE_CUMPLIDA = 100
@@ -105,6 +116,31 @@ export class Tarea {
       asignadoA: this.nombreAsignatario,
     }
   }
+
+
+  validarCreacion(): ValidationError[] {
+    const errores: ValidationError[] = []
+
+    const descripcionValida = this.descripcion?.trim()
+    if (!descripcionValida) {
+      errores.push({ field: 'descripcion', message: 'La descripción es obligatoria' })
+    }
+
+    const fechaIngresada = this.fecha
+    if (!fechaIngresada) {
+      errores.push({ field: 'fecha', message: 'La fecha debe ser mayor o igual a la fecha de hoy' })
+    } else {
+      const hoy = startOfDay(new Date())
+      const fechaTarea = startOfDay(parse(fechaIngresada, 'yyyy-MM-dd', new Date()))
+
+      if (isBefore(fechaTarea, hoy)) {
+        errores.push({ field: 'fecha', message: 'La fecha debe ser mayor o igual a la fecha de hoy' })
+      }
+    }
+
+    return errores
+  }
+
 
   validarAsignacion() {
     if (!this.nombreAsignatario) {

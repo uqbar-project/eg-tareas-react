@@ -2,3 +2,8 @@ packages:
   - .
 allowBuilds:
   '@swc/core': true
+minimumReleaseAgeExclude:
+  - data-urls@8.0.0
+  - jsdom@30.1.2
+  - tr46@7.0.0
+  - whatwg-url@17.2.0

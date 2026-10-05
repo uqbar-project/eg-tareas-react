@@ -201,12 +201,62 @@ function runTests() {
       expect(screen.getByTestId('crear')).toBeTruthy()
     })
 
+    const hoy = new Date()
+    const fechaValida = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+
+    await userEvent.type(screen.getByTestId('descripcion'), 'Nueva tarea')
+    const fechaInput = screen.getByTestId('fecha') as HTMLInputElement
+    await userEvent.clear(fechaInput)
+    await userEvent.type(fechaInput, fechaValida)
+    const selectAsignatario = screen.getByTestId('asignatario') as HTMLSelectElement
+    await userEvent.selectOptions(selectAsignatario, 'Misia Pataca')
+
     await userEvent.click(screen.getByTestId('crear'))
 
     await waitFor(() => {
       expect(screen.getByText('Error al crear')).toBeTruthy()
     })
   })
+
+
+  test('muestra errores debajo de cada campo cuando la validación falla', async () => {
+    render(
+      <MemoryRouter initialEntries={['/crearTarea']} initialIndex={0}>
+        <Routes>
+          <Route path="/" element={<PaginadorLayout />}>
+            <Route path="/crearTarea" element={<CrearTareaComponent />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('crear')).toBeTruthy()
+    })
+
+    const ayer = new Date()
+    ayer.setDate(ayer.getDate() - 1)
+    const fechaAyer = `${ayer.getFullYear()}-${String(ayer.getMonth() + 1).padStart(2, '0')}-${String(ayer.getDate()).padStart(2, '0')}`
+    const fechaInput = screen.getByTestId('fecha') as HTMLInputElement
+    await userEvent.clear(fechaInput)
+    await userEvent.type(fechaInput, fechaAyer)
+
+    await userEvent.click(screen.getByTestId('crear'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('error-descripcion')).toBeTruthy()
+      expect(screen.getByTestId('error-descripcion').textContent).toBe(
+        'La descripción es obligatoria'
+      )
+      expect(screen.getByTestId('error-fecha')).toBeTruthy()
+      expect(screen.getByTestId('error-fecha').textContent).toBe(
+        'La fecha debe ser mayor o igual a la fecha de hoy'
+      )
+    })
+
+    expect(spyPostAxios.mock.calls.length).toBe(0)
+  })
+
 
   test('al cancelar se vuelve atras', async () => {
     render(

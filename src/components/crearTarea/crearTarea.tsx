@@ -2,7 +2,7 @@ import { type ChangeEvent, useId, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
 import { showToast } from '@/customHooks/useToast'
-import { Tarea, type TareaJSON } from '@/domain/tarea'
+import { Tarea, type TareaJSON, type ValidationError, obtenerErrorPorCampo } from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
@@ -14,6 +14,7 @@ export const CrearTareaComponent = () => {
   const { agregarTarea } = useOutletContext<PaginadorContextType>()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([])
   const navigate = useNavigate()
 
   const descripcionId = useId()
@@ -74,6 +75,12 @@ export const CrearTareaComponent = () => {
   }
 
   const crear = async () => {
+    const erroresValidacion = tarea.validarCreacion()
+    if (erroresValidacion.length > 0) {
+      setValidationErrors(erroresValidacion)
+      return
+    }
+    setValidationErrors([])
     try {
       const response = await tareaService.crearTarea(tarea)
       const tareaCreada = Tarea.fromJson(response.data as TareaJSON)
@@ -105,6 +112,11 @@ export const CrearTareaComponent = () => {
           className="formControl"
         />
       </div>
+      {obtenerErrorPorCampo(validationErrors, 'descripcion') && (
+        <div data-testid="error-descripcion" className="error">
+          {obtenerErrorPorCampo(validationErrors, 'descripcion')}
+        </div>
+      )}
       <label className="fieldLabel" htmlFor={iteracionId}>
         Iteración
       </label>
@@ -131,6 +143,11 @@ export const CrearTareaComponent = () => {
           className="formControl"
         />
       </div>
+      {obtenerErrorPorCampo(validationErrors, 'fecha') && (
+        <div data-testid="error-fecha" className="error">
+          {obtenerErrorPorCampo(validationErrors, 'fecha')}
+        </div>
+      )}
       <label className="fieldLabel" htmlFor={asignatarioId}>
         Asignatario
       </label>
