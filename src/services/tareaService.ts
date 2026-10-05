@@ -30,7 +30,8 @@ class TareaService {
   }
   async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
     const tareasResult = await this.getInternalTareas(paginationData)
-    if (!tareasResult.data) {
+    const tareasBackend = tareasResult.data
+    if (!tareasBackend || !Array.isArray(tareasBackend)) {
       throw new Error(
         'La búsqueda de tareas no trajo resultados, revise la configuración de la aplicación (por ejemplo el paginado)'
       )
