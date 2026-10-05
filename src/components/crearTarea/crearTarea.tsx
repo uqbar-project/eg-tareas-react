@@ -2,7 +2,12 @@ import { type ChangeEvent, useId, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
 import { showToast } from '@/customHooks/useToast'
-import { Tarea, type TareaJSON, type ValidationError, obtenerErrorPorCampo } from '@/domain/tarea'
+import {
+  obtenerErrorPorCampo,
+  Tarea,
+  type TareaJSON,
+  type ValidationError,
+} from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
@@ -14,7 +19,9 @@ export const CrearTareaComponent = () => {
   const { agregarTarea } = useOutletContext<PaginadorContextType>()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [tarea, setTarea] = useState(new Tarea())
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([])
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  )
   const navigate = useNavigate()
 
   const descripcionId = useId()

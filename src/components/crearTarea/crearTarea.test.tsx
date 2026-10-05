@@ -208,7 +208,9 @@ function runTests() {
     const fechaInput = screen.getByTestId('fecha') as HTMLInputElement
     await userEvent.clear(fechaInput)
     await userEvent.type(fechaInput, fechaValida)
-    const selectAsignatario = screen.getByTestId('asignatario') as HTMLSelectElement
+    const selectAsignatario = screen.getByTestId(
+      'asignatario'
+    ) as HTMLSelectElement
     await userEvent.selectOptions(selectAsignatario, 'Misia Pataca')
 
     await userEvent.click(screen.getByTestId('crear'))
@@ -217,7 +219,6 @@ function runTests() {
       expect(screen.getByText('Error al crear')).toBeTruthy()
     })
   })
-
 
   test('muestra errores debajo de cada campo cuando la validación falla', async () => {
     render(
@@ -256,7 +257,6 @@ function runTests() {
 
     expect(spyPostAxios.mock.calls.length).toBe(0)
   })
-
 
   test('al cancelar se vuelve atras', async () => {
     render(
