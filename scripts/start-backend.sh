@@ -9,8 +9,20 @@ if [ ! -d "$BACKEND_DIR/.git" ]; then
   echo "Cloning backend into $BACKEND_DIR..."
   git clone "$REPO_URL" "$BACKEND_DIR"
 else
-  echo "Pulling latest changes in $BACKEND_DIR..."
-  (cd "$BACKEND_DIR" && git pull)
+  echo "Updating backend in $BACKEND_DIR..."
+  (
+    cd "$BACKEND_DIR"
+    git fetch origin
+    # La rama default del remoto puede cambiar (p.ej. de master a main):
+    # preguntamos cuál es y la seguimos en vez de asumir una fija.
+    git remote set-head origin -a
+    DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+    echo "Remote default branch is $DEFAULT_BRANCH"
+    git checkout "$DEFAULT_BRANCH"
+    # El clon es descartable (solo sirve para levantar el backend en e2e),
+    # así que sincronizamos exacto con el remoto sin intentar merges.
+    git reset --hard "origin/$DEFAULT_BRANCH"
+  )
 fi
 
 cd "$BACKEND_DIR"
