@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { addDays, format } from 'date-fns'
 
 const NUEVO_USUARIO = 'Eva Dida'
+const URL_BACKEND = 'http://localhost:9000'
 
 const fechaFutura = (diasEnFuturo = 30): string =>
   format(addDays(new Date(), diasEnFuturo), 'yyyy-MM-dd')
@@ -42,15 +43,20 @@ const crearTarea = async (
   return tareaId
 }
 
+// los data-testid de la fila de la tarea, sin el sufijo `_${tareaId}`
+type CampoTarea = 'title' | 'fecha' | 'iteracion' | 'porcentaje' | 'asignatario'
+
 const verificarTarea = async (
   page: Page,
   tareaId: number,
-  campos: Record<string, string>
+  campos: Partial<Record<CampoTarea, string>>
 ) => {
   await expect(page.getByTestId(`tarea_${tareaId}`)).toBeVisible()
-  for (const [campo, valor] of Object.entries(campos)) {
-    await expect(page.getByTestId(`${campo}_${tareaId}`)).toHaveText(valor)
-  }
+  await Promise.all(
+    (Object.entries(campos) as [CampoTarea, string][]).map(([campo, valor]) =>
+      expect(page.getByTestId(`${campo}_${tareaId}`)).toHaveText(valor)
+    )
+  )
 }
 
 const editarTarea = async (
@@ -107,7 +113,7 @@ test.describe('flujo principal', () => {
   let asignatarioId: number
 
   test.beforeEach(async ({ request }) => {
-    const response = await request.post('http://localhost:9000/usuarios', {
+    const response = await request.post(`${URL_BACKEND}/usuarios`, {
       data: { nombre: NUEVO_USUARIO },
     })
     expect(response.ok()).toBeTruthy()
@@ -117,7 +123,7 @@ test.describe('flujo principal', () => {
 
   test.afterEach(async ({ request }) => {
     const response = await request.delete(
-      `http://localhost:9000/usuarios/${asignatarioId}`
+      `${URL_BACKEND}/usuarios/${asignatarioId}`
     )
     expect(response.ok()).toBeTruthy()
   })
