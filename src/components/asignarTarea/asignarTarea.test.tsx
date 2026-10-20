@@ -319,6 +319,7 @@ function runTests() {
 
   test('cuando la tarea no está en la lista local se muestra toast', async () => {
     spyPutAxios.mockReset()
+    spyPutAxios.mockResolvedValue({ data: mockTareaJSON })
     spyGetAxios.mockReset()
     spyGetAxios.mockImplementation((url: string) => {
       if (url.includes('/usuarios')) {

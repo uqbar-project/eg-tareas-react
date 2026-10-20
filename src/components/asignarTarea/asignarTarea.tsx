@@ -3,7 +3,7 @@ import { type ChangeEvent, useId, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useOnInit } from '@/customHooks/hooks'
 import { showToast } from '@/customHooks/useToast'
-import { Tarea } from '@/domain/tarea'
+import { Tarea, type TareaJSON } from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
 import type { PaginadorContextType } from '@/routes'
 import { tareaService } from '@/services/tareaService'
@@ -68,8 +68,9 @@ export const AsignarTareaComponent = () => {
   const aceptarCambios = async () => {
     try {
       tarea.validarAsignacion()
-      await tareaService.actualizarTarea(tarea)
-      actualizarTarea(tarea)
+      const response = await tareaService.actualizarTarea(tarea)
+      const tareaActualizada = Tarea.fromJson(response.data as TareaJSON)
+      actualizarTarea(tareaActualizada)
       volver()
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error)
