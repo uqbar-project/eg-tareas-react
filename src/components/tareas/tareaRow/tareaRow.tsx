@@ -3,7 +3,7 @@ import { Asignatario } from '@/components/asignatario/asignatario'
 import { Icono } from '@/components/common/Icono'
 import { PorcentajeCumplimiento } from '@/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { useToast } from '@/customHooks/useToast'
-import { Tarea, type TareaJSON } from '@/domain/tarea'
+import type { Tarea } from '@/domain/tarea'
 import { tareaService } from '@/services/tareaService'
 import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
 

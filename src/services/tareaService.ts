@@ -48,12 +48,18 @@ class TareaService {
   }
 
   async actualizarTarea(tarea: Tarea): Promise<Tarea> {
-    const { data: tareaJSON } = await axios.put<TareaJSON>(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+    const { data: tareaJSON } = await axios.put<TareaJSON>(
+      `${REST_SERVER_URL}/tareas/${tarea.id}`,
+      tarea.toJSON()
+    )
     return Tarea.fromJson(tareaJSON)
   }
 
   async crearTarea(tarea: Tarea): Promise<Tarea> {
-    const { data: tareaJSON } = await axios.post<TareaJSON>(`${REST_SERVER_URL}/tareas`, tarea.toJSON())
+    const { data: tareaJSON } = await axios.post<TareaJSON>(
+      `${REST_SERVER_URL}/tareas`,
+      tarea.toJSON()
+    )
     return Tarea.fromJson(tareaJSON)
   }
 
