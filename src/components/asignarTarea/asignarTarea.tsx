@@ -68,8 +68,7 @@ export const AsignarTareaComponent = () => {
   const aceptarCambios = async () => {
     try {
       tarea.validarAsignacion()
-      const response = await tareaService.actualizarTarea(tarea)
-      const tareaActualizada = Tarea.fromJson(response.data as TareaJSON)
+      const tareaActualizada = await tareaService.actualizarTarea(tarea)
       actualizarTarea(tareaActualizada)
       volver()
     } catch (error: unknown) {

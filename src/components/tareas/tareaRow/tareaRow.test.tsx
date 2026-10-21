@@ -1,9 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { AxiosResponse } from 'axios'
 import { BrowserRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import type { Tarea } from '@/domain/tarea'
+import { Tarea } from '@/domain/tarea'
 import { tareaService } from '@/services/tareaService'
 import { crearTarea } from '@/testUtils/crearTarea'
 import { TareaRow } from './tareaRow'
@@ -30,9 +29,7 @@ describe('TareaRow', () => {
 
     beforeEach(() => {
       vi.mocked(tareaService.actualizarTarea).mockReset()
-      vi.mocked(tareaService.actualizarTarea).mockResolvedValue({
-        data: {},
-      } as AxiosResponse<Tarea>)
+      vi.mocked(tareaService.actualizarTarea).mockResolvedValue(new Tarea())
       tareaAsignada = crearTarea(
         159,
         'Construir test TODO List',

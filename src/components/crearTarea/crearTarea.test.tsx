@@ -149,7 +149,16 @@ function runTests() {
   })
 
   test('al crear la tarea se llama al servicio POST y se vuelve atras', async () => {
-    spyPostAxios.mockResolvedValue({ data: { id: 999 } })
+    spyPostAxios.mockResolvedValue({
+      data: {
+        id: 999,
+        descripcion: 'Nueva tarea',
+        iteracion: '',
+        porcentajeCumplimiento: 0,
+        fecha: '20/10/2026',
+        asignadoA: 'Misia Pataca',
+      },
+    })
 
     render(
       <MemoryRouter initialEntries={['/crearTarea']} initialIndex={0}>

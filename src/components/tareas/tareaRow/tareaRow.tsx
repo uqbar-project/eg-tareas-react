@@ -22,8 +22,7 @@ export const TareaRow = ({
     // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
       tarea.cumplir()
-      const response = await tareaService.actualizarTarea(tarea)
-      const tareaActualizada = Tarea.fromJson(response.data as TareaJSON)
+      const tareaActualizada = await tareaService.actualizarTarea(tarea)
       await actualizar(tareaActualizada)
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)

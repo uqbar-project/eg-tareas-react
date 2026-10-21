@@ -47,12 +47,14 @@ class TareaService {
     return tareaAsJson(tareaJson.data)
   }
 
-  actualizarTarea(tarea: Tarea) {
-    return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+  async actualizarTarea(tarea: Tarea): Promise<Tarea> {
+    const { data: tareaJSON } = await axios.put<TareaJSON>(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+    return Tarea.fromJson(tareaJSON)
   }
 
-  crearTarea(tarea: Tarea) {
-    return axios.post(`${REST_SERVER_URL}/tareas`, tarea.toJSON())
+  async crearTarea(tarea: Tarea): Promise<Tarea> {
+    const { data: tareaJSON } = await axios.post<TareaJSON>(`${REST_SERVER_URL}/tareas`, tarea.toJSON())
+    return Tarea.fromJson(tareaJSON)
   }
 
   eliminarTarea(id: number) {

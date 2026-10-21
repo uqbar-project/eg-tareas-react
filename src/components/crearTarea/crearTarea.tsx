@@ -5,7 +5,6 @@ import { showToast } from '@/customHooks/useToast'
 import {
   obtenerErrorPorCampo,
   Tarea,
-  type TareaJSON,
   type ValidationError,
 } from '@/domain/tarea'
 import type { Usuario } from '@/domain/usuario'
@@ -89,8 +88,7 @@ export const CrearTareaComponent = () => {
     }
     setValidationErrors([])
     try {
-      const response = await tareaService.crearTarea(tarea)
-      const tareaCreada = Tarea.fromJson(response.data as TareaJSON)
+      const tareaCreada = await tareaService.crearTarea(tarea)
       await agregarTarea(tareaCreada)
       volver()
     } catch (error: unknown) {
