@@ -1,9 +1,4 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useState,
-} from 'react'
+import { type Dispatch, type SetStateAction, useState } from 'react'
 import {
   Link,
   Outlet,
@@ -26,7 +21,7 @@ export type PaginadorContextType = {
   tareas: Tarea[]
   setTareas: Dispatch<SetStateAction<Tarea[]>>
   hasMore: boolean
-  traerMasTareas: () => Promise<Tarea[]>
+  traerTareas: () => Promise<void>
   actualizarTarea: (tarea: Tarea) => Promise<Tarea[]>
   agregarTarea: (tarea: Tarea) => Promise<Tarea[]>
   eliminarTarea: (id: number) => Promise<Tarea[]>
@@ -37,32 +32,28 @@ const pageSize = 10
 export const PaginadorLayout = () => {
   const [tareas, setTareas] = useState<Tarea[]>([])
   const [hasMore, setHasMore] = useState(false)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const { toast } = useToast()
 
-  const getTareas = useCallback(async (newPage: number, init = false) => {
+  const getTareas = async (newPage: number) => {
     try {
       const { tareas, hasMore } = await tareaService.getTareas({
         page: newPage,
         limit: pageSize,
       })
       setHasMore(hasMore)
-      setTareas((oldTareas) => (init ? [] : oldTareas).concat(tareas))
+      setTareas((oldTareas) => oldTareas.concat(tareas))
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)
       showToast(errorMessage, 'error')
     }
-  }, [])
+  }
 
-  const traerMasTareas = async () => {
+  const traerTareas = async () => {
     const newPage = page + 1
     getTareas(newPage)
     setPage(newPage)
   }
-
-  const traerTareas = useCallback(async () => {
-    getTareas(page, true)
-  }, [page, getTareas])
 
   const actualizarTarea = async (tareaActualizada: Tarea) => {
     const nuevasTareas = [...tareas]
@@ -103,7 +94,7 @@ export const PaginadorLayout = () => {
             tareas,
             setTareas,
             hasMore,
-            traerMasTareas,
+            traerTareas,
             actualizarTarea,
             agregarTarea,
             eliminarTarea,

@@ -14,32 +14,22 @@ export interface TareasPaginadas {
 }
 
 class TareaService {
-  private async getInternalTareas(paginationData: PaginationData) {
-    if (PAGINATION_CONFIG.enabled) {
-      const tareasJson = await axios.get(
-        `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
-      )
-      const tareasResult = tareasJson.data
-      return tareasResult
-    } else {
-      return {
-        hasMore: false,
-        data: (await axios.get(`${REST_SERVER_URL}/tareas`)).data,
-      }
-    }
-  }
   async getTareas(paginationData: PaginationData): Promise<TareasPaginadas> {
-    const tareasResult = await this.getInternalTareas(paginationData)
-    const tareasBackend = tareasResult.data
-    if (!tareasBackend || !Array.isArray(tareasBackend)) {
+    const url = PAGINATION_CONFIG.enabled
+      ? `${REST_SERVER_URL}/tareas?page=${paginationData?.page || 1}&limit=${paginationData?.limit || 10}`
+      : `${REST_SERVER_URL}/tareas`
+    const { data: responseData } = await axios.get(url)
+    const hasMore = PAGINATION_CONFIG.enabled ? responseData?.hasMore : false
+    const tareasJson = PAGINATION_CONFIG.enabled
+      ? responseData?.data
+      : responseData
+    if (!Array.isArray(tareasJson)) {
       throw new Error(
         'La búsqueda de tareas no trajo resultados, revise la configuración de la aplicación (por ejemplo el paginado)'
       )
     }
-    const tareas = tareasResult.data.map((tareaJson: TareaJSON) =>
-      Tarea.fromJson(tareaJson)
-    ) // o ... this.tareaAsJson
-    return { tareas, hasMore: tareasResult.hasMore }
+    const tareas = tareasJson.map(tareaAsJson)
+    return { tareas, hasMore }
   }
 
   async getTareaById(id: number) {

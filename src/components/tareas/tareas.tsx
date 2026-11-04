@@ -8,7 +8,7 @@ const TareaRow = React.lazy(() => import('./tareaRow/tareaRow'))
 
 export const TareasComponent = () => {
   const navigate = useNavigate()
-  const { tareas, hasMore, traerMasTareas, actualizarTarea } =
+  const { tareas, hasMore, traerTareas, actualizarTarea } =
     useOutletContext<PaginadorContextType>()
 
   const goToCrearTarea = () => {
@@ -51,7 +51,7 @@ export const TareasComponent = () => {
                 <tr>
                   <td colSpan={3} data-testid="fallback_tareas">
                     <span aria-live="polite" aria-busy="true">
-                      Cargando filas...
+                      Cargando tareas...
                     </span>
                   </td>
                 </tr>
@@ -91,7 +91,7 @@ export const TareasComponent = () => {
             type="button"
             className="buttonRow secondary"
             data-testid="mas_tareas"
-            onClick={traerMasTareas}
+            onClick={traerTareas}
             aria-label="Cargar más tareas"
           >
             Ver más tareas
