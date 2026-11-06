@@ -799,18 +799,34 @@ export const TareaRow = ({ tarea, actualizar }: { tarea: Tarea, actualizar: () =
   }
 ```
 
-**Este comportamiento ya no nos sirve** porque traerTareas nos devuelve la lista de tareas pero únicamente con la página actual. En lugar de eso vamos a pedirle al backend que nos devuelva la tarea actualizada:
+**Este comportamiento ya no nos sirve** porque `traerTareas` devuelve únicamente la página actual. En lugar de recargar la lista, pedimos al backend que nos devuelva la tarea actualizada:
 
 ```ts
 // tareaService
-actualizarTarea(tarea: Tarea) {
-  return axios.put(`${REST_SERVER_URL}/tareas/${tarea.id}`, tarea.toJSON())
+async actualizarTarea(tarea: Tarea): Promise<Tarea> {
+  const { data: tareaJSON } = await axios.put<TareaJSON>(
+    `${REST_SERVER_URL}/tareas/${tarea.id}`,
+    tarea.toJSON()
+  )
+  return Tarea.fromJson(tareaJSON)
 }
 ```
 
-Y ahora desde el componente principal vamos a pasarle a cada TareaRow una función que toma únicamente la tarea cumplida y regenera la lista que tiene en el estado actual:
+El componente crea una copia de la tarea antes de cumplirla. Así, si falla el pedido al backend, el objeto que ya está en el estado de React conserva sus datos originales. Cuando la actualización tiene éxito, `actualizarTarea` reemplaza la tarea correspondiente en el estado:
 
 ```tsx
+const cumplirTarea = async () => {
+  try {
+    const tareaParaCumplir = Tarea.fromJson(tarea.toJSON())
+    tareaParaCumplir.cumplir()
+    const tareaActualizada =
+      await tareaService.actualizarTarea(tareaParaCumplir)
+    await actualizar(tareaActualizada)
+  } catch (error: unknown) {
+    showToast(getMensajeError(error), 'error')
+  }
+}
+
   const actualizarTarea = async (tareaActualizada: Tarea) => {
     const nuevasTareas = [...tareas]
     const indexTarea = nuevasTareas.findIndex((tareaSearch: Tarea) => tareaSearch.id === tareaActualizada.id)
@@ -829,6 +845,16 @@ Y ahora desde el componente principal vamos a pasarle a cada TareaRow una funci�
 
 De esa manera reemplazamos la lista original con una nueva lista que tiene la tarea cumplida en el mismo lugar.
 
+### Manejo de errores
+
+`getMensajeError` recibe errores como `unknown` y diferencia los errores HTTP de Axios de otros errores:
+
+- Para respuestas `4xx`, muestra el mensaje no vacío enviado por el backend; si no hay uno válido, utiliza el mensaje de Axios.
+- Para respuestas `5xx` y errores de conexión, registra el error en consola y muestra un mensaje genérico.
+- Para otros objetos `Error`, registra y muestra su mensaje, o un mensaje genérico si está vacío. Los valores que no son errores muestran un mensaje genérico.
+
+La app usa `React.StrictMode`. Para evitar repetir la carga inicial durante la doble ejecución de efectos que React hace en desarrollo, `useOnInit` asegura que su callback se ejecute una sola vez por montaje.
+
 ## Una última mejora: Suspense + Lazy loading
 
 Desde la versión 16, React trae el componente [Suspense](https://es.react.dev/reference/react/Suspense), que permite mostrar una interfaz alternativa hasta que sus hijos hayan terminado de cargar.
@@ -838,4 +864,3 @@ Además vamos a cargar el componente TareaRow de forma [lazy](https://react.dev/
 Para ver el _fallback_ de nuestro nuevo componente Suspense, vamos a la solapa Network y seleccionamos la opción `Slow 4G`, que simula una red con una conexión 4G lenta. Allí vemos que inicialmente aparece una fila que dice "Cargando filas..." y cuando terminan de traerse las tareas del backend se reemplaza el _fallback_ por la lista de TareaRow.
 
 ![React suspense en acción](./images/React.suspense.gif)
-
