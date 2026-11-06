@@ -1,9 +1,23 @@
-import { isAxiosError } from 'axios'
-
 const MENSAJE_ERROR = 'Ocurrió un error. Consulte al administrador del sistema'
 
 const MENSAJE_ERROR_BACKEND =
   'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema'
+
+type AxiosLikeError = {
+  isAxiosError: true
+  message: string
+  status?: number
+  response?: {
+    status: number
+    data: unknown
+  }
+}
+
+const isAxiosLikeError = (error: unknown): error is AxiosLikeError =>
+  typeof error === 'object' &&
+  error !== null &&
+  'isAxiosError' in error &&
+  error.isAxiosError === true
 
 const obtenerMensajeBackend = (data: unknown): string | undefined => {
   if (
@@ -20,7 +34,7 @@ const obtenerMensajeBackend = (data: unknown): string | undefined => {
 }
 
 export const getMensajeError = (error: unknown): string => {
-  if (isAxiosError(error)) {
+  if (isAxiosLikeError(error)) {
     const status = error.response?.status ?? error.status
 
     if (status !== undefined && status >= 400 && status < 500) {
