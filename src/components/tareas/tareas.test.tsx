@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import axios from 'axios'
+import { StrictMode } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import {
   afterEach,
@@ -91,6 +92,31 @@ describe('TareasComponent con paginador activado', () => {
         expect(screen.getAllByRole('row')).not.toHaveLength(0)
       })
       expect(screen.queryByTestId('mas_tareas')).toBeNull()
+    })
+
+    test('en StrictMode no duplica la carga inicial', async () => {
+      const spyGetAxios = vi.spyOn(axios, 'get')
+      spyGetAxios.mockReset()
+      spyGetAxios.mockResolvedValue({
+        data: {
+          hasMore: false,
+          data: mockTareasData,
+        },
+      })
+
+      render(
+        <StrictMode>
+          <BrowserRouter>
+            <TareasRoutes />
+          </BrowserRouter>
+        </StrictMode>
+      )
+
+      await screen.findByTestId('tarea_68')
+      await screen.findByTestId('tarea_159')
+      expect(spyGetAxios).toHaveBeenCalledTimes(1)
+      expect(screen.getAllByTestId('tarea_68')).toHaveLength(1)
+      expect(screen.getAllByTestId('tarea_159')).toHaveLength(1)
     })
 
     afterEach(() => {
