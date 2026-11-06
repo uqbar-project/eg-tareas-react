@@ -3,7 +3,7 @@ import { Asignatario } from '@/components/asignatario/asignatario'
 import { Icono } from '@/components/common/Icono'
 import { PorcentajeCumplimiento } from '@/components/porcentajeCumplimiento/porcentajeCumplimiento'
 import { useToast } from '@/customHooks/useToast'
-import type { Tarea } from '@/domain/tarea'
+import { Tarea } from '@/domain/tarea'
 import { tareaService } from '@/services/tareaService'
 import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
 
@@ -19,10 +19,11 @@ export const TareaRow = ({
   const { showToast } = useToast()
 
   const cumplirTarea = async () => {
-    // debugger // para mostrar que no se cambia la ui despues de hacer tarea.cumplir()
     try {
-      tarea.cumplir()
-      const tareaActualizada = await tareaService.actualizarTarea(tarea)
+      const tareaParaCumplir = Tarea.fromJson(tarea.toJSON())
+      tareaParaCumplir.cumplir()
+      const tareaActualizada =
+        await tareaService.actualizarTarea(tareaParaCumplir)
       await actualizar(tareaActualizada)
     } catch (error: unknown) {
       const errorMessage = getMensajeError(error as ErrorResponse)
