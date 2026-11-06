@@ -7,7 +7,7 @@ import {
   Routes,
 } from 'react-router-dom'
 import { tareaService } from '@/services/tareaService'
-import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
+import { getMensajeError } from '@/utils/errorHandling'
 import { AsignarTareaComponent } from './components/asignarTarea/asignarTarea'
 import { Toast } from './components/common/toast'
 import { CrearTareaComponent } from './components/crearTarea/crearTarea'
@@ -44,7 +44,7 @@ export const PaginadorLayout = () => {
       setHasMore(hasMore)
       setTareas((oldTareas) => oldTareas.concat(tareas))
     } catch (error: unknown) {
-      const errorMessage = getMensajeError(error as ErrorResponse)
+      const errorMessage = getMensajeError(error)
       showToast(errorMessage, 'error')
     }
   }

@@ -5,7 +5,7 @@ import { PorcentajeCumplimiento } from '@/components/porcentajeCumplimiento/porc
 import { useToast } from '@/customHooks/useToast'
 import { Tarea } from '@/domain/tarea'
 import { tareaService } from '@/services/tareaService'
-import { type ErrorResponse, getMensajeError } from '@/utils/errorHandling'
+import { getMensajeError } from '@/utils/errorHandling'
 
 export const TareaRow = ({
   tarea,
@@ -26,7 +26,7 @@ export const TareaRow = ({
         await tareaService.actualizarTarea(tareaParaCumplir)
       await actualizar(tareaActualizada)
     } catch (error: unknown) {
-      const errorMessage = getMensajeError(error as ErrorResponse)
+      const errorMessage = getMensajeError(error)
       showToast(errorMessage, 'error')
     }
   }
